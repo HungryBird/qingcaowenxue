@@ -88,7 +88,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '微信管理',
-      icon: '404'
+      icon: 'wechat'
     },
     children: [
       {
@@ -96,6 +96,25 @@ export const asyncRoutes = [
         component: () => import('@/pages/wechat/index'),
         name: 'BaseConfig',
         meta: { title: '基本配置' }
+      }
+    ]
+  },
+  {
+    path: '/proxy',
+    component: Layout,
+    redirect: '/proxy/list',
+    name: 'proxy',
+    alwaysShow: true,
+    meta: {
+      title: '代理管理',
+      icon: 'peoples'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/proxy/list'),
+        name: 'proxy-list',
+        meta: { title: '代理列表' }
       }
     ]
   }
