@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div v-if="current === 'add'">
+    <div v-if="current === 'add' || current === 'edit'">
       <el-tabs v-model="add.active" @tab-click="handleClick">
         <el-tab-pane label="基本信息" name="first">
           <el-form label-position="left" label-width="100px">
@@ -103,37 +103,307 @@
                 </el-form-item>
               </el-col>
             </el-row>
+            <el-row v-show="add.form.payMethod === 'bankcard'">
+              <el-col :span="24">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="持卡人姓名：" prop="name">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="银行卡号：" prop="password">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="开户行：" prop="password">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row v-show="add.form.payMethod === 'alipay'">
+              <el-col :span="24">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="账号：" prop="name">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="姓名：" prop="password">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row v-show="add.form.payMethod === 'wechat'">
+              <el-col :span="24">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="微信号：" prop="name">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="昵称：" prop="password">
+                      <el-input v-model="add.form.password" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="等级划分" name="fourth">
+          <el-form label-position="left" label-width="100px">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="登录密码：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
+                <el-form-item label="等级：" prop="username">
+                  <el-select filterable>
+                    <el-option value="admin">admin</el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="登录密码：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="登录密码：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
+                <el-form-item label="备注：" prop="level">
+                  <el-input type="textarea" />
                 </el-form-item>
               </el-col>
             </el-row>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="等级划分" name="fourth">等级划分</el-tab-pane>
+        <el-tab-pane v-if="current === 'edit'" label="联系信息" name="five">
+          <el-form label-position="left" label-width="100px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="联系人姓名：" prop="level">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="联系电话：" prop="level">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="公司名称：" prop="level">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="对接公众号昵称：" prop="level">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
       </el-tabs>
       <div />
       <el-button type="success">保存</el-button>
-      <el-button type="danger" @click="toggleCurrent">返回</el-button>
+      <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
-    <div v-else-if="current === 'edit'">
-      <div>编辑</div>
+    <div v-else-if="current === 'wechatConfig'">
+      <el-tabs v-model="wechatConfig.active">
+        <el-tab-pane label="公众号配置" name="gzhpz">
+          <el-form label-position="left" label-width="100px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="类型：" prop="username">
+                  <el-radio>
+                    认证服务号
+                  </el-radio>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="原始ID：" prop="level">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                注意: 上线后请不要更改公众号，否则会影响先前的粉丝，如需换号请申请开新号
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="微信号：" prop="password">
+                  <el-input v-model="add.form.password" type="password" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="微信公众号名称：" prop="password">
+                  <el-input v-model="add.form.password" type="password" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="App ID：" prop="password">
+                  <el-input v-model="add.form.password" type="password" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="App Secret：" prop="password">
+                  <el-input v-model="add.form.password" type="password" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="客服二维码：" prop="switch">
+                  <el-upload
+                    class="upload-demo"
+                    :multiple="false"
+                    :limit="1"
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :file-list="wechatConfig.kefu"
+                    :on-success="onUploadKefuSuccess"
+                    list-type="picture"
+                  >
+                    <el-button size="small" type="primary">点击上传</el-button>
+                  </el-upload>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane name="gzhjr" label="公众号接入">
+          <el-row>
+            <el-col :span="12">
+              <el-alert
+                title="注意: 接入公众号必须是&quot;认证服务号&quot;"
+                :closable="false"
+              />
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12" style="line-height: 36px;">
+              公众号设置 (微信后台 > 公众号设置 > 功能设置)
+            </el-col>
+          </el-row>
+          <el-form label-width="187px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="业务域名：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="JS接口安全域名：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="网页授权域名：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col style="line-height: 36px;" :span="12">
+                公众号回复 (微信后台 > 基本配置)
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="URL(服务器地址)：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="Token(令牌)：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-button type="success">
+                  生成token
+                </el-button>
+              </el-col>
+            </el-row>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="EncodingAESKey(消息加解密密钥)：">
+                  <el-input :disabled="true" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-button type="success">
+                  生成解密秘钥
+                </el-button>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="消息加解密方式：">
+                  明文模式
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane name="qdpz" label="签到配置">
+          <el-form label-width="187px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="签到送书币：">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="连续签到书币：">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="最高赠送书币：">
+                  <el-input />
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+      <el-button type="success">保存</el-button>
+      <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else>
       <div class="filter-container">
@@ -155,13 +425,13 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              <el-button type="primary" size="mini" @click="recommend(row)">
                 推荐微信菜单
               </el-button>
-              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              <el-button type="primary" size="mini" @click="setWechatConfig(row)">
                 微信配置
               </el-button>
-              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              <el-button type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
             </div>
@@ -194,6 +464,13 @@ export default {
           switch: 'on',
           payMethod: 'bankcard'
         }
+      },
+      wechatConfig: {
+        form: {
+          kefu: ''
+        },
+        active: 'gzhpz',
+        kefu: []
       },
       current: '',
       table: {
@@ -278,8 +555,48 @@ export default {
     sortChange() {
       //
     },
-    handleClick() {
+    handleClick(row) {
+      console.log('handleClick: ', row)
+    },
+    recommend(row) {
+      this.$confirm('确认要推荐微信菜单吗?此操作覆盖之前的菜单，新的菜单生效时间24小时内!', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '推送成功!'
+        })
+      }).catch(() => {
+        //
+      })
+    },
+    setWechatConfig(row) {
+      this.toggleCurrent('wechatConfig')
+      for (const key in row) {
+        if (row.hasOwnProperty(key)) {
+          this.$set(this.wechatConfig.form, key, row[key])
+        }
+      }
+    },
+    edit(row) {
+      this.toggleCurrent('edit')
+      for (const key in row) {
+        if (row.hasOwnProperty(key)) {
+          this.$set(this.add.form, key, row[key])
+        }
+      }
+    },
+    handlePreview() {
       //
+    },
+    handleRemove() {
+      //
+    },
+    onUploadKefuSuccess(res, file, fileList) {
+      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
+      this.wechatConfig.kefu = fileList
     }
   }
 }
