@@ -117,6 +117,31 @@ export const asyncRoutes = [
         meta: { title: '代理列表' }
       }
     ]
+  },
+  {
+    path: '/novelManagement',
+    component: Layout,
+    redirect: '/novelManagement/novelManagement',
+    name: 'novelManagement',
+    alwaysShow: true,
+    meta: {
+      title: '小说管理',
+      icon: 'list'
+    },
+    children: [
+      {
+        path: 'novelManagement',
+        component: () => import('@/pages/novelManagement/novelManagement'),
+        name: 'novel-management',
+        meta: { title: '小说管理' }
+      },
+      {
+        path: 'categoriesManagement',
+        component: () => import('@/pages/novelManagement/categoriesManagement'),
+        name: 'catogories-management',
+        meta: { title: '分类管理' }
+      }
+    ]
   }
 ]
 

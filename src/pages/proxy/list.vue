@@ -435,6 +435,13 @@
                 编辑
               </el-button>
             </div>
+            <div v-else-if="cl.prop === 'status'">
+              <el-switch
+                v-model="row.status"
+                active-text="开启"
+                inactive-text="关闭"
+              />
+            </div>
             <div v-else>
               {{ row[cl.prop] }}
             </div>
