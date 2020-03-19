@@ -126,7 +126,8 @@ export default {
         form: {
           switch: 'on',
           payMethod: 'bankcard'
-        }
+        },
+        loading: false
       },
       wechatConfig: {
         form: {
