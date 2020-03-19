@@ -161,6 +161,25 @@ export const asyncRoutes = [
         meta: { title: '推荐位列表' }
       }
     ]
+  },
+  {
+    path: '/financialManagement',
+    component: Layout,
+    redirect: '/financialManagement/proxyOrder',
+    name: 'financial-management',
+    alwaysShow: true,
+    meta: {
+      title: '财务管理',
+      icon: 'money'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/financialManagement/proxyOrder'),
+        name: 'proxy-order',
+        meta: { title: '代理提现单' }
+      }
+    ]
   }
 ]
 
