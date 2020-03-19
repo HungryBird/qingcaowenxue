@@ -142,6 +142,25 @@ export const asyncRoutes = [
         meta: { title: '分类管理' }
       }
     ]
+  },
+  {
+    path: '/recommed',
+    component: Layout,
+    redirect: '/recommend/list',
+    name: 'recommend',
+    alwaysShow: true,
+    meta: {
+      title: '推荐位管理',
+      icon: 'guide'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/recommend/list'),
+        name: 'recommend-list',
+        meta: { title: '推荐位列表' }
+      }
+    ]
   }
 ]
 
