@@ -197,6 +197,12 @@ export const asyncRoutes = [
         component: () => import('@/pages/promoteManagement/list'),
         name: 'promote-list',
         meta: { title: '推广列表' }
+      },
+      {
+        path: 'mass',
+        component: () => import('@/pages/promoteManagement/mass'),
+        name: 'promote-mass',
+        meta: { title: '群发推广' }
       }
     ]
   }
