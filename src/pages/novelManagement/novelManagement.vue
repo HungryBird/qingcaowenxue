@@ -211,7 +211,7 @@
       </div>
     </el-main>
     <!-- 快速进入 -->
-    <el-dialog :visible.sync="dialogTableVisible" :modal="false" :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" width="450px" top="35vh">
+    <el-dialog :visible.sync="dialogTableVisible" :modal="false" :modal-append-to-body="false" :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" width="450px" top="35vh">
       <div slot="title">
         快速进入
       </div>

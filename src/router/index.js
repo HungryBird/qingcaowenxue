@@ -180,6 +180,25 @@ export const asyncRoutes = [
         meta: { title: '代理提现单' }
       }
     ]
+  },
+  {
+    path: '/promoteManagement',
+    component: Layout,
+    redirect: '/promoteManagement/list',
+    name: 'promote-management',
+    alwaysShow: true,
+    meta: {
+      title: '推广管理',
+      icon: 'star'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/promoteManagement/list'),
+        name: 'promote-list',
+        meta: { title: '推广列表' }
+      }
+    ]
   }
 ]
 
