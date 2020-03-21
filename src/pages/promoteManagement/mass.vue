@@ -1,58 +1,77 @@
 <template>
   <div class="app-container">
     <div v-if="current === 'add' || current === 'edit'">
-      <el-form label-position="left" label-width="100px">
+      <el-form ref="add" label-width="200px" :model="add.form" :rules="add.rules">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="管理员账号：" prop="username">
-              <el-select filterable>
-                <el-option value="admin">admin</el-option>
-              </el-select>
+            <el-form-item label="推广名称：" prop="name">
+              <el-input v-model="add.form.name" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="代理级别：" prop="level">
-              <el-select>
-                <el-option value="1">一级代理</el-option>
-                <el-option value="2">二级代理</el-option>
-                <el-option value="3">作者管理员</el-option>
-                <el-option value="4">作者</el-option>
-              </el-select>
+            <el-form-item label="推广链接：" prop="link">
+              <el-input v-model="add.form.link" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="登录密码：" prop="password">
-              <el-input v-model="add.form.password" type="password" />
+            <el-form-item label="封面图片：" prop="img">
+              <el-upload
+                class="upload-demo"
+                :multiple="false"
+                :limit="1"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :on-remove="handleRemove"
+                :file-list="add.list"
+                :on-success="onUploadImgSuccess"
+                list-type="picture"
+              >
+                <el-button size="small" type="primary">点击上传</el-button>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="16">
+            <el-form-item label="推广描述：" prop="descript">
+              <el-input v-model="add.form.descript" type="textarea" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="上级代理：" prop="username">
-              <el-select>
-                <el-option value="1">一级代理</el-option>
-                <el-option value="2">二级代理</el-option>
-                <el-option value="3">作者管理员</el-option>
-                <el-option value="4">作者</el-option>
-              </el-select>
+            <el-form-item label="接受粉丝[充值情况]：" prop="situation">
+              <el-radio-group v-model="add.form.situation">
+                <el-radio label="none">
+                  不限
+                </el-radio>
+                <el-radio label="done">
+                  己充值粉丝
+                </el-radio>
+                <el-radio label="should">
+                  未充值粉丝
+                </el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="代理名称：" prop="username">
-              <el-input />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="手机号码：" prop="username">
-              <el-input type="tel" />
+            <el-form-item label="接受粉丝[性别]：" prop="sex">
+              <el-radio-group v-model="add.form.sex">
+                <el-radio label="none">
+                  不限
+                </el-radio>
+                <el-radio label="male">
+                  男
+                </el-radio>
+                <el-radio label="female">
+                  女
+                </el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
         </el-row>
@@ -70,9 +89,15 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item>
+              <el-button type="success" :loading="add.loading" @click="saveAdd">保存</el-button>
+              <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
-      <el-button type="success">保存</el-button>
-      <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else>
       <div class="filter-container">
@@ -103,7 +128,7 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="recommend(row)">
+              <el-button type="primary" size="mini" @click="send(row)">
                 发送
               </el-button>
               <el-button type="primary" size="mini" @click="edit(row)">
@@ -119,7 +144,7 @@
             <div v-else-if="cl.prop === 'name'">
               <div>
                 推荐精彩文章：医流高手
-                <a href="javascript:;" style="color: #069;">
+                <a style="color: #069;" @click.stop="handleTest(row)">
                   [测试发送]
                 </a>
               </div>
@@ -141,9 +166,29 @@
           </template>
         </el-table-column>
       </el-table>
-
       <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
     </div>
+
+    <!-- 测试发送 -->
+    <el-dialog :visible.sync="test.visible" width="900px" top="35vh" title="测试发送">
+      <el-form ref="test" :model="test.form" :rules="test.rules" label-width="120px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item prop="fanId" label="测试粉丝ID">
+              <el-input v-model="test.form.fanId" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" style="color: #f00;line-height: 2.5;padding-left: 10px;">
+            用测试粉丝帐号点公众号菜单 "用户中心" > "个人中心"。
+          </el-col>
+        </el-row>
+      </el-form>
+      <div style="text-align: center;">
+        <el-button type="primary" @click="toSend">
+          发送
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -158,16 +203,46 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 测试发送
+      test: {
+        visible: false,
+        loading: false,
+        form: {},
+        rules: {
+          fanId: { required: true, message: '请您输入测试粉丝ID' }
+        }
+      },
       search: {
         form: {},
         loading: false
       },
       add: {
-        active: 'first',
+        loading: false,
         form: {
+          name: '',
+          link: '',
+          img: '',
+          descript: '',
+          situation: 'none',
+          sex: 'none',
           switch: 'on',
           payMethod: 'bankcard'
-        }
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入推广名称' }
+          ],
+          link: [
+            { required: true, message: '请输入推广链接' }
+          ],
+          img: [
+            { required: true, message: '请上传推广封面' }
+          ],
+          descript: [
+            { required: true, message: '请输入推广描述' }
+          ]
+        },
+        list: []
       },
       current: '',
       table: {
@@ -185,12 +260,16 @@ export default {
           {
             label: '名称',
             prop: 'name',
-            align: 'center'
+            align: 'left',
+            'header-align': 'center',
+            width: 400
           },
           {
             label: '描述',
             prop: 'descript',
-            align: 'center'
+            align: 'left',
+            'header-align': 'center',
+            width: 400
           },
           {
             label: '接受粉丝[充值情况]',
@@ -216,7 +295,7 @@ export default {
             label: '操作',
             prop: 'action',
             align: 'center',
-            width: 298
+            width: 220
           }
         ],
         data: [],
@@ -237,10 +316,43 @@ export default {
     console.log('router: ', this.$route)
   },
   methods: {
+    // 保存
+    saveAdd() {
+      this.$refs.add.validate(valid => {
+        if (valid) {
+          //
+        }
+      })
+    },
+    // 上传成功
+    onUploadImgSuccess(...args) {
+      //
+    },
+    // 删除上传封面
+    handleRemove() {
+      //
+    },
+    // 开始测试发送
+    toSend() {
+      this.$refs.test.validate(valid => {
+        if (valid) {
+          this.$message({
+            type: 'success',
+            message: '发送成功'
+          })
+          this.test.visible = false
+        } else {
+          //
+        }
+      })
+    },
+    // 测试发送
+    handleTest(row) {
+      this.test.visible = true
+    },
     getList() {
       this.table.loading = true
       fetchList(this.listQuery).then(response => {
-        console.log('response: ', response)
         this.table.data = response.data.items
         this.table.total = response.data.total
 
@@ -265,8 +377,8 @@ export default {
     handleClick(row) {
       console.log('handleClick: ', row)
     },
-    recommend(row) {
-      this.$confirm('确认要推荐微信菜单吗?此操作覆盖之前的菜单，新的菜单生效时间24小时内!', '提示', {
+    send(row) {
+      this.$confirm('确定要群发此推广链接吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
