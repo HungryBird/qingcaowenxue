@@ -96,6 +96,250 @@
           <el-button type="danger" @click="toggleCurrent('index')">返回</el-button>
         </div>
       </div>
+      <div v-else-if="current === 'story'">
+        <el-row :gutter="22" style="padding-bottom: 10px;">
+          <el-col :span="6">
+            <el-row>
+              <el-col :span="8">
+                <el-image style="width: 100%;" />
+              </el-col>
+              <el-col :span="16">
+                <div style="font-weight: bold;font-size: 14px;color: rgb(51, 122, 183);">
+                  六界哀歌
+                </div>
+                <div>
+                  章节数量：共<span class="code">747</span>章
+                </div>
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="18" style="border-left: 1px solid #e7eaec;line-height: 28px;">
+            遥远的时空中流传着一个界面的传说。 宇宙空间是六维的六维空间形成了传闻中的六界。 第一界凌驾于其他五界之上操纵着每一界的生灵。 地球便是那第六界。 第一界在第六界上演了一场进化纪元整个第六界陷入了一场生化危机！ 2014年夏林墨正在家里玩着游戏忽然发现整个世界变成了末世而他。。莫名其妙的成了“天选者”之一。 六维世界？进化纪元？ 神秘的女杀手英姿飒爽的女警真正的身世惊天的阴谋死亡的威胁。 本文通篇以第一人称视角叙述行文流畅笔风幽默故事情让人耳目一新。从主角最开始经常发傻到后来渐渐成熟给读者一种真实的感觉。
+          </el-col>
+        </el-row>
+        <div class="filter-container">
+          <div style="display: flex;align-items: center;">
+            <div>
+              <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary">
+                全部
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+                收费
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+                免费
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd')">
+                添加章节
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+                更新章节
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+                清除阅读量
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('')">
+                返回
+              </el-button>
+            </div>
+            <div style="flex: 1;display: flex;flex-direction: row-reverse;">
+              <div class="filter-item" style="margin-left: 10px;">
+                <el-input placeholder="输入需查询的章节名称">
+                  <el-button slot="append" icon="el-icon-search" />
+                </el-input>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-container">
+          <div class="filter-item">
+            <el-input placeholder="先选择设置章节，再点此输入收费金额" style="width: 370px;">
+              <el-button slot="append">
+                批量设置
+              </el-button>
+            </el-input>
+          </div>
+          <el-button type="primary" class="filter-item" style="margin-left: 10px;">
+            章节重排
+          </el-button>
+          <div class="filter-item" style="margin-left: 10px;">
+            <el-input placeholder="输入前多少章节免费">
+              <el-button slot="append">
+                提交
+              </el-button>
+            </el-input>
+          </div>
+          <div class="filter-item" style="margin-left: 10px;">
+            <el-input placeholder="请输入要处理的文字">
+              <el-button slot="append">
+                提交
+              </el-button>
+            </el-input>
+          </div>
+          <div class="filter-item" style="margin-left: 10px;">
+            <el-input placeholder="输入要删除的章节区间：格式[1-20]" style="width: 330px;">
+              <el-button slot="append">
+                提交
+              </el-button>
+            </el-input>
+          </div>
+          <el-table
+            ref="storyTable"
+            v-loading="story.table.loading"
+            :data="story.table.data"
+            border
+            fit
+            highlight-current-row
+          >
+            <el-table-column width="55" type="selection" align="center" />
+            <el-table-column v-for="(sc, index) in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
+              <template slot-scope="{ row }">
+                <div v-if="sc.prop === 'name'">
+                  <a href="javascript:;" style="color: #337ab7;" @click="clickSection(row)">
+                    <b style="color: #900;">
+                      [{{ ++index }}]
+                    </b>
+                    测试测试
+                    <i class="el-icon-trophy" />
+                  </a>
+                </div>
+                <div v-else-if="sc.prop === 'tuiguang'">
+                  <el-button size="mini" type="primary" plain @click="story.tuiguang.visible = true">
+                    生成推广文案
+                  </el-button>
+                  <el-button size="mini" type="danger" plain @click="story.tuiguanglianjie.visible = true">
+                    获取推广链接
+                  </el-button>
+                </div>
+                <div v-else-if="sc.prop === 'shoufei'">
+                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'">
+                    {{ row[sc.prop] ? '是' : '否' }}
+                  </el-button>
+                </div>
+                <div v-else-if="sc.prop === 'status'">
+                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'">
+                    {{ row[sc.prop] ? '开启' : '禁用' }}
+                  </el-button>
+                </div>
+                <div v-else-if="sc.prop === 'action'">
+                  <el-button size="mini" type="primary" plain @click="story.edit.visible = true">
+                    编辑
+                  </el-button>
+                  <el-button size="mini" type="danger" plain @click="remove(row)">
+                    删除
+                  </el-button>
+                </div>
+                <div v-else>
+                  {{ row[sc.prop] }}
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <!-- 生成推广链接 -->
+        <el-dialog :visible.sync="story.tuiguanglianjie.visible" title="生成推广链接">
+          <el-form ref="tuiguanglianjie" :model="story.tuiguanglianjie.form" :rules="story.tuiguanglianjie.rules" label-width="150px">
+            <el-form-item label="入口页面：" prop="entry">
+              <el-input v-model="story.tuiguanglianjie.form.entry" />
+            </el-form-item>
+            <el-form-item label="备注：" prop="remark">
+              <el-input v-model="story.tuiguanglianjie.form.entry" />
+            </el-form-item>
+            <el-form-item label="推广类型：" prop="entry">
+              <el-radio-group v-model="story.tuiguanglianjie.form.type">
+                <el-radio label="inner">
+                  内推
+                </el-radio>
+                <el-radio label="outter">
+                  外推
+                </el-radio>
+              </el-radio-group>
+              <el-alert show-icon type="warning" title="内推链接 无法引导关注公众号，仅限公众号内部推文使用，如需推广引粉请选择外推" />
+            </el-form-item>
+            <el-form-item label="首章显示章节：" prop="entry">
+              <el-input v-model="story.tuiguanglianjie.form.entry" />
+            </el-form-item>
+            <el-form-item label="关注章节序号：" prop="entry">
+              <el-input v-model="story.tuiguanglianjie.form.entry" placeholder="可选，如不填则使用小说默认设置" />
+            </el-form-item>
+          </el-form>
+          <div style="text-align: center;">
+            <el-button type="primary">
+              生成链接
+            </el-button>
+          </div>
+        </el-dialog>
+        <!-- 推广方式 -->
+        <el-dialog :visible.sync="story.tuiguang.visible" title="选择推广文案方式">
+          <el-form label-width="250">
+            <el-form-item label="选择推广方式：">
+              <el-button type="primary" plain>
+                文字模式
+              </el-button>
+              <el-button type="primary" plain>
+                图片模式
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
+        <!-- 故事编辑？？？ -->
+        <el-dialog :visible.sync="story.edit.visible" title="编辑章节" />
+      </div>
+      <!-- 添加或者编辑章节 -->
+      <div v-else-if="current === 'storyAdd' || current === 'storyEdit'">
+        <el-form ref="storyAdd" :model="story.add.form" :rules="story.add.rules" label-width="150px">
+          <el-form-item label="章节标题：" prop="entry">
+            <el-input v-model="story.add.form.entry" />
+          </el-form-item>
+          <el-form-item label="输入章节：" prop="entry">
+            <el-input v-model="story.add.form.entry" />
+          </el-form-item>
+          <el-form-item label="章节内容：" prop="entry">
+            <tinymce v-model="story.add.form.content" :height="300" />
+          </el-form-item>
+          <el-form-item label="是否免费：" prop="entry">
+            <el-radio-group v-model="story.add.form.type">
+              <el-radio label="inner">
+                免费
+              </el-radio>
+              <el-radio label="outter">
+                收费
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="状 态：" prop="entry">
+            <el-radio-group v-model="story.add.form.type">
+              <el-radio label="inner">
+                开启
+              </el-radio>
+              <el-radio label="outter">
+                关闭
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="入口页面：" prop="entry">
+            <el-input v-model="story.add.form.entry" />
+          </el-form-item>
+          <el-form-item>
+            <el-button size="mini">
+              保存
+            </el-button>
+            <el-button size="mini">
+              返回
+            </el-button>
+            <el-button size="mini">
+              目录
+            </el-button>
+            <el-button size="mini">
+              上一章
+            </el-button>
+            <el-button size="mini">
+              下一章
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
       <div v-else-if="current === 'index'">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
@@ -126,8 +370,8 @@
               <el-button slot="append" icon="el-icon-search" />
             </el-input>
           </div>
-
         </div>
+
         <div>数量：共<span style="color: #f00;">{{ table.total }}</span>个</div>
         <el-table
           v-loading="table.loading"
@@ -137,6 +381,7 @@
           highlight-current-row
           style="width: 100%;"
         >
+          <el-table-column width="55" type="selection" align="center" />
           <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :type="cl.type" :label="cl.label" :width="cl.width" :align="cl.align">
             <template slot-scope="{ row }">
               <div v-if="cl.prop === 'action'">
@@ -161,10 +406,10 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <span>小城女律师</span>
-                  <span>总裁豪门</span>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story')">小城女律师</a>
+                  <span class="code">总裁豪门</span>
                 </div>
-                <div>
+                <div style="color: #999;">
                   共xxx章，xxx章后就要收费
                 </div>
                 <div style="display: flex;align-items: center;">
@@ -374,11 +619,95 @@ import mix from '@/mixs/mix'
 import { fetchList } from '@/api/article'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
+import Tinymce from '@/components/Tinymce'
 export default {
-  components: { Pagination },
+  components: { Pagination, Tinymce },
   mixins: [mix],
   data() {
     return {
+      // 小说内容
+      story: {
+        // 编辑或者添加
+        add: {
+          form: {},
+          rules: {}
+        },
+        // 推广链接
+        tuiguanglianjie: {
+          visible: false,
+          form: {
+            remark: '',
+            type: 'inner'
+          },
+          rules: {
+            remark: [
+              { required: true, message: '请输入备注' }
+            ]
+          }
+        },
+        // 推广
+        tuiguang: {
+          visible: false
+        },
+        // 编辑
+        edit: {
+          visible: false
+        },
+        // 搜索
+        search: {
+          form: {},
+          loading: false
+        },
+        table: {
+          columns: [
+            {
+              label: '章节名称',
+              prop: 'name',
+              align: 'center'
+            },
+            {
+              label: '推广',
+              prop: 'tuiguang',
+              align: 'center',
+              width: 260
+            },
+            {
+              label: '阅读量',
+              prop: 'views',
+              align: 'center'
+            },
+            {
+              label: '是否收费',
+              prop: 'shoufei',
+              align: 'center'
+            },
+            {
+              label: '书币',
+              prop: 'shubi',
+              align: 'center'
+            },
+            {
+              label: '状态',
+              prop: 'status',
+              align: 'center'
+            },
+            {
+              label: '操作',
+              prop: 'action',
+              align: 'center'
+            }
+          ],
+          data: [
+            {}, {}, {}
+          ],
+          total: 0,
+          page: 1,
+          size: 10,
+          limit: 10,
+          loading: false
+        }
+      },
+      // 复制小说
       copy: {
         visible: false,
         form: {
@@ -459,10 +788,6 @@ export default {
       table: {
         columns: [
           {
-            type: 'selection',
-            width: 55
-          },
-          {
             label: 'ID',
             prop: 'id',
             align: 'center'
@@ -541,6 +866,10 @@ export default {
     }
   },
   methods: {
+    // 点击章节
+    clickSection(row) {
+      this.toggleCurrent('storyEdit')
+    },
     // 复制小说
     toCopyNovel(row) {
       this.copy.visible = true
@@ -684,6 +1013,15 @@ export default {
 <style lang="scss" scoped>
   .novel-management{
     position: relative;
+    .code{
+      background-color: #F9F2F4;
+      border-radius: 4px;
+      color: #ca4440;
+      font-size: 90%;
+      padding: 2px 4px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
     .mask{
       position: absolute;
       top: 0;

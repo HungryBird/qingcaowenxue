@@ -203,6 +203,12 @@ export const asyncRoutes = [
         component: () => import('@/pages/promoteManagement/mass'),
         name: 'promote-mass',
         meta: { title: '群发推广' }
+      },
+      {
+        path: 'activity',
+        component: () => import('@/pages/promoteManagement/activity'),
+        name: 'promote-mass',
+        meta: { title: '促销活动' }
       }
     ]
   }
