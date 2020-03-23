@@ -60,6 +60,14 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/tuiguangImg',
+    component: () => import('@/pages/novelManagement/tuiguangImg')
+  },
+  {
+    path: '/tuiguangText',
+    component: () => import('@/pages/novelManagement/tuiguangText')
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',

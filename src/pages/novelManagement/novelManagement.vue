@@ -133,10 +133,10 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd')">
                 添加章节
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection(row)">
                 更新章节
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews(row)">
                 清除阅读量
               </el-button>
               <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('')">
@@ -154,8 +154,8 @@
         </div>
         <div class="filter-container">
           <div class="filter-item">
-            <el-input placeholder="先选择设置章节，再点此输入收费金额" style="width: 370px;">
-              <el-button slot="append">
+            <el-input v-model="story.handler.charge" placeholder="先选择设置章节，再点此输入收费金额" style="width: 370px;">
+              <el-button slot="append" :loading="story.setLoading" @click="massSet">
                 批量设置
               </el-button>
             </el-input>
@@ -164,21 +164,21 @@
             章节重排
           </el-button>
           <div class="filter-item" style="margin-left: 10px;">
-            <el-input placeholder="输入前多少章节免费">
+            <el-input v-model="story.handler.free" placeholder="输入前多少章节免费">
               <el-button slot="append">
                 提交
               </el-button>
             </el-input>
           </div>
           <div class="filter-item" style="margin-left: 10px;">
-            <el-input placeholder="请输入要处理的文字">
+            <el-input v-model="story.handler.text" placeholder="请输入要处理的文字">
               <el-button slot="append">
                 提交
               </el-button>
             </el-input>
           </div>
           <div class="filter-item" style="margin-left: 10px;">
-            <el-input placeholder="输入要删除的章节区间：格式[1-20]" style="width: 330px;">
+            <el-input v-model="story.handler.remove" placeholder="输入要删除的章节区间：格式[1-20]" style="width: 330px;">
               <el-button slot="append">
                 提交
               </el-button>
@@ -191,6 +191,7 @@
             border
             fit
             highlight-current-row
+            @selection-change="handleStorySelectionChange"
           >
             <el-table-column width="55" type="selection" align="center" />
             <el-table-column v-for="(sc, index) in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
@@ -274,10 +275,10 @@
         <el-dialog :visible.sync="story.tuiguang.visible" title="选择推广文案方式">
           <el-form label-width="250">
             <el-form-item label="选择推广方式：">
-              <el-button type="primary" plain>
+              <el-button type="primary" plain @click="chooseTuiguang('Text')">
                 文字模式
               </el-button>
-              <el-button type="primary" plain>
+              <el-button type="primary" plain @click="chooseTuiguang('Img')">
                 图片模式
               </el-button>
             </el-form-item>
@@ -289,52 +290,49 @@
       <!-- 添加或者编辑章节 -->
       <div v-else-if="current === 'storyAdd' || current === 'storyEdit'">
         <el-form ref="storyAdd" :model="story.add.form" :rules="story.add.rules" label-width="150px">
-          <el-form-item label="章节标题：" prop="entry">
-            <el-input v-model="story.add.form.entry" />
+          <el-form-item label="章节标题：" prop="title">
+            <el-input v-model="story.add.form.title" />
           </el-form-item>
-          <el-form-item label="输入章节：" prop="entry">
-            <el-input v-model="story.add.form.entry" />
+          <el-form-item label="输入章节：" prop="section">
+            <el-input v-model="story.add.form.section" />
           </el-form-item>
-          <el-form-item label="章节内容：" prop="entry">
+          <el-form-item label="章节内容：" prop="content">
             <tinymce v-model="story.add.form.content" :height="300" />
           </el-form-item>
-          <el-form-item label="是否免费：" prop="entry">
-            <el-radio-group v-model="story.add.form.type">
-              <el-radio label="inner">
+          <el-form-item label="是否免费：" prop="isFree">
+            <el-radio-group v-model="story.add.form.isFree">
+              <el-radio label="yes">
                 免费
               </el-radio>
-              <el-radio label="outter">
+              <el-radio label="no">
                 收费
               </el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="状 态：" prop="entry">
-            <el-radio-group v-model="story.add.form.type">
-              <el-radio label="inner">
+          <el-form-item label="状 态：" prop="status">
+            <el-radio-group v-model="story.add.form.status">
+              <el-radio label="on">
                 开启
               </el-radio>
-              <el-radio label="outter">
+              <el-radio label="off">
                 关闭
               </el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="入口页面：" prop="entry">
-            <el-input v-model="story.add.form.entry" />
-          </el-form-item>
           <el-form-item>
-            <el-button size="mini">
+            <el-button size="mini" type="primary">
               保存
             </el-button>
-            <el-button size="mini">
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.id })">
               返回
             </el-button>
-            <el-button size="mini">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
               目录
             </el-button>
-            <el-button size="mini">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
               上一章
             </el-button>
-            <el-button size="mini">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
               下一章
             </el-button>
           </el-form-item>
@@ -406,7 +404,7 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story')">小城女律师</a>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id })">小城女律师</a>
                   <span class="code">总裁豪门</span>
                 </div>
                 <div style="color: #999;">
@@ -625,12 +623,45 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 选择推广模式
+      chooseTuiguang(mode) {
+        const routeUrl = this.$router.resolve({
+          path: `/tuiguang${mode}`,
+          query: { id: 96 }
+        })
+        window.open(routeUrl.href, '_blank')
+      },
       // 小说内容
       story: {
+        id: '',
+        // 按钮loading
+        setLoading: false,
+        // 处理章节
+        handler: {
+          charge: '',
+          text: '',
+          free: null,
+          remove: ''
+        },
+        // 选择的章节
+        selections: [],
         // 编辑或者添加
         add: {
-          form: {},
-          rules: {}
+          form: {
+            title: '',
+            section: '',
+            content: '',
+            isFree: 'yes',
+            status: 'on'
+          },
+          rules: {
+            title: [
+              { required: true, message: '请输入小说标题' }
+            ],
+            section: [
+              { required: true, message: '请输入小说ID' }
+            ]
+          }
         },
         // 推广链接
         tuiguanglianjie: {
@@ -866,9 +897,57 @@ export default {
     }
   },
   methods: {
+    // story章节被选中
+    handleStorySelectionChange(selection) {
+      this.story.selections = selection
+    },
+    // 批量设置
+    massSet() {
+      if (this.story.selections.length === 0) {
+        this.$message.error('请选择设置章节')
+        return
+      } else if (this.story.handler.charge === '') {
+        this.$message.error('请输入收费金额')
+        return
+      }
+      this.$message.success('设置成功')
+      setTimeout(() => {
+        this.toggleCurrent('story')
+      }, 1500)
+    },
+    // 清除略度量
+    clearViews(row) {
+      this.$confirm('清除阅读量?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '清除成功!'
+        })
+      }).catch(() => {
+        //
+      })
+    },
+    // 更新章节
+    updateSelection(row) {
+      this.$confirm('确认要更新章节吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '更新成功!'
+        })
+      }).catch(() => {
+        //
+      })
+    },
     // 点击章节
     clickSection(row) {
-      this.toggleCurrent('storyEdit')
+      this.toggleCurrent('storyEdit', { id: 1 })
     },
     // 复制小说
     toCopyNovel(row) {
@@ -881,7 +960,6 @@ export default {
     },
     // 开始复制
     copyNovel() {
-      console.log('this.copy: ', this.copy)
       this.copy.loading = true
       setTimeout(() => {
         this.copy.loading = false
@@ -898,12 +976,13 @@ export default {
       this.add.list = fileList
     },
     // 切换页面
-    toggleCurrent(current = '') {
+    toggleCurrent(current = '', obj) {
       const { fullPath } = this.$route
       this.$router.replace({
         path: '/redirect' + fullPath,
         query: {
-          current
+          current,
+          ...obj
         }
       })
     },
