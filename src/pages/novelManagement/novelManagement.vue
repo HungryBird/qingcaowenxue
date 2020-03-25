@@ -338,7 +338,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-else-if="current === 'index'">
+      <div v-else-if="current === 'index'" style="position: relative;">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
@@ -452,23 +452,22 @@
         </el-table>
         <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
       </div>
+      <!-- 快速进入 -->
+      <div v-if="dialogTableVisible && !current" class="quick-entry">
+        <div class="title">
+          快速进入
+        </div>
+        <div class="body">
+          <el-autocomplete
+            v-model="categoryName"
+            placeholder="输入分类名可快速搜索"
+            class="inline-input"
+            :fetch-suggestions="querySearch"
+            @select="handleSelect"
+          />
+        </div>
+      </div>
     </el-main>
-    <!-- 快速进入 -->
-    <el-dialog :visible.sync="dialogTableVisible" :modal="false" :modal-append-to-body="false" :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" width="450px" top="35vh">
-      <div slot="title">
-        快速进入
-      </div>
-      <div>
-        <el-autocomplete
-          v-model="categoryName"
-          placeholder="输入分类名可快速搜索"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          @select="handleSelect"
-        />
-      </div>
-      <div slot="footer" />
-    </el-dialog>
     <!-- 修改小说备注 -->
     <el-dialog :visible.sync="remark.visible" title="修改小说备注" width="450px" top="35vh">
       <el-form ref="remark" :model="remark.form" :rules="remark.rules" label-width="80px">
@@ -615,6 +614,7 @@
 <script>
 import mix from '@/mixs/mix'
 import { fetchList } from '@/api/article'
+import { categoryList } from '@/api/category-list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
 import Tinymce from '@/components/Tinymce'
@@ -890,6 +890,7 @@ export default {
     this.current = current
   },
   mounted() {
+    this.getCategoryList()
     if (!this.current) {
       this.dialogTableVisible = true
     } else if (this.current === 'index') {
@@ -897,6 +898,14 @@ export default {
     }
   },
   methods: {
+    // 获取分类
+    getCategoryList() {
+      categoryList().then(res => {
+        console.log('res: ', res)
+      }).catch(err => {
+        console.error('err: ', err)
+      })
+    },
     // story章节被选中
     handleStorySelectionChange(selection) {
       this.story.selections = selection
@@ -1092,6 +1101,36 @@ export default {
 <style lang="scss" scoped>
   .novel-management{
     position: relative;
+    .quick-entry{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 450px;
+      margin: -87px 0 0 -225px;
+      border: 1px solid #293846;
+      border-radius: 4px;
+      box-shadow: 0px 1px 2px rgba(0,0,0,0.1);
+      .title{
+        background-image: none;
+        background: #293846;
+        height: 32px;
+        padding: 0px;
+        line-height: 32px;
+        font-size: 14px;
+        color: #DFE4ED;
+        text-align: left;
+        text-indent: 1em;
+      }
+      .body{
+        padding: 65px 0;
+        text-align: center;
+        background-color: #fff;
+        .el-autocomplete{
+          width: 300px;
+        }
+      }
+    }
     .code{
       background-color: #F9F2F4;
       border-radius: 4px;

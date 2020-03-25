@@ -27,8 +27,11 @@ export function getInfo(token) {
 }
 
 export function logout() {
-  return request({
-    url: '/vue-element-admin/user/logout',
-    method: 'post'
+  // return request({
+  //   url: '/vue-element-admin/user/logout',
+  //   method: 'post'
+  // })
+  return new Promise(resolve => {
+    resolve()
   })
 }
