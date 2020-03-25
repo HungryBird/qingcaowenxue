@@ -36,7 +36,17 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    before: require('./mock/mock-server.js'),
+    // proxy: {
+    //   '/main': {
+    //       target: 'http://admin_api.fuleien.com',
+    //       changeOrigin: true,
+    //       ws: true,
+    //       pathRewrite: {
+    //         '^/main': ''
+    //       }
+    //   }
+    // }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
