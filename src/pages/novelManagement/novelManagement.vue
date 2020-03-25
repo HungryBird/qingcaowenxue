@@ -1,9 +1,15 @@
 <template>
   <el-container style="height: calc(100vh - 84px);" class="novel-management">
     <el-aside width="200px">
-      <el-tree :props="defaultProps" :data="treeData" />
+      <el-tree
+        :props="defaultProps"
+        :data="treeData"
+        default-expand-all
+        highlight-current
+        @node-click="handlerCategory"
+      />
     </el-aside>
-    <el-main>
+    <el-main style="position: relative;">
       <div v-if="current === 'add' || current === 'edit'">
         <div>
           <el-form ref="add" :model="add.form" :rules="add.rules" label-width="120px">
@@ -299,8 +305,8 @@
           <el-form-item label="章节内容：" prop="content">
             <tinymce v-model="story.add.form.content" :height="300" />
           </el-form-item>
-          <el-form-item label="是否免费：" prop="isFree">
-            <el-radio-group v-model="story.add.form.isFree">
+          <el-form-item label="是否免费：" prop="is_fee">
+            <el-radio-group v-model="story.add.form.is_fee">
               <el-radio label="yes">
                 免费
               </el-radio>
@@ -338,11 +344,11 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-else-if="current === 'index'" style="position: relative;">
+      <div v-else-if="current === 'index'">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
-            添加
+            添加本地小说
           </el-button>
           <el-select placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
             <el-option value="1">
@@ -364,7 +370,7 @@
             </el-option>
           </el-select>
           <div class="filter-item" style="margin-left: 10px;">
-            <el-input>
+            <el-input placeholder="输入需查询的小说名称">
               <el-button slot="append" icon="el-icon-search" />
             </el-input>
           </div>
@@ -402,13 +408,16 @@
               <div v-else-if="cl.prop === 'img'">
                 <el-image style="width: 50px;" fit="fill" :src="row[cl.prop]" />
               </div>
+              <div v-else-if="cl.prop === 'is_fee'">
+                {{ row[cl.prop] === 0 ? '否' : '是' }}
+              </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id })">小城女律师</a>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id })">{{ row['name'] }}</a>
                   <span class="code">总裁豪门</span>
                 </div>
                 <div style="color: #999;">
-                  共xxx章，xxx章后就要收费
+                  {{ row['description'] }}
                 </div>
                 <div style="display: flex;align-items: center;">
                   <a style="font-size: 12px;color: #337ab7;padding-right: 4px;">http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html</a>
@@ -420,7 +429,10 @@
                   <span>
                     备注：
                   </span>
-                  <a style="font-size: 12px;color: #337ab7;padding-right: 4px;" @click.stop="addRemark(row)">原著：【XXX】历险记<i class="el-icon-edit" /></a>
+                  <a style="font-size: 12px;color: #337ab7;padding-right: 4px;" @click.stop="addRemark(row)">
+                    {{ row['remarks'] }}
+                    <i class="el-icon-edit" />
+                  </a>
                 </div>
               </div>
               <div v-else-if="cl.prop === 'update'">
@@ -436,12 +448,9 @@
                   上架
                 </el-button>
               </div>
-              <div v-else-if="cl.prop === 'done'">
-                <el-button v-if="!row[cl.prop]" size="mini" type="primary">
-                  连载
-                </el-button>
-                <el-button v-else size="mini" type="danger">
-                  完结
+              <div v-else-if="cl.prop === 'serial'">
+                <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'">
+                  {{ row[cl.prop] === 1 ? '连载' : '完结' }}
                 </el-button>
               </div>
               <div v-else>
@@ -613,8 +622,8 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { fetchList } from '@/api/article'
-import { categoryList } from '@/api/category-list'
+import { bookList, bookDelete } from '@/api/book/list'
+import { categoryList } from '@/api/book/category'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
 import Tinymce from '@/components/Tinymce'
@@ -623,6 +632,8 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 小说类型
+      book_category_id: null,
       // 选择推广模式
       chooseTuiguang(mode) {
         const routeUrl = this.$router.resolve({
@@ -651,7 +662,7 @@ export default {
             title: '',
             section: '',
             content: '',
-            isFree: 'yes',
+            is_fee: 'yes',
             status: 'on'
           },
           rules: {
@@ -728,9 +739,7 @@ export default {
               align: 'center'
             }
           ],
-          data: [
-            {}, {}, {}
-          ],
+          data: [],
           total: 0,
           page: 1,
           size: 10,
@@ -793,27 +802,11 @@ export default {
         }
       },
       defaultProps: {
-        label: 'label',
+        label: 'name',
         children: 'children'
       },
       categoryName: '',
-      treeData: [
-        {
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1'
-          }]
-        },
-        {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1'
-          },
-          {
-            label: '二级 2-2'
-          }]
-        }
-      ],
+      treeData: [],
       dialogTableVisible: false,
       current: '',
       table: {
@@ -846,7 +839,7 @@ export default {
           },
           {
             label: '完结',
-            prop: 'done',
+            prop: 'serial',
             align: 'center'
           },
           {
@@ -856,7 +849,7 @@ export default {
           },
           {
             label: '限时免费',
-            prop: 'free',
+            prop: 'is_fee',
             align: 'center'
           },
           {
@@ -891,17 +884,46 @@ export default {
   },
   mounted() {
     this.getCategoryList()
+    const { book_category_id } = this.$route.query
     if (!this.current) {
       this.dialogTableVisible = true
     } else if (this.current === 'index') {
-      this.getList()
+      if (book_category_id) {
+        this.book_category_id = book_category_id
+        this.getList({
+          id: book_category_id
+        })
+      } else {
+        this.getList()
+      }
     }
   },
   methods: {
+    // 点击分类
+    handlerCategory(data, node, VueComponent) {
+      if (data.pid !== 0) {
+        this.handleSelect(data)
+        this.dialogTableVisible = false
+      }
+    },
     // 获取分类
     getCategoryList() {
       categoryList().then(res => {
-        console.log('res: ', res)
+        const pTree = []
+        res.data.data.forEach(item => {
+          if (item.pid === 0) {
+            item.children = []
+            pTree.push(item)
+          }
+        })
+        for (const row of pTree) {
+          for (const cRow of res.data.data) {
+            if (cRow.pid === row.id) {
+              row.children.push(cRow)
+            }
+          }
+        }
+        this.treeData = pTree
       }).catch(err => {
         console.error('err: ', err)
       })
@@ -1011,30 +1033,37 @@ export default {
       })
     },
     // 获取列表
-    getList() {
+    getList(book_category_id) {
       this.table.loading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('response: ', response)
-        this.table.data = response.data.items
+      bookList({
+        book_category_id
+      }).then(response => {
+        this.table.data = response.data.data
         this.table.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.table.loading = false
-        }, 1.5 * 1000)
+        this.table.loading = false
+        this.table.limit = response.data.per_size
       })
     },
     // 输入查询
     querySearch(queryString, cb) {
-      cb([{
-        value: '123'
-      }])
+      // categoryList
+      categoryList({
+        category_name: queryString
+      }).then(res => {
+        cb(res.data.data.filter(item => {
+          item.value = item.name
+          return item.pid !== 0
+        }))
+      })
     },
     // 选择查询结果
-    handleSelect() {
+    handleSelect(data) {
       this.dialogTableVisible = false
-      this.current = 'index'
-      this.getList()
+      this.toggleCurrent('index', {
+        book_category_id: data.id
+      })
+      this.book_category_id = data.id
+      this.getList(data.id)
     },
     // 更换作者
     toUpdate(row) {
@@ -1062,9 +1091,23 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        bookDelete({
+          id: row.id
+        }).then(res => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: res.message
+            })
+            setTimeout(() => {
+              this.getList(this.book_category_id)
+            }, 1500)
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.message
+            })
+          }
         })
       }).catch(() => {
         //

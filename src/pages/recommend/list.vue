@@ -177,7 +177,7 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { recommendList } from '@/api/recommend'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -304,7 +304,7 @@ export default {
   methods: {
     getList() {
       this.table.loading = true
-      fetchList(this.listQuery).then(response => {
+      recommendList().then(response => {
         console.log('response: ', response)
         this.table.data = response.data.items
         this.table.total = response.data.total
