@@ -111,16 +111,19 @@
               </el-col>
               <el-col :span="16">
                 <div style="font-weight: bold;font-size: 14px;color: rgb(51, 122, 183);">
-                  六界哀歌
+                  {{ story.name }}
                 </div>
                 <div>
-                  章节数量：共<span class="code">747</span>章
+                  章节数量：共
+                  <span class="code">
+                    {{ story.chapter_num }}
+                  </span>章
                 </div>
               </el-col>
             </el-row>
           </el-col>
           <el-col :span="18" style="border-left: 1px solid #e7eaec;line-height: 28px;">
-            遥远的时空中流传着一个界面的传说。 宇宙空间是六维的六维空间形成了传闻中的六界。 第一界凌驾于其他五界之上操纵着每一界的生灵。 地球便是那第六界。 第一界在第六界上演了一场进化纪元整个第六界陷入了一场生化危机！ 2014年夏林墨正在家里玩着游戏忽然发现整个世界变成了末世而他。。莫名其妙的成了“天选者”之一。 六维世界？进化纪元？ 神秘的女杀手英姿飒爽的女警真正的身世惊天的阴谋死亡的威胁。 本文通篇以第一人称视角叙述行文流畅笔风幽默故事情让人耳目一新。从主角最开始经常发傻到后来渐渐成熟给读者一种真实的感觉。
+            {{ story.description }}
           </el-col>
         </el-row>
         <div class="filter-container">
@@ -200,14 +203,14 @@
             @selection-change="handleStorySelectionChange"
           >
             <el-table-column width="55" type="selection" align="center" />
-            <el-table-column v-for="(sc, index) in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
+            <el-table-column v-for="sc in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
               <template slot-scope="{ row }">
-                <div v-if="sc.prop === 'name'">
+                <div v-if="sc.prop === 'name'" style="text-align: left;">
                   <a href="javascript:;" style="color: #337ab7;" @click="clickSection(row)">
                     <b style="color: #900;">
-                      [{{ ++index }}]
+                      [{{ row['num'] }}]
                     </b>
-                    测试测试
+                    {{ row[sc.prop] }}
                     <i class="el-icon-trophy" />
                   </a>
                 </div>
@@ -243,6 +246,7 @@
               </template>
             </el-table-column>
           </el-table>
+          <pagination v-show="story.table.total>0" :total="story.table.total" :page.sync="story.table.page" :limit.sync="story.table.size" @pagination="storyPagein" />
         </div>
         <!-- 生成推广链接 -->
         <el-dialog :visible.sync="story.tuiguanglianjie.visible" title="生成推广链接">
@@ -413,11 +417,12 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id })">{{ row['name'] }}</a>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num })">{{ row['name'] }}</a>
                   <span class="code">总裁豪门</span>
                 </div>
                 <div style="color: #999;">
-                  {{ row['description'] }}
+                  <!-- 开始收费备注 -->
+                  <!-- {{ row['description'] }} -->
                 </div>
                 <div style="display: flex;align-items: center;">
                   <a style="font-size: 12px;color: #337ab7;padding-right: 4px;">http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html</a>
@@ -459,7 +464,7 @@
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
+        <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.size" @pagination="pagein" />
       </div>
       <!-- 快速进入 -->
       <div v-if="dialogTableVisible && !current" class="quick-entry">
@@ -622,7 +627,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete } from '@/api/book/list'
+import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
@@ -644,7 +649,14 @@ export default {
       },
       // 小说内容
       story: {
+        // 小说id
         id: '',
+        // 小说章节数量
+        chapter_num: 0,
+        // 小说名字
+        name: '',
+        // 小说描述
+        description: '',
         // 按钮loading
         setLoading: false,
         // 处理章节
@@ -705,7 +717,8 @@ export default {
             {
               label: '章节名称',
               prop: 'name',
-              align: 'center'
+              align: 'center',
+              width: 360
             },
             {
               label: '推广',
@@ -743,7 +756,6 @@ export default {
           total: 0,
           page: 1,
           size: 10,
-          limit: 10,
           loading: false
         }
       },
@@ -873,7 +885,6 @@ export default {
         total: 0,
         page: 1,
         size: 10,
-        limit: 10,
         loading: false
       }
     }
@@ -890,15 +901,76 @@ export default {
     } else if (this.current === 'index') {
       if (book_category_id) {
         this.book_category_id = book_category_id
-        this.getList({
-          id: book_category_id
-        })
+        this.getList(book_category_id)
       } else {
         this.getList()
       }
+    } else if (this.current === 'story') {
+      const { id, description, chapter_num, name } = this.$route.query
+      this.story.id = id
+      this.story.description = description
+      this.story.chapter_num = chapter_num
+      this.story.name = name
+      this.description = description
+      this.chapterList(id)
+      // this.chapterContent(id)
     }
   },
   methods: {
+    //
+    // 设置收费
+    setcost() {
+      setcost().then(res => {
+
+      })
+    },
+    // 章节删除
+    sectionDelete() {
+      sectionDelete().then(res => {
+
+      })
+    },
+    // 清除阅读量
+    clearRead() {
+      clearRead().then(res => {
+
+      })
+    },
+    // 引入章节
+    importChapter() {
+      importChapter().then(res => {
+
+      })
+    },
+    // 章节列表翻页
+    storyPagein(data) {
+      const { page, limit } = data
+      this.story.table.page = page
+      this.story.table.size = limit
+      this.chapterList(this.story.id)
+    },
+    // 获取章节具体内容
+    chapterContent(id) {
+      chapterContent({
+        id
+      }).then(res => {
+
+      })
+    },
+    // 获取书籍章节列表
+    chapterList(book_id) {
+      this.story.table.loading = true
+      chapterList({
+        book_id,
+        page: this.story.table.page,
+        size: this.story.table.size
+      }).then(res => {
+        this.story.table.total = res.data.total
+        this.story.table.size = res.data.per_page
+        this.story.table.data = res.data.data
+        this.story.table.loading = false
+      })
+    },
     // 点击分类
     handlerCategory(data, node, VueComponent) {
       if (data.pid !== 0) {
@@ -1032,16 +1104,24 @@ export default {
         this.remark.loading = false
       })
     },
+    // 翻页
+    pagein(data) {
+      const { page, limit } = data
+      this.table.page = page
+      this.table.size = limit
+      this.getList(this.book_category_id)
+    },
     // 获取列表
     getList(book_category_id) {
       this.table.loading = true
       bookList({
+        page: this.table.page,
         book_category_id
       }).then(response => {
         this.table.data = response.data.data
         this.table.total = response.data.total
         this.table.loading = false
-        this.table.limit = response.data.per_size
+        this.table.size = response.data.per_size
       })
     },
     // 输入查询

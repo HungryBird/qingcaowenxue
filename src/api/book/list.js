@@ -15,3 +15,51 @@ export function bookDelete(data) {
     data
   })
 }
+
+export function chapterList(data) {
+  return request({
+    url: '/chapter/list',
+    method: 'post',
+    data
+  })
+}
+
+export function chapterContent(data) {
+  return request({
+    url: '/chapter/content',
+    method: 'post',
+    data
+  })
+}
+
+export function setcost(data) {
+  return request({
+    url: '/chapter/setcost',
+    method: 'post',
+    data
+  })
+}
+
+export function sectionDelete(data) {
+  return request({
+    url: '/chapter/sectionDelete',
+    method: 'post',
+    data
+  })
+}
+
+export function clearRead(data) {
+  return request({
+    url: '/chapter/clearRead',
+    method: 'post',
+    data
+  })
+}
+
+export function importChapter(data) {
+  return request({
+    url: '/chapter/importChapter',
+    method: 'post',
+    data
+  })
+}
