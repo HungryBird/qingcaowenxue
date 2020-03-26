@@ -436,11 +436,7 @@
               </el-button>
             </div>
             <div v-else-if="cl.prop === 'status'">
-              <el-switch
-                v-model="row.status"
-                active-text="开启"
-                inactive-text="关闭"
-              />
+              <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'">{{ row[cl.prop] === 1 ? '开启' : '关闭' }}</el-button>
             </div>
             <div v-else>
               {{ row[cl.prop] }}
@@ -449,13 +445,13 @@
         </el-table-column>
       </el-table>
 
-      <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
+      <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="pagin" />
     </div>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { adminList } from '@/api/proxy/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -499,12 +495,12 @@ export default {
           },
           {
             label: '上次登录时间',
-            prop: 'last_login_time',
+            prop: 'update_time',
             align: 'center'
           },
           {
             label: '真实姓名',
-            prop: 'real_name',
+            prop: 'truename',
             align: 'center'
           },
           {
@@ -523,7 +519,6 @@ export default {
         total: 0,
         page: 1,
         size: 10,
-        limit: 10,
         loading: false
       }
     }
@@ -537,17 +532,23 @@ export default {
     console.log('router: ', this.$route)
   },
   methods: {
+    // 翻页
+    pagin(data) {
+      const { limit, page } = data
+      this.table.size = limit
+      this.table.page = page
+      this.getList()
+    },
     getList() {
       this.table.loading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('response: ', response)
-        this.table.data = response.data.items
+      adminList({
+        size: this.table.size,
+        page: this.table.page
+      }).then(response => {
+        this.table.data = response.data.data
+        this.table.size = response.data.size
         this.table.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.table.loading = false
-        }, 1.5 * 1000)
+        this.table.loading = false
       })
     },
     toggleCurrent(current = '') {
