@@ -63,3 +63,19 @@ export function importChapter(data) {
     data
   })
 }
+
+export function chapterAdd(data) {
+  return request({
+    url: '/chapter/add',
+    method: 'post',
+    data
+  })
+}
+
+export function chapterUpdate(data) {
+  return request({
+    url: '/chapter/update',
+    method: 'post',
+    data
+  })
+}

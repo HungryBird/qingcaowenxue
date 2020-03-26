@@ -99,7 +99,7 @@
             </el-row>
           </el-form>
           <el-button type="success">保存</el-button>
-          <el-button type="danger" @click="toggleCurrent('index')">返回</el-button>
+          <el-button type="danger" @click="toggleCurrent('index', { book_category_id: id })">返回</el-button>
         </div>
       </div>
       <div v-else-if="current === 'story'">
@@ -139,16 +139,16 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
                 免费
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd')">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
                 添加章节
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection(row)">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection">
                 更新章节
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews(row)">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews">
                 清除阅读量
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('')">
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('', { id: story.book_id })">
                 返回
               </el-button>
             </div>
@@ -233,7 +233,7 @@
                   </el-button>
                 </div>
                 <div v-else-if="sc.prop === 'action'">
-                  <el-button size="mini" type="primary" plain @click="story.edit.visible = true">
+                  <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num})">
                     编辑
                   </el-button>
                   <el-button size="mini" type="danger" plain @click="remove(row)">
@@ -294,46 +294,44 @@
             </el-form-item>
           </el-form>
         </el-dialog>
-        <!-- 故事编辑？？？ -->
-        <el-dialog :visible.sync="story.edit.visible" title="编辑章节" />
       </div>
       <!-- 添加或者编辑章节 -->
       <div v-else-if="current === 'storyAdd' || current === 'storyEdit'">
         <el-form ref="storyAdd" :model="story.add.form" :rules="story.add.rules" label-width="150px">
-          <el-form-item label="章节标题：" prop="title">
-            <el-input v-model="story.add.form.title" />
+          <el-form-item label="章节标题：" prop="name">
+            <el-input v-model="story.add.form.name" />
           </el-form-item>
-          <el-form-item label="输入章节：" prop="section">
-            <el-input v-model="story.add.form.section" />
+          <el-form-item label="输入章节：" prop="num">
+            <el-input v-model="story.add.form.num" />
           </el-form-item>
           <el-form-item label="章节内容：" prop="content">
             <tinymce v-model="story.add.form.content" :height="300" />
           </el-form-item>
-          <el-form-item label="是否免费：" prop="is_fee">
-            <el-radio-group v-model="story.add.form.is_fee">
-              <el-radio label="yes">
+          <el-form-item label="是否免费：" prop="is_pay">
+            <el-radio-group v-model="story.add.form.is_pay">
+              <el-radio :label="1">
                 免费
               </el-radio>
-              <el-radio label="no">
+              <el-radio :label="0">
                 收费
               </el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="状 态：" prop="status">
             <el-radio-group v-model="story.add.form.status">
-              <el-radio label="on">
+              <el-radio :label="1">
                 开启
               </el-radio>
-              <el-radio label="off">
+              <el-radio :label="0">
                 关闭
               </el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
-            <el-button size="mini" type="primary">
+            <el-button size="mini" type="primary" :loading="story.add.addLoading" @click="chapterAdd">
               保存
             </el-button>
-            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.id })">
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
               返回
             </el-button>
             <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
@@ -627,7 +625,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter } from '@/api/book/list'
+import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
@@ -650,7 +648,7 @@ export default {
       // 小说内容
       story: {
         // 小说id
-        id: '',
+        book_id: '',
         // 小说章节数量
         chapter_num: 0,
         // 小说名字
@@ -658,7 +656,9 @@ export default {
         // 小说描述
         description: '',
         // 按钮loading
-        setLoading: false,
+        addLoading: false,
+        // 清除loading
+        clearLoading: false,
         // 处理章节
         handler: {
           charge: '',
@@ -671,18 +671,22 @@ export default {
         // 编辑或者添加
         add: {
           form: {
-            title: '',
-            section: '',
+            id: '',
+            name: '',
+            num: '',
             content: '',
-            is_fee: 'yes',
-            status: 'on'
+            is_pay: 1,
+            status: 1
           },
           rules: {
-            title: [
+            name: [
               { required: true, message: '请输入小说标题' }
             ],
-            section: [
+            num: [
               { required: true, message: '请输入小说ID' }
+            ],
+            content: [
+              { required: true, message: '请您输入章节内容' }
             ]
           }
         },
@@ -749,7 +753,8 @@ export default {
             {
               label: '操作',
               prop: 'action',
-              align: 'center'
+              align: 'center',
+              width: 148
             }
           ],
           data: [],
@@ -896,8 +901,10 @@ export default {
   mounted() {
     this.getCategoryList()
     const { book_category_id } = this.$route.query
+    // 没有选择分类
     if (!this.current) {
       this.dialogTableVisible = true
+    // 选择了分类
     } else if (this.current === 'index') {
       if (book_category_id) {
         this.book_category_id = book_category_id
@@ -905,19 +912,74 @@ export default {
       } else {
         this.getList()
       }
+    // 举个某个作品
     } else if (this.current === 'story') {
+      console.log('story: ', this.$route)
       const { id, description, chapter_num, name } = this.$route.query
-      this.story.id = id
+      this.story.book_id = id
       this.story.description = description
       this.story.chapter_num = chapter_num
       this.story.name = name
       this.description = description
       this.chapterList(id)
-      // this.chapterContent(id)
+    // 添加或者编辑
+    } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
+      const { num, book_id, description, chapter_num, name } = this.$route.query
+      this.story.add.form.num = num + 1
+      this.story.book_id = book_id
+      this.story.description = description
+      this.story.chapter_num = chapter_num
+      this.story.name = name
+      this.description = description
+      if (this.current === 'storyEdit') {
+        const { id, is_pay, status, name, book_name } = this.$route.query
+        this.story.add.form.id = id
+        this.story.name = book_name
+        this.story.add.form.name = name
+        this.story.add.form.is_pay = Number(is_pay)
+        this.story.add.form.status = Number(status)
+        this.chapterContent(id)
+      }
     }
   },
   methods: {
-    //
+    // 切换编辑章节
+    handleStoryEdit(row) {
+      console.log('row: ', row)
+      this.toggleCurrent('storyEdit', row)
+    },
+    // 添加编辑章节
+    chapterAdd() {
+      this.$refs.storyAdd.validate(valid => {
+        if (valid) {
+          this.story.add.addLoading = true
+          const form = Object.assign({ book_id: this.story.book_id }, this.story.add.form)
+          if (this.current === 'storyAdd') {
+            chapterAdd(form).then(res => {
+              /**
+               * 不用resetFields是因为要让num每次新增+1
+               */
+              // this.$refs.storyAdd.resetFields()
+              this.story.add.form.num++
+              this.story.add.form.content = ''
+              this.story.add.form.name = ''
+              this.story.add.form.status = 1
+              this.story.add.form.is_pay = 1
+              this.story.add.addLoading = false
+              this.$nextTick(() => {
+                this.$refs.storyAdd.clearValidate()
+              })
+              this.$message.success(res.message)
+            })
+          } else if (this.current === 'storyEdit') {
+            chapterUpdate(form).then(res => {
+              this.$message.success(res.message)
+              this.story.add.addLoading = false
+            })
+          }
+        }
+      })
+    },
     // 设置收费
     setcost() {
       setcost().then(res => {
@@ -927,12 +989,6 @@ export default {
     // 章节删除
     sectionDelete() {
       sectionDelete().then(res => {
-
-      })
-    },
-    // 清除阅读量
-    clearRead() {
-      clearRead().then(res => {
 
       })
     },
@@ -947,14 +1003,16 @@ export default {
       const { page, limit } = data
       this.story.table.page = page
       this.story.table.size = limit
-      this.chapterList(this.story.id)
+      this.chapterList(this.story.book_id)
     },
     // 获取章节具体内容
     chapterContent(id) {
       chapterContent({
         id
       }).then(res => {
-
+        this.story.add.form.content = res.data
+      }).catch(() => {
+        this.story.add.form.content = '<p>获取数据失败...</p>'
       })
     },
     // 获取书籍章节列表
@@ -1018,16 +1076,19 @@ export default {
         this.toggleCurrent('story')
       }, 1500)
     },
-    // 清除略度量
-    clearViews(row) {
+    // 清除阅读量
+    clearViews() {
       this.$confirm('清除阅读量?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '清除成功!'
+        this.story.clearLoading = true
+        clearRead({
+          book_id: this.story.book_id
+        }).then(res => {
+          this.$message.success(res.message)
+          this.story.clearLoading = false
         })
       }).catch(() => {
         //
@@ -1080,9 +1141,10 @@ export default {
     },
     // 切换页面
     toggleCurrent(current = '', obj) {
-      const { fullPath } = this.$route
+      const { path } = this.$route
+      console.log('this.$route: ', this.$route)
       this.$router.replace({
-        path: '/redirect' + fullPath,
+        path: '/redirect' + path,
         query: {
           current,
           ...obj
