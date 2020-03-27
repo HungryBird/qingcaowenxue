@@ -22,16 +22,18 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="封面图片：">
+                <el-form-item label="封面图片：" prop="thumb_url">
                   <el-upload
                     class="upload-demo"
                     :multiple="false"
                     :limit="1"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :action="uploadUrl"
+                    name="image"
+                    :headers="headers"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :file-list="add.list"
-                    :on-success="onUploadImgSuccess"
+                    :on-success="addUploadImgSuccess"
                     list-type="picture"
                   >
                     <el-button size="small" type="primary">点击上传</el-button>
@@ -41,65 +43,65 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="状 态：">
-                  <el-radio-group v-model="add.form.status">
-                    <el-radio label="serialize">连载</el-radio>
-                    <el-radio label="done">完结</el-radio>
+                <el-form-item label="状 态：" prop="serial">
+                  <el-radio-group v-model="add.form.serial">
+                    <el-radio :label="1">连载</el-radio>
+                    <el-radio :label="2">完结</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="万字：">
-                  <el-input v-model="add.form.w" placeholder="万字" />
+                <el-form-item label="万字：" prop="book_length">
+                  <el-input-number v-model="add.form.book_length" :precision="2" placeholder="万字" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="总章节：">
-                  <el-input v-model="add.form.total" placeholder="总章节" />
+                <el-form-item label="总章节：" prop="chapter_num">
+                  <el-input v-model="add.form.chapter_num" placeholder="总章节" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
+            <!-- <el-row>
               <el-col :span="12">
                 <el-form-item label="收费章节起始：">
                   <el-input v-model="add.form.begin" />
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> -->
             <el-row>
               <el-col :span="24">
-                <el-form-item label="小说简介：">
-                  <el-input v-model="add.form.free" type="textarea" />
+                <el-form-item label="小说简介：" prop="description">
+                  <el-input v-model="add.form.description" type="textarea" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="限时免费：">
-                  <el-radio-group v-model="add.form.status">
-                    <el-radio label="off">关闭</el-radio>
-                    <el-radio label="on">开启</el-radio>
+                <el-form-item label="限时免费：" prop="is_fee">
+                  <el-radio-group v-model="add.form.is_fee">
+                    <el-radio :label="0">关闭</el-radio>
+                    <el-radio :label="1">开启</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="是否上架：">
+                <el-form-item label="是否上架：" prop="status">
                   <el-radio-group v-model="add.form.status">
-                    <el-radio label="yes">是</el-radio>
-                    <el-radio label="no">否</el-radio>
+                    <el-radio :label="1">是</el-radio>
+                    <el-radio :label="0">否</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
             </el-row>
           </el-form>
-          <el-button type="success">保存</el-button>
-          <el-button type="danger" @click="toggleCurrent('index', { book_category_id: id })">返回</el-button>
+          <el-button type="success" :loading="add.loading" @click="bookAdd">保存</el-button>
+          <el-button type="danger" @click="toggleCurrent('index', { book_category_id })">返回</el-button>
         </div>
       </div>
       <div v-else-if="current === 'story'">
@@ -164,7 +166,7 @@
         <div class="filter-container">
           <div class="filter-item">
             <el-input v-model="story.handler.charge" placeholder="先选择设置章节，再点此输入收费金额" style="width: 370px;">
-              <el-button slot="append" :loading="story.setLoading" @click="massSet">
+              <el-button slot="append" :loading="story.massSetLoading" @click="massSet">
                 批量设置
               </el-button>
             </el-input>
@@ -236,7 +238,7 @@
                   <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num})">
                     编辑
                   </el-button>
-                  <el-button size="mini" type="danger" plain @click="remove(row)">
+                  <el-button size="mini" type="danger" plain @click="handleStoryRemove(row)">
                     删除
                   </el-button>
                 </div>
@@ -305,7 +307,7 @@
             <el-input v-model="story.add.form.num" />
           </el-form-item>
           <el-form-item label="章节内容：" prop="content">
-            <tinymce v-model="story.add.form.content" :height="300" />
+            <tinymce ref="tinymce" v-model="story.add.form.content" :height="300" />
           </el-form-item>
           <el-form-item label="是否免费：" prop="is_pay">
             <el-radio-group v-model="story.add.form.is_pay">
@@ -349,7 +351,7 @@
       <div v-else-if="current === 'index'">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-          <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
+          <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
           <el-select placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
@@ -361,13 +363,13 @@
             </el-option>
           </el-select>
           <el-select placeholder="状态" class="filter-item" style="margin-left: 10px;">
-            <el-option value="1">
+            <el-option :value="1">
               全部
             </el-option>
-            <el-option value="2">
+            <el-option :value="2">
               连载中
             </el-option>
-            <el-option value="3">
+            <el-option :value="3">
               已完结
             </el-option>
           </el-select>
@@ -540,16 +542,18 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="封面图片：">
+                <el-form-item label="封面图片：" prop="thumb_url">
                   <el-upload
                     class="upload-demo"
                     :multiple="false"
+                    :headers="headers"
                     :limit="1"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :action="uploadUrl"
+                    name="image"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :file-list="copy.list"
-                    :on-success="onUploadImgSuccess"
+                    :on-success="copyUploadImgSuccess"
                     list-type="picture"
                   >
                     <el-button size="small" type="primary">点击上传</el-button>
@@ -559,7 +563,7 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="状 态：">
+                <el-form-item label="状 态：" prop="status">
                   <el-radio-group v-model="copy.form.status">
                     <el-radio lable="serialize">
                       连载
@@ -573,8 +577,8 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="总章节：">
-                  <el-input v-model="copy.form.total" :disabled="true" />
+                <el-form-item label="总章节：" prop="chapter_num">
+                  <el-input v-model="copy.form.chapter_num" :disabled="true" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -625,7 +629,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate } from '@/api/book/list'
+import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
@@ -635,6 +639,12 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 上传地址
+      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      // 上传头部
+      headers: {
+        token: ''
+      },
       // 小说类型
       book_category_id: null,
       // 选择推广模式
@@ -657,6 +667,8 @@ export default {
         description: '',
         // 按钮loading
         addLoading: false,
+        // 批量设置loading
+        massSetLoading: false,
         // 清除loading
         clearLoading: false,
         // 处理章节
@@ -768,7 +780,8 @@ export default {
       copy: {
         visible: false,
         form: {
-          //
+          thumb_url: '',
+          thumb_id: ''
         },
         loading: false,
         list: []
@@ -776,11 +789,27 @@ export default {
       // 添加或者编辑
       add: {
         form: {
-          name: ''
+          name: '',
+          author_id: '',
+          serial: 1,
+          chapter_num: null,
+          book_length: null,
+          description: '',
+          is_fee: 0,
+          remarks: '',
+          status: 1,
+          thumb_url: '',
+          thumb_id: ''
         },
         rules: {
           name: [
             { required: true, message: '请输入小说名称' }
+          ],
+          description: [
+            { required: true, message: '请输入小说描述' }
+          ],
+          thumb_url: [
+            { required: true, message: '请您上传封面' }
           ]
         },
         list: [],
@@ -896,6 +925,7 @@ export default {
   },
   created() {
     const { current } = this.$route.query
+    this.headers.token = this.$store.getters.token
     this.current = current
   },
   mounted() {
@@ -912,7 +942,7 @@ export default {
       } else {
         this.getList()
       }
-    // 举个某个作品
+    // 点击了某个作品
     } else if (this.current === 'story') {
       console.log('story: ', this.$route)
       const { id, description, chapter_num, name } = this.$route.query
@@ -922,7 +952,7 @@ export default {
       this.story.name = name
       this.description = description
       this.chapterList(id)
-    // 添加或者编辑
+    // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
       const { num, book_id, description, chapter_num, name } = this.$route.query
       this.story.add.form.num = num + 1
@@ -940,12 +970,48 @@ export default {
         this.story.add.form.status = Number(status)
         this.chapterContent(id)
       }
+      // 添加或者编辑小说
+    } else if (this.current === 'add' || this.current === 'edit') {
+      const { book_category_id } = this.$route.query
+      this.book_category_id = book_category_id
+      if (this.current === 'edit') {
+        const query = this.$route.query
+        for (const key in query) {
+          if (key === 'thumb_url') {
+            this.add.list = [{
+              name: '',
+              url: query[key]
+            }]
+          } else if (key === 'status' || key === 'is_fee') {
+            this.add.form[key] = Number(query[key])
+          } else if (key === 'book_length') {
+            this.add.form[key] === query[key] / 10000
+          } else if (key !== 'book_category_id') {
+            this.$set(this.add.form, key, query[key])
+          }
+        }
+      }
     }
   },
   methods: {
+    // 添加书籍
+    bookAdd() {
+      this.$refs.add.validate(valid => {
+        if (valid) {
+          this.add.loading = true
+          const data = Object.assign({}, this.add.form, { book_category_id: this.book_category_id, book_length: this.add.form.book_length * 10000 })
+          bookAdd(data).then(res => {
+            this.$message.success(res.message)
+            this.add.loading = false
+            this.$refs.add.resetFields()
+          }).catch(() => {
+            this.add.loading = false
+          })
+        }
+      })
+    },
     // 切换编辑章节
     handleStoryEdit(row) {
-      console.log('row: ', row)
       this.toggleCurrent('storyEdit', row)
     },
     // 添加编辑章节
@@ -961,10 +1027,10 @@ export default {
                */
               // this.$refs.storyAdd.resetFields()
               this.story.add.form.num++
-              this.story.add.form.content = ''
               this.story.add.form.name = ''
               this.story.add.form.status = 1
               this.story.add.form.is_pay = 1
+              this.$refs.tinymce.setContent('')
               this.story.add.addLoading = false
               this.$nextTick(() => {
                 this.$refs.storyAdd.clearValidate()
@@ -978,12 +1044,6 @@ export default {
             })
           }
         }
-      })
-    },
-    // 设置收费
-    setcost() {
-      setcost().then(res => {
-
       })
     },
     // 章节删除
@@ -1071,10 +1131,21 @@ export default {
         this.$message.error('请输入收费金额')
         return
       }
-      this.$message.success('设置成功')
-      setTimeout(() => {
-        this.toggleCurrent('story')
-      }, 1500)
+      const chapter_ids = this.story.selections.map(item => item.id).join(',')
+      const data = {
+        chapter_ids,
+        book_id: this.story.book_id,
+        cost: this.story.handler.charge
+      }
+      this.story.massSetLoading = true
+      setcost(data).then(res => {
+        this.$message.success(res.mess)
+        this.$refs.storyTable.clearSelection()
+        this.story.handler.charge = ''
+        this.story.massSetLoading = false
+      }).catch(() => {
+        this.story.massSetLoading = false
+      })
     },
     // 清除阅读量
     clearViews() {
@@ -1111,7 +1182,8 @@ export default {
     },
     // 点击章节
     clickSection(row) {
-      this.toggleCurrent('storyEdit', { id: 1 })
+      const { query } = this.$route
+      this.toggleCurrent('storyEdit', { id: row.id, ...query })
     },
     // 复制小说
     toCopyNovel(row) {
@@ -1135,7 +1207,16 @@ export default {
     handleRemove() {
       //
     },
-    onUploadImgSuccess(res, file, fileList) {
+    // 新增或者编辑上传成功
+    addUploadImgSuccess(res, file, fileList) {
+      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
+      const { id, url } = res.data
+      this.add.form.thumb_url = url
+      this.add.form.thumb_id = id
+      this.add.list = fileList
+    },
+    // 复制上传封面成功
+    copyUploadImgSuccess(res, file, fileList) {
       console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
       this.add.list = fileList
     },
@@ -1226,6 +1307,28 @@ export default {
     handleCopy(text, event) {
       clip(text, event)
     },
+    // 删除章节
+    handleStoryRemove(row) {
+      this.$confirm('确认删除此记录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.story.table.loading = true
+        chapterDelete({
+          id: row.id
+        }).then(res => {
+          this.$message({
+            type: 'success',
+            message: res.message
+          })
+          this.chapterList(this.story.book_id)
+          this.story.table.loading = false
+        })
+      }).catch(() => {
+        this.story.table.loading = false
+      })
+    },
     // 删除
     remove(row) {
       this.$confirm('确认删除此记录吗?', '提示', {
@@ -1272,12 +1375,7 @@ export default {
     },
     // 编辑
     edit(row) {
-      this.toggleCurrent('edit')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.add.form, key, row[key])
-        }
-      }
+      this.toggleCurrent('edit', { ...row, book_category_id: this.book_category_id })
     }
   }
 }

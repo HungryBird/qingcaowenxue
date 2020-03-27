@@ -79,3 +79,19 @@ export function chapterUpdate(data) {
     data
   })
 }
+
+export function bookAdd(data) {
+  return request({
+    url: '/book/add',
+    method: 'post',
+    data
+  })
+}
+
+export function chapterDelete(params) {
+  return request({
+    url: '/chapter/delete',
+    method: 'get',
+    params
+  })
+}
