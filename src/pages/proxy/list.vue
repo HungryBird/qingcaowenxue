@@ -19,8 +19,7 @@
                   <el-select>
                     <el-option value="1">一级代理</el-option>
                     <el-option value="2">二级代理</el-option>
-                    <el-option value="3">作者管理员</el-option>
-                    <el-option value="4">作者</el-option>
+                    <el-option value="3">三级代理</el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -32,7 +31,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
+            <!-- <el-row>
               <el-col :span="12">
                 <el-form-item label="上级代理：" prop="username">
                   <el-select>
@@ -43,7 +42,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> -->
             <el-row>
               <el-col :span="12">
                 <el-form-item label="代理名称：" prop="username">
@@ -166,7 +165,7 @@
             </el-row>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="等级划分" name="fourth">
+        <!-- <el-tab-pane label="等级划分" name="fourth">
           <el-form label-position="left" label-width="100px">
             <el-row>
               <el-col :span="12">
@@ -185,7 +184,7 @@
               </el-col>
             </el-row>
           </el-form>
-        </el-tab-pane>
+        </el-tab-pane> -->
         <el-tab-pane v-if="current === 'edit'" label="联系信息" name="five">
           <el-form label-position="left" label-width="100px">
             <el-row>
