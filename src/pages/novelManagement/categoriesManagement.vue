@@ -1,44 +1,51 @@
 <template>
   <div class="app-container">
     <div v-if="current === 'add' || current === 'edit'">
-      <el-form label-position="left" label-width="100px">
+      <el-form ref="addForm" label-width="100px" :rules="add.rules" :model="add.form">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="分类名称：" prop="username">
-              <el-autocomplete
-                v-model="add.name"
+            <el-form-item label="分类名称：" prop="name">
+              <!-- <el-autocomplete
+                v-model="add.form.name"
                 class="inline-input"
                 :fetch-suggestions="querySearch"
                 placeholder="请输入内容"
                 @select="handleSelect"
-              />
+              /> -->
+              <el-input v-model="add.form.name" placeholder="请输入内容" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="上级分类：" prop="level">
-              <el-select>
-                <el-option value="1">一级代理</el-option>
-                <el-option value="2">二级代理</el-option>
-                <el-option value="3">作者管理员</el-option>
-                <el-option value="4">作者</el-option>
+            <el-form-item label="上级分类：" prop="pid">
+              <el-select v-model="add.form.pid" placeholder="不选则为顶级分类">
+                <el-option v-for="td in table.data" :key="td.id" :value="td.id" :label="td.name" clearable>
+                  <div v-if="td.pid === 0">
+                    {{ td.name }}
+                  </div>
+                  <div v-else>
+                    —— —— {{ td.name }}
+                  </div>
+                </el-option>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="分类图片：" prop="password">
+            <el-form-item label="分类图片：" prop="thumb_url">
               <el-upload
                 class="upload-demo"
                 :multiple="false"
                 :limit="1"
-                action="https://jsonplaceholder.typicode.com/posts/"
+                :action="uploadUrl"
+                name="image"
+                :headers="headers"
                 :on-preview="handlePreview"
                 :on-remove="handleRemove"
-                :file-list="wechatConfig.kefu"
-                :on-success="onUploadKefuSuccess"
+                :file-list="add.list"
+                :on-success="addUploadImgSuccess"
                 list-type="picture"
               >
                 <el-button size="small" type="primary">点击上传</el-button>
@@ -48,12 +55,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="状 态：" prop="switch">
-              <el-radio-group v-model="add.form.switch">
-                <el-radio label="on">
+            <el-form-item label="状 态：" prop="status">
+              <el-radio-group v-model="add.form.status">
+                <el-radio :label="1">
                   开启
                 </el-radio>
-                <el-radio label="off">
+                <el-radio :label="0">
                   关闭
                 </el-radio>
               </el-radio-group>
@@ -61,7 +68,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <el-button type="success">保存</el-button>
+      <el-button type="success" :loading="add.loading" @click="save">保存</el-button>
       <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else>
@@ -71,7 +78,6 @@
           添加
         </el-button>
       </div>
-
       <el-table
         v-loading="table.loading"
         :data="table.data"
@@ -87,19 +93,18 @@
               <el-button type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
-              <el-button type="danger" size="mini" @click="setWechatConfig(row)">
+              <el-button v-if="row['pid'] !== 0" type="danger" size="mini" @click="categoryDelete(row.id)">
                 删除
               </el-button>
             </div>
             <div v-else-if="cl.prop === 'sort'">
-              <el-input v-model="row.sort" />
+              <el-input v-if="row['pid'] !== 0" v-model="row.sort" @change="changeSort($event, row)" />
             </div>
             <div v-else-if="cl.prop === 'status'">
-              <el-switch
-                v-model="row.status"
-                active-text="显示"
-                inactive-text="不显示"
-              />
+              <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="updateStatus(row)">{{ row[cl.prop] === 1 ? '显示' : '不显示' }}</el-button>
+            </div>
+            <div v-else-if="cl.prop === 'thumb_url'">
+              <el-image v-if="row['pid'] !== 0" :src="row[cl.prop]" fit="cover" />
             </div>
             <div v-else>
               {{ row[cl.prop] }}
@@ -107,13 +112,13 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="primary">排序</el-button>
+      <!-- <el-button type="primary" style="margin-top: 20px;">排序</el-button> -->
     </div>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { categoryList, categoryUpdate, categoryDelete, categoryAdd } from '@/api/book/category'
 import mix from '@/mixs/mix'
 
 export default {
@@ -121,20 +126,27 @@ export default {
   mixins: [mix],
   data() {
     return {
-      add: {
-        active: 'first',
-        form: {
-          switch: 'on',
-          payMethod: 'bankcard'
-        },
-        loading: false
+      // 上传地址
+      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      // 上传头部
+      headers: {
+        token: ''
       },
-      wechatConfig: {
+      add: {
         form: {
-          kefu: ''
+          name: '',
+          pid: null,
+          thumb_id: '',
+          thumb_url: '',
+          status: 1
         },
-        active: 'gzhpz',
-        kefu: []
+        rules: {
+          name: [
+            { required: true, message: '请您输入分类名称' }
+          ]
+        },
+        list: [],
+        loading: false
       },
       current: '',
       table: {
@@ -151,17 +163,17 @@ export default {
           },
           {
             label: '图片',
-            prop: 'title',
+            prop: 'thumb_url',
             align: 'center'
           },
           {
             label: '分类名称',
-            prop: 'last_login_time',
+            prop: 'name',
             align: 'center'
           },
           {
             label: '创建时间',
-            prop: 'real_name',
+            prop: 'create_time',
             align: 'center'
           },
           {
@@ -179,40 +191,117 @@ export default {
         data: [],
         total: 0,
         page: 1,
-        size: 10,
-        limit: 10,
+        size: 9999,
         loading: false
       }
     }
   },
   created() {
     const { current } = this.$route.query
+    this.headers.token = this.$store.getters.token
     this.current = current
-    if (!current) {
-      this.getList()
+    if (current === 'edit') {
+      for (const key in this.$route.query) {
+        if (key === 'thumb_url') {
+          this.add.list = [{
+            name: '',
+            url: this.$route.query[key]
+          }]
+        } else if (key === 'pid' || key === 'status') {
+          this.add.form.pid = Number(this.$route.query[key])
+        } else if (key !== 'current') {
+          this.$set(this.add.form, key, this.$route.query[key])
+        }
+      }
+      console.log('this.add: ', this.add)
     }
-    console.log('router: ', this.$route)
+    this.getList()
   },
   methods: {
-    getList() {
-      this.table.loading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('response: ', response)
-        this.table.data = response.data.items
-        this.table.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.table.loading = false
-        }, 1.5 * 1000)
+    save() {
+      this.$refs.addForm.validate(valid => {
+        if (valid) {
+          this.add.loading = true
+          const obj = Object.assign({}, this.add.form)
+          obj.pid = obj.pid ? obj.pid : 0
+          const submit = this.current === 'add' ? categoryAdd : categoryUpdate
+          submit(obj).then(res => {
+            this.$message.success(res.message)
+            this.add.loading = false
+            if (this.current === 'add' && this.$refs.addForm.resetFields()) {
+              this.add.list = []
+            }
+          })
+        }
       })
     },
-    toggleCurrent(current = '') {
-      const { fullPath } = this.$route
+    addUploadImgSuccess(res, file, fileList) {
+      const { id, url } = res.data
+      this.add.form.thumb_url = url
+      this.add.form.thumb_id = id
+      this.add.list = fileList
+    },
+    handlePreview() {
+      //
+    },
+    handleRemove() {
+      this.add.form.thumb_id = ''
+      this.add.form.thumb_url = ''
+    },
+    // 选择
+    handleSelect() {
+
+    },
+    // 更新排序
+    changeSort(sort, row) {
+      this.table.loading = true
+      categoryUpdate({
+        id: row.id,
+        sort
+      }).then(res => {
+        this.$message.success(res.message)
+        this.getList()
+        this.table.loading = false
+      }).catch((err) => {
+        this.table.loading = false
+        this.$message.error(err.message)
+      })
+    },
+    // 更新状态
+    updateStatus(row) {
+      const status = row.status === 1 ? 0 : 1
+      this.table.loading = true
+      categoryUpdate({
+        id: row.id,
+        status
+      }).then(res => {
+        this.$message.success(res.message)
+        this.getList()
+        this.table.loading = false
+      }).catch((err) => {
+        this.table.loading = false
+        this.$message.error(err.message)
+      })
+    },
+    // 获取列表
+    getList() {
+      this.table.loading = true
+      categoryList({
+        page: this.table.page,
+        size: this.table.size
+      }).then(response => {
+        this.table.data = response.data.data.reverse()
+        this.table.total = response.data.total
+        this.table.loading = false
+      })
+    },
+    toggleCurrent(current = '', row) {
+      const { path } = this.$route
       this.$router.replace({
-        path: '/redirect' + fullPath,
+        path: '/redirect' + path,
         query: {
-          current
+          current,
+          ...row
         }
       })
     },
@@ -242,27 +331,27 @@ export default {
         //
       })
     },
-    setWechatConfig(row) {
-      this.toggleCurrent('wechatConfig')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.wechatConfig.form, key, row[key])
-        }
-      }
+    categoryDelete(id) {
+      this.$confirm('确定删除该数据？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.table.loading = true
+        categoryDelete({
+          id
+        }).then(res => {
+          this.$message.success(res.message)
+          this.getList()
+          this.table.loading = false
+        }).catch((err) => {
+          this.table.loading = false
+          this.$message.error(err.message)
+        })
+      })
     },
     edit(row) {
-      this.toggleCurrent('edit')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.add.form, key, row[key])
-        }
-      }
-    },
-    handlePreview() {
-      //
-    },
-    handleRemove() {
-      //
+      this.toggleCurrent('edit', row)
     },
     onUploadKefuSuccess(res, file, fileList) {
       console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)

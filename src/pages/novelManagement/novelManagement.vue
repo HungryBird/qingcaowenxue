@@ -1209,7 +1209,6 @@ export default {
     },
     // 新增或者编辑上传成功
     addUploadImgSuccess(res, file, fileList) {
-      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
       const { id, url } = res.data
       this.add.form.thumb_url = url
       this.add.form.thumb_id = id
