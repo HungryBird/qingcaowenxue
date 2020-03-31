@@ -3,17 +3,15 @@
     <div v-if="current === 'add' || current === 'edit'">
       <el-tabs v-model="add.active" @tab-click="handleClick">
         <el-tab-pane label="基本信息" name="first">
-          <el-form label-position="left" label-width="100px">
+          <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="12">
                 <el-form-item label="管理员账号：" prop="username">
-                  <el-select filterable>
-                    <el-option value="admin">admin</el-option>
-                  </el-select>
+                  <el-input v-model="add.form.username" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
+            <!-- <el-row>
               <el-col :span="12">
                 <el-form-item label="代理级别：" prop="level">
                   <el-select>
@@ -23,7 +21,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> -->
             <el-row>
               <el-col :span="12">
                 <el-form-item label="登录密码：" prop="password">
@@ -43,28 +41,28 @@
                 </el-form-item>
               </el-col>
             </el-row> -->
-            <el-row>
+            <!-- <el-row>
               <el-col :span="12">
                 <el-form-item label="代理名称：" prop="username">
                   <el-input />
                 </el-form-item>
               </el-col>
-            </el-row>
+            </el-row> -->
             <el-row>
               <el-col :span="12">
-                <el-form-item label="手机号码：" prop="username">
-                  <el-input type="tel" />
+                <el-form-item label="手机号码：" prop="mobile">
+                  <el-input v-model="add.form.mobile" type="mobile" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="状 态：" prop="switch">
-                  <el-radio-group v-model="add.form.switch">
-                    <el-radio label="on">
+                <el-form-item label="状 态：" prop="status">
+                  <el-radio-group v-model="add.form.status">
+                    <el-radio :label="1">
                       开启
                     </el-radio>
-                    <el-radio label="off">
+                    <el-radio :label="0">
                       关闭
                     </el-radio>
                   </el-radio-group>
@@ -74,11 +72,11 @@
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="抽成设置" name="second">
-          <el-form label-position="left" label-width="100px">
+          <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="8">
-                <el-form-item label="抽成比例：" prop="password">
-                  <el-input v-model="add.form.password" type="password" placeholder="请您输入抽成比例" />
+                <el-form-item label="抽成比例：" prop="percentage">
+                  <el-input v-model="add.form.percentage" placeholder="请您输入抽成比例" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
@@ -90,8 +88,8 @@
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="收款信息" name="third">
-          <el-form label-width="100px">
-            <el-row>
+          <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
+            <!-- <el-row>
               <el-col :span="12">
                 <el-form-item>
                   <el-radio-group v-model="add.form.payMethod">
@@ -101,66 +99,66 @@
                   </el-radio-group>
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row v-show="add.form.payMethod === 'bankcard'">
+            </el-row> -->
+            <el-row>
               <el-col :span="24">
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="持卡人姓名：" prop="name">
-                      <el-input v-model="add.form.password" />
+                      <el-input v-model="add.form.name" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item label="银行卡号：" prop="password">
-                      <el-input v-model="add.form.password" />
+                    <el-form-item label="银行卡号：" prop="bank_card">
+                      <el-input v-model="add.form.bank_card" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item label="开户行：" prop="password">
-                      <el-input v-model="add.form.password" />
+                    <el-form-item label="开户行：" prop="bank_address">
+                      <el-input v-model="add.form.bank_address" />
                     </el-form-item>
                   </el-col>
                 </el-row>
               </el-col>
             </el-row>
-            <el-row v-show="add.form.payMethod === 'alipay'">
+            <el-row>
               <el-col :span="24">
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item label="账号：" prop="name">
-                      <el-input v-model="add.form.password" />
+                    <el-form-item label="支付宝账号：" prop="alipay">
+                      <el-input v-model="add.form.alipay" />
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <el-row>
+                <!-- <el-row>
                   <el-col :span="12">
                     <el-form-item label="姓名：" prop="password">
                       <el-input v-model="add.form.password" />
                     </el-form-item>
                   </el-col>
-                </el-row>
+                </el-row> -->
               </el-col>
             </el-row>
-            <el-row v-show="add.form.payMethod === 'wechat'">
+            <el-row>
               <el-col :span="24">
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item label="微信号：" prop="name">
-                      <el-input v-model="add.form.password" />
+                    <el-form-item label="微信号：" prop="wepay">
+                      <el-input v-model="add.form.wepay" />
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <el-row>
+                <!-- <el-row>
                   <el-col :span="12">
                     <el-form-item label="昵称：" prop="password">
                       <el-input v-model="add.form.password" />
                     </el-form-item>
                   </el-col>
-                </el-row>
+                </el-row> -->
               </el-col>
             </el-row>
           </el-form>
@@ -185,7 +183,7 @@
             </el-row>
           </el-form>
         </el-tab-pane> -->
-        <el-tab-pane v-if="current === 'edit'" label="联系信息" name="five">
+        <!-- <el-tab-pane v-if="current === 'edit'" label="联系信息" name="five">
           <el-form label-position="left" label-width="100px">
             <el-row>
               <el-col :span="12">
@@ -216,10 +214,10 @@
               </el-col>
             </el-row>
           </el-form>
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
       <div />
-      <el-button type="success">保存</el-button>
+      <el-button type="success" :loading="add.loading" @click="saveAdd">保存</el-button>
       <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else-if="current === 'wechatConfig'">
@@ -241,7 +239,7 @@
                   <el-input />
                 </el-form-item>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="12" style="padding: 10px;">
                 注意: 上线后请不要更改公众号，否则会影响先前的粉丝，如需换号请申请开新号
               </el-col>
             </el-row>
@@ -424,18 +422,18 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="recommend(row)">
+              <!-- <el-button type="primary" size="mini" @click="recommend(row)">
                 推荐微信菜单
-              </el-button>
+              </el-button> -->
               <el-button type="primary" size="mini" @click="setWechatConfig(row)">
-                微信配置
+                公众查看
               </el-button>
               <el-button type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
             </div>
             <div v-else-if="cl.prop === 'status'">
-              <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'">{{ row[cl.prop] === 1 ? '开启' : '关闭' }}</el-button>
+              <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'" @click="changeStatus(row)">{{ row[cl.prop] === 1 ? '开启' : '关闭' }}</el-button>
             </div>
             <div v-else>
               {{ row[cl.prop] }}
@@ -450,7 +448,7 @@
 </template>
 
 <script>
-import { adminList } from '@/api/proxy/list'
+import { adminList, add_agent, update_agent, getEditOther } from '@/api/proxy/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -463,8 +461,32 @@ export default {
       add: {
         active: 'first',
         form: {
-          switch: 'on',
-          payMethod: 'bankcard'
+          bank_address: '',
+          username: '',
+          password: '',
+          nickname: '',
+          mobile: '',
+          status: 1,
+          percentage: '',
+          name: '',
+          wepay: '',
+          alipay: '',
+          bank_card: ''
+        },
+        loading: false,
+        rules: {
+          username: [
+            { required: true, message: '请输入用户名称' }
+          ],
+          bank_card: [
+            { required: true, message: '请输入银行卡号' }
+          ],
+          name: [
+            { required: true, message: '请输入银行持卡人' }
+          ],
+          bank_address: [
+            { required: true, message: '请输入银行开户行' }
+          ]
         }
       },
       wechatConfig: {
@@ -511,7 +533,7 @@ export default {
             label: '操作',
             prop: 'action',
             align: 'center',
-            width: 298
+            width: 198
           }
         ],
         data: [],
@@ -523,14 +545,64 @@ export default {
     }
   },
   created() {
-    const { current } = this.$route.query
+    const query = this.$route.query
+    const { current } = query
     this.current = current
     if (!current) {
       this.getList()
     }
-    console.log('router: ', this.$route)
+    if (current === 'edit') {
+      for (const key in query) {
+        this.$set(this.add.form, key, query[key])
+      }
+      this.getEditOther()
+    }
   },
   methods: {
+    // 开启关闭
+    changeStatus(row) {
+      const status = row.status === 1 ? 0 : 1
+      this.table.loading = true
+      update_agent({
+        id: row.id,
+        status
+      }).then(res => {
+        this.$message.success(res.message)
+        this.table.loading = false
+        this.getList()
+      }).catch(err => {
+        this.$message.error(err.message)
+        this.table.loading = false
+      })
+    },
+    // 获取其他编辑数据
+    getEditOther() {
+      const id = this.add.form.id
+      getEditOther({ id }).then(res => {
+        const data = res.data
+        for (const key in data) {
+          this.$set(this.add.form, key, data[key])
+        }
+      })
+    },
+    saveAdd() {
+      this.$refs.addForm.validate(valid => {
+        if (valid) {
+          this.add.loading = true
+          const obj = Object.assign({}, this.add.form)
+          obj.pid = obj.pid ? obj.pid : 0
+          const submit = this.current === 'add' ? add_agent : update_agent
+          submit(obj).then(res => {
+            this.$message.success(res.message)
+            this.add.loading = false
+            if (this.current === 'add' && this.$refs.addForm.resetFields()) return
+          })
+        } else {
+          this.$message.error('请您填写完整数据')
+          this.add.loading = false
+        }
+      })
+    },
     // 翻页
     pagin(data) {
       const { limit, page } = data
@@ -545,17 +617,18 @@ export default {
         page: this.table.page
       }).then(response => {
         this.table.data = response.data.data
-        this.table.size = response.data.size
+        this.table.size = response.data.per_page
         this.table.total = response.data.total
         this.table.loading = false
       })
     },
-    toggleCurrent(current = '') {
+    toggleCurrent(current = '', obj) {
       const { fullPath } = this.$route
       this.$router.replace({
         path: '/redirect' + fullPath,
         query: {
-          current
+          current,
+          ...obj
         }
       })
     },
@@ -588,12 +661,7 @@ export default {
       }
     },
     edit(row) {
-      this.toggleCurrent('edit')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.add.form, key, row[key])
-        }
-      }
+      this.toggleCurrent('edit', row)
     },
     handlePreview() {
       //
