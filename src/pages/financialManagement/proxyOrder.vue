@@ -21,7 +21,7 @@
           end-placeholder="结束日期"
         />
       </div>
-      <el-button class="filter-item" style="margin-left: 10px;" icon="el-icon-search" type="primary" />
+      <el-button class="filter-item" style="margin-left: 10px;" icon="el-icon-search" type="primary" @click="getList" />
     </div>
     <aside>
       <a href="javascript:;">
@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { withdrawsList } from '@/api/withdraws/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -194,8 +194,7 @@ export default {
       search: {
         form: {
           proxy: '',
-          date: ''
-
+          date: []
         },
         loading: false
       },
@@ -282,15 +281,14 @@ export default {
     },
     getList() {
       this.table.loading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('response: ', response)
-        this.table.data = response.data.items
+      console.log('search.form.date: ', this.search.form.date)
+      withdrawsList({
+        page: this.table.page,
+        size: this.table.size
+      }).then(response => {
+        this.table.data = response.data.data
         this.table.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.table.loading = false
-        }, 1.5 * 1000)
+        this.table.loading = false
       })
     },
     toggleCurrent(current = '') {

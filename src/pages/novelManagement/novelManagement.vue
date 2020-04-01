@@ -208,7 +208,7 @@
             <el-table-column v-for="sc in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
               <template slot-scope="{ row }">
                 <div v-if="sc.prop === 'name'" style="text-align: left;">
-                  <a href="javascript:;" style="color: #337ab7;" @click="clickSection(row)">
+                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num})">
                     <b style="color: #900;">
                       [{{ row['num'] }}]
                     </b>
@@ -220,7 +220,7 @@
                   <el-button size="mini" type="primary" plain @click="story.tuiguang.visible = true">
                     生成推广文案
                   </el-button>
-                  <el-button size="mini" type="danger" plain @click="story.tuiguanglianjie.visible = true">
+                  <el-button size="mini" type="danger" plain @click="getTuiguang(row)">
                     获取推广链接
                   </el-button>
                 </div>
@@ -254,10 +254,10 @@
         <el-dialog :visible.sync="story.tuiguanglianjie.visible" title="生成推广链接">
           <el-form ref="tuiguanglianjie" :model="story.tuiguanglianjie.form" :rules="story.tuiguanglianjie.rules" label-width="150px">
             <el-form-item label="入口页面：" prop="entry">
-              <el-input v-model="story.tuiguanglianjie.form.entry" />
+              <el-input v-model="story.tuiguanglianjie.form.entry" disabled />
             </el-form-item>
             <el-form-item label="备注：" prop="remark">
-              <el-input v-model="story.tuiguanglianjie.form.entry" />
+              <el-input v-model="story.tuiguanglianjie.form.remark" />
             </el-form-item>
             <el-form-item label="推广类型：" prop="entry">
               <el-radio-group v-model="story.tuiguanglianjie.form.type">
@@ -270,11 +270,11 @@
               </el-radio-group>
               <el-alert show-icon type="warning" title="内推链接 无法引导关注公众号，仅限公众号内部推文使用，如需推广引粉请选择外推" />
             </el-form-item>
-            <el-form-item label="首章显示章节：" prop="entry">
-              <el-input v-model="story.tuiguanglianjie.form.entry" />
+            <el-form-item label="首章显示章节：" prop="firt">
+              <el-input v-model="story.tuiguanglianjie.form.first" />
             </el-form-item>
-            <el-form-item label="关注章节序号：" prop="entry">
-              <el-input v-model="story.tuiguanglianjie.form.entry" placeholder="可选，如不填则使用小说默认设置" />
+            <el-form-item label="关注章节序号：" prop="focus">
+              <el-input v-model="story.tuiguanglianjie.form.focus" placeholder="可选，如不填则使用小说默认设置" />
             </el-form-item>
           </el-form>
           <div style="text-align: center;">
@@ -706,6 +706,7 @@ export default {
         tuiguanglianjie: {
           visible: false,
           form: {
+            entry: '',
             remark: '',
             type: 'inner'
           },
@@ -994,6 +995,11 @@ export default {
     }
   },
   methods: {
+    // 获取推广链接
+    getTuiguang(row) {
+      this.story.tuiguanglianjie.form.entry = row.name
+      this.story.tuiguanglianjie.visible = true
+    },
     // 添加书籍
     bookAdd() {
       this.$refs.add.validate(valid => {

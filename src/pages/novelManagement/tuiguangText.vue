@@ -17,6 +17,7 @@
           <template10 v-if="template === 10" />
           <template11 v-if="template === 11" />
           <template12 v-if="template === 12" />
+          <div id="img" />
         </div>
       </div>
     </div>
@@ -98,6 +99,7 @@
 </template>
 
 <script>
+import html2canvas from 'html2canvas'
 import template1 from './templates/template1'
 import template2 from './templates/template2'
 import template3 from './templates/template3'
@@ -129,6 +131,7 @@ export default {
       text: '',
       title: '你以为嫁了个没钱的男人，他就一定会对你好？',
       content: '',
+      test: '',
       cover: {
         visible: false,
         list: [
@@ -194,11 +197,16 @@ export default {
   methods: {
     // 切换文本和图片模式
     toggleTextImg(mode) {
-      const routeUrl = this.$router.resolve({
-        path: `/tuiguang${mode}`,
-        query: { id: 96 }
+      // const routeUrl = this.$router.resolve({
+      //   path: `/tuiguang${mode}`,
+      //   query: { id: 96 }
+      // })
+      // window.replace(routeUrl.href, '_blank')
+      const dom = document.querySelector('#wx-article-body')
+      const img = document.querySelector('#img')
+      html2canvas(dom).then(function(canvas) {
+        img.appendChild(img)
       })
-      window.replace(routeUrl.href, '_blank')
     },
     // 选择封面
     chooseCoverImg(cl) {
