@@ -1,59 +1,34 @@
 <template>
   <div class="app-container">
     <div v-if="current === 'add' || current === 'edit'">
-      <el-form label-position="left" label-width="100px">
+      <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="100px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="分类名称：" prop="username">
-              <el-autocomplete
-                v-model="add.name"
-                class="inline-input"
-                :fetch-suggestions="querySearch"
-                placeholder="请输入内容"
-                @select="handleSelect"
-              />
+            <el-form-item label="分类名称：" prop="name">
+              <el-input v-model="add.form.name" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="上级分类：" prop="level">
-              <el-select>
-                <el-option value="1">一级代理</el-option>
-                <el-option value="2">二级代理</el-option>
-                <el-option value="3">作者管理员</el-option>
-                <el-option value="4">作者</el-option>
+            <el-form-item label="上级分类：" prop="channel">
+              <el-select v-model="add.form.channel">
+                <el-option :value="1" label="精选" />
+                <el-option :value="2" label="男生" />
+                <el-option :value="3" label="女生" />
+                <el-option :value="4" label="其它" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="分类图片：" prop="password">
-              <el-upload
-                class="upload-demo"
-                :multiple="false"
-                :limit="1"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :file-list="wechatConfig.kefu"
-                :on-success="onUploadKefuSuccess"
-                list-type="picture"
-              >
-                <el-button size="small" type="primary">点击上传</el-button>
-              </el-upload>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="状 态：" prop="switch">
-              <el-radio-group v-model="add.form.switch">
-                <el-radio label="on">
+            <el-form-item label="推荐位状态：" prop="status">
+              <el-radio-group v-model="add.form.status">
+                <el-radio :label="1">
                   开启
                 </el-radio>
-                <el-radio label="off">
+                <el-radio :label="0">
                   关闭
                 </el-radio>
               </el-radio-group>
@@ -61,14 +36,14 @@
           </el-col>
         </el-row>
       </el-form>
-      <el-button type="success">保存</el-button>
+      <el-button type="success" @click="save">保存</el-button>
       <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
-          添加
+          添加推荐位
         </el-button>
         <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
           <el-option value="1" label="全部" />
@@ -110,11 +85,8 @@
               <el-input v-model="row.sort" />
             </div>
             <div v-else-if="cl.prop === 'status'">
-              <el-button v-show="row.status" size="mini" type="primary">
-                开启
-              </el-button>
-              <el-button v-show="!row.status" size="mini" type="danger">
-                禁用
+              <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'" @click="changeStatus(row)">
+                {{ row[cl.prop] === 1 ? '开启' : '禁用' }}
               </el-button>
             </div>
             <div v-else-if="cl.prop === 'number'">
@@ -128,7 +100,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
+      <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.size" @pagination="pagin" />
       <!-- 数据列表 -->
       <el-dialog ref="dataList" :visible.sync="dataList.visible" top="5vh" width="80%" title="数据列表">
         <el-table
@@ -149,11 +121,8 @@
                 <el-input v-model="row.sort" />
               </div>
               <div v-else-if="dc.prop === 'status'">
-                <el-button v-show="row.status" size="mini" type="primary">
-                  开启
-                </el-button>
-                <el-button v-show="!row.status" size="mini" type="danger">
-                  禁用
+                <el-button size="mini" :type="row[dc.prop] === 1 ? 'primary' : 'danger'" @click="dChangeStatus(row)">
+                  {{ row[dc.prop] === 1 ? '开启' : '禁用' }}
                 </el-button>
               </div>
               <div v-else-if="dc.prop === 'number'">
@@ -167,17 +136,18 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="primary">
+        <!-- <el-button type="primary">
           排序
-        </el-button>
-        <pagination v-show="dataList.table.total>0" :total="dataList.table.total" :page.sync="dataList.table.page" :limit.sync="dataList.table.limit" @pagination="getList" />
+        </el-button> -->
+        <pagination :total="dataList.table.total" :page.sync="dataList.table.page" :limit.sync="dataList.table.size" @pagination="dPagin" />
       </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { recommendList } from '@/api/recommend'
+import { recommendList, recommendUpdate, recommendDelete, recommendAdd } from '@/api/recommend/recommend'
+import { bookList, bookDelete } from '@/api/book/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -194,7 +164,8 @@ export default {
           page: 1,
           total: 0,
           loading: false,
-          limit: 10,
+          size: 10,
+          recommend_id: '',
           columns: [
             {
               label: 'ID',
@@ -236,17 +207,17 @@ export default {
       add: {
         active: 'first',
         form: {
-          switch: 'on',
-          payMethod: 'bankcard'
+          status: 1,
+          name: '',
+          sort: '',
+          channel: ''
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入分类名称' }
+          ]
         },
         loading: false
-      },
-      wechatConfig: {
-        form: {
-          kefu: ''
-        },
-        active: 'gzhpz',
-        kefu: []
       },
       current: '',
       table: {
@@ -269,7 +240,7 @@ export default {
           },
           {
             label: '数量',
-            prop: 'number',
+            prop: 'num',
             align: 'center'
           },
           {
@@ -288,39 +259,101 @@ export default {
         total: 0,
         page: 1,
         size: 10,
-        limit: 10,
         loading: false
       }
     }
   },
   created() {
-    const { current } = this.$route.query
+    const query = this.$route.query
+    const { current } = query
     this.current = current
     if (!current) {
       this.getList()
+    } else if (current === 'edit') {
+      for (const key in query) {
+        if (key === status) {
+          this.$set(this.add.form, key, Number(query[key]))
+        }
+        if (key !== 'current') {
+          this.$set(this.add.form, key, query[key])
+        }
+      }
     }
-    console.log('router: ', this.$route)
   },
   methods: {
+    // 保存
+    save() {
+      this.$refs.addForm.validate(valid => {
+        if (valid) {
+          this.add.loading = true
+          const obj = Object.assign({}, this.add.form)
+          const submit = this.current === 'add' ? recommendAdd : recommendUpdate
+          submit(obj).then(res => {
+            this.$message.success(res.message)
+            this.add.loading = false
+            if (this.current === 'add') {
+              this.$refs.addForm.resetFields()
+            }
+          }).catch(() => {
+            this.add.loading = false
+          })
+        }
+      })
+    },
+    // 分页
+    pagin({ page, limit }) {
+      this.table.page = page
+      this.table.size = limit
+      this.getList()
+    },
+    // 数据列表分页
+    dPagin({ page, limit }) {
+      this.dataList.table.page = page
+      this.dataList.table.size = limit
+      this.getDataList()
+    },
+    // 数据列表切换开启禁用
+    dChangeStatus(row) {
+      this.dataList.table.loading = true
+      const status = row.status === 1 ? 0 : 1
+      recommendUpdate({
+        status,
+        id: row.id
+      }).then(res => {
+        this.$message.success(res.message)
+        this.dataList.table.loading = false
+        this.getDataList()
+      })
+    },
+    // 切换开启禁用
+    changeStatus(row) {
+      this.table.loading = true
+      const status = row.status === 1 ? 0 : 1
+      recommendUpdate({
+        status,
+        id: row.id
+      }).then(res => {
+        this.$message.success(res.message)
+        this.table.loading = false
+        this.getList()
+      })
+    },
     getList() {
       this.table.loading = true
       recommendList().then(response => {
         console.log('response: ', response)
-        this.table.data = response.data.items
+        this.table.data = response.data.data
         this.table.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.table.loading = false
-        }, 1.5 * 1000)
+        this.table.loading = false
       })
     },
-    toggleCurrent(current = '') {
-      const { fullPath } = this.$route
+    toggleCurrent(current = '', query) {
+      const { path } = this.$route
       this.$router.replace({
-        path: '/redirect' + fullPath,
+        path: '/redirect' + path,
         query: {
-          current
+          current,
+          ...query
         }
       })
     },
@@ -350,31 +383,8 @@ export default {
         //
       })
     },
-    setWechatConfig(row) {
-      this.toggleCurrent('wechatConfig')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.wechatConfig.form, key, row[key])
-        }
-      }
-    },
     edit(row) {
-      this.toggleCurrent('edit')
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          this.$set(this.add.form, key, row[key])
-        }
-      }
-    },
-    handlePreview() {
-      //
-    },
-    handleRemove() {
-      //
-    },
-    onUploadKefuSuccess(res, file, fileList) {
-      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
-      this.wechatConfig.kefu = fileList
+      this.toggleCurrent('edit', row)
     },
     remove(row) {
       this.$confirm('确认删除此记录吗?', '提示', {
@@ -382,9 +392,18 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        this.table.loading = true
+        recommendDelete({
+          id: row.id
+        }).then(res => {
+          this.table.loading = false
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }).catch(() => {
+          this.table.loading = false
         })
       }).catch(() => {
         //
@@ -396,16 +415,42 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        this.dataList.table.loading = true
+        bookDelete({
+          id: row.id
+        }).then(res => {
+          this.dataList.table.loading = false
+          this.$message({
+            type: 'success',
+            message: res.message
+          })
+          this.getDataList()
+        }).catch(() => {
+          this.dataList.table.loading = false
         })
       }).catch(() => {
         //
       })
     },
     showDataList(row) {
+      this.dataList.table.recommend_id = row.id
       this.dataList.visible = true
+      this.getDataList()
+    },
+    // 获取数据列表
+    getDataList(recommend_id) {
+      this.dataList.table.loading = true
+      bookList({
+        page: this.dataList.table.page,
+        size: this.dataList.table.size,
+        recommend_id: this.dataList.table.recommend_id
+      }).then(res => {
+        this.dataList.table.total = res.data.total
+        this.dataList.table.data = res.data.data
+        this.dataList.table.loading = false
+      }).catch(() => {
+        this.dataList.table.loading = false
+      })
     }
   }
 }
