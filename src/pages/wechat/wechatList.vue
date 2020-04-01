@@ -66,7 +66,7 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="客服二维码" prop="qrcode_url">
+                <el-form-item label="客服二维码" prop="qrcode_thumb_id">
                   <el-upload
                     class="upload-demo"
                     :multiple="false"
@@ -123,15 +123,15 @@
                 <el-form-item label="公众域证明文件" prop="verify_file_id">
                   <el-upload
                     class="upload-demo"
-                    :multiple="false"
-                    :limit="1"
-                    :action="uploadUrl"
+                    action="http://admin_api.fuleien.com/main/common/upload_files"
                     drag
+                    name="files"
                     :headers="headers"
                     :on-remove="proveRemove"
                     :file-list="add.proveList"
+                    :multiple="false"
+                    :limit="1"
                     :on-success="proveUploadSuccess"
-                    list-type="picture"
                   >
                     <i class="el-icon-upload" />
                     <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -256,6 +256,7 @@ export default {
           token: '',
           encoding: '',
           qrcode_url: '',
+          qrcode_thumb_id: '',
           signIn_day: '',
           sub_thumb_id: '',
           verify_file_id: '',
@@ -287,7 +288,7 @@ export default {
           encoding: [
             { required: true, message: '请您输入EncodingAESKey(消息加解密密钥)' }
           ],
-          qrcode_url: [
+          qrcode_thumb_id: [
             { required: true, message: '请上传客服二维码' }
           ]
         },
@@ -353,21 +354,31 @@ export default {
     if (current === 'edit') {
       this.proxyListVisible(true)
       for (const key in query) {
-        if (key === 'qrcode') {
+        if (key === 'qrcode_thumb_url') {
+          console.log('qrcode_thumb_url: ', query[key])
+          const arr = query[key].split('/')
+          const name = arr.splice(arr.length - 1, arr.length)[0]
           this.add.kefuList = [{
-            name: '',
+            name,
             url: query[key]
           }]
-        } else if (key === 'sub_thumb_id') {
-          this.add.kefuList = [{
-            name: '',
+        } else if (key === 'sub_thumb_url') {
+          console.log('sub_thumb_url: ', query[key])
+          const arr = query[key].split('/')
+          const name = arr.splice(arr.length - 1, arr.length)[0]
+          this.add.guanzhuList = [{
+            name,
             url: query[key]
           }]
-        } else if (key === 'encoding') {
-          //
+        } else if (key === 'verify_file_url') {
+          const arr = query[key].split('/')
+          const name = arr.splice(arr.length - 1, arr.length)[0]
+          this.add.proveList = [{
+            name,
+            url: query[key]
+          }]
         } else if (key !== 'current' && key) {
           this.$set(this.add.form, key, query[key])
-          console.log('add: ', this.add.form)
         }
       }
     } else if (!current) {
@@ -388,11 +399,11 @@ export default {
     },
     // 客服上传成功
     kefuUploadSuccess(res, file, fileList) {
-      this.add.form.qrcode_url = res.data.id
+      this.add.form.qrcode_thumb_id = res.data.id
     },
     // 客服删除图片
     kefuRemove() {
-      this.add.form.qrcode_url = ''
+      this.add.form.qrcode_thumb_id = ''
     },
     // 关注二维码上传成功
     guanzhuUploadSuccess(res, file, fileList) {
@@ -442,6 +453,8 @@ export default {
               this.$refs.form1.resetFields()
               this.$refs.form2.reserFields()
             }
+          }).catch(() => {
+            this.add.loading = false
           })
         }
       })
