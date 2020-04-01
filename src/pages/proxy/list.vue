@@ -404,7 +404,7 @@
     </div>
     <div v-else>
       <div class="filter-container">
-        <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
+        <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="toggleCurrent('')" />
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
           添加
         </el-button>
@@ -425,8 +425,8 @@
               <!-- <el-button type="primary" size="mini" @click="recommend(row)">
                 推荐微信菜单
               </el-button> -->
-              <el-button type="primary" size="mini" @click="setWechatConfig(row)">
-                公众查看
+              <el-button type="primary" size="mini" @click="see(row)">
+                公众号查看
               </el-button>
               <el-button type="primary" size="mini" @click="edit(row)">
                 编辑
@@ -670,8 +670,16 @@ export default {
       //
     },
     onUploadKefuSuccess(res, file, fileList) {
-      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
       this.wechatConfig.kefu = fileList
+    },
+    // 查看公众号
+    see(row) {
+      this.$router.push({
+        path: '/wechat/wechat-list',
+        query: {
+          admin_id: row.id
+        }
+      })
     }
   }
 }

@@ -96,7 +96,7 @@ export const asyncRoutes = [
     name: 'wechat',
     alwaysShow: true,
     meta: {
-      title: '微信管理',
+      title: '公众号管理',
       icon: 'wechat'
     },
     children: [
@@ -107,10 +107,10 @@ export const asyncRoutes = [
         meta: { title: '基本配置' }
       },
       {
-        path: 'base-config',
+        path: 'wechat-list',
         component: () => import('@/pages/wechat/wechatList'),
         name: 'wechat-list',
-        meta: { title: '微信列表' }
+        meta: { title: '公众号列表' }
       }
     ]
   },
