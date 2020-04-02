@@ -2,32 +2,32 @@
   <div class="app-container">
     <div class="filter-container">
       <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('export')">
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('export')">
         导出
-      </el-button>
-      <el-select v-model="search.form.proxy" placeholder="我的代理" class="filter-item" style="margin-left: 10px;">
-        <el-option value="1" label="全部代理" />
-        <el-option value="2" label="精选" />
-        <el-option value="3" label="男生" />
-        <el-option value="4" label="女生" />
-        <el-option value="5" label="其它" />
+      </el-button> -->
+      <el-select v-model="search.form.status" placeholder="打款状态" class="filter-item" style="margin-left: 10px;" clearable>
+        <el-option :value="1" label="审核中" />
+        <el-option :value="2" label="已打款" />
       </el-select>
       <div class="filter-item" style="margin-left: 10px;">
         <el-date-picker
-          v-model="search.form.date"
-          type="daterange"
+          v-model="search.date"
+          type="datetimerange"
           range-separator="至"
+          value-format="yyyy-MM-dd hh:mm:ss"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :unlink-panels="true"
+          @change="dateChange"
         />
       </div>
       <el-button class="filter-item" style="margin-left: 10px;" icon="el-icon-search" type="primary" @click="getList" />
     </div>
-    <aside>
+    <!-- <aside>
       <a href="javascript:;">
         金额：总充值<span style="color: #f00;">1000</span>元，提现<span style="color: #f00;">666</span>元。
       </a>
-    </aside>
+    </aside> -->
     <el-table
       v-loading="table.loading"
       :data="table.data"
@@ -43,16 +43,19 @@
             <el-button type="primary" size="mini" @click="seeMore(row)">
               查看详情
             </el-button>
+            <el-button type="danger" size="mini" @click="remove(row)">
+              删除
+            </el-button>
           </div>
           <div v-else-if="cl.prop === 'sort'">
             <el-input v-model="row.sort" />
           </div>
+          <div v-else-if="cl.prop === 'ssje'">
+            {{ row['amount'] - row['fee'] }}
+          </div>
           <div v-else-if="cl.prop === 'status'">
-            <el-button v-show="row.status" size="mini" type="primary" @click="changeStatus(row)">
-              已打款
-            </el-button>
-            <el-button v-show="!row.status" size="mini" type="danger" @click="changeStatus(row)">
-              未打款
+            <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'">
+              {{ row[cl.prop] === 1 ? '已打款' : '未打款' }}
             </el-button>
           </div>
           <div v-else-if="cl.prop === 'number'">
@@ -66,7 +69,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="getList" />
+    <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.size" @pagination="pagin" />
     <!-- 查看详情 -->
     <el-dialog :visible.sync="detail.visible" title="查看详情" width="80%" top="5vh">
       <el-tabs v-model="detail.active">
@@ -139,7 +142,7 @@
 </template>
 
 <script>
-import { withdrawsList } from '@/api/withdraws/list'
+import { withdrawsList, withdrawsDelete } from '@/api/withdraws/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -192,9 +195,11 @@ export default {
       },
       // 搜索
       search: {
+        date: [],
         form: {
-          proxy: '',
-          date: []
+          start_time: '',
+          end_time: '',
+          status: ''
         },
         loading: false
       },
@@ -203,50 +208,49 @@ export default {
         columns: [
           {
             label: '申请人',
-            prop: 'applyPerson',
+            prop: 'admin_name',
             align: 'center'
           },
-          {
-            label: '提交时间',
-            prop: 'submitTime',
-            align: 'center'
-          },
-          {
-            label: '充值金额',
-            prop: 'rechargeMoney',
-            align: 'center'
-          },
+          // {
+          //   label: '提交时间',
+          //   prop: 'submitTime',
+          //   align: 'center'
+          // },
+          // {
+          //   label: '充值金额',
+          //   prop: 'rechargeMoney',
+          //   align: 'center'
+          // },
           {
             label: '提现金额',
-            prop: 'withDraw',
+            prop: 'amount',
             align: 'center'
           },
           {
             label: '手续费',
-            prop: 'serviceCharge',
+            prop: 'fee',
             align: 'center'
           },
           {
             label: '实收金额',
-            prop: 'shje',
+            prop: 'ssje',
             align: 'center'
           },
-          {
-            label: '利润',
-            prop: 'lr',
-            align: 'center'
-          },
+          // {
+          //   label: '利润',
+          //   prop: 'lr',
+          //   align: 'center'
+          // },
           {
             label: '收款人',
-            prop: 'skr',
-            align: 'center',
-            width: 450
-          },
-          {
-            label: '审核',
-            prop: 'sh',
+            prop: 'name',
             align: 'center'
           },
+          // {
+          //   label: '审核',
+          //   prop: 'sh',
+          //   align: 'center'
+          // },
           {
             label: '状态',
             prop: 'status',
@@ -262,7 +266,6 @@ export default {
         total: 0,
         page: 1,
         size: 10,
-        limit: 10,
         loading: false
       }
     }
@@ -273,21 +276,62 @@ export default {
     if (!current) {
       this.getList()
     }
-    console.log('router: ', this.$route)
   },
   methods: {
+    // 删除
+    remove(row) {
+      this.$confirm('确认删除此记录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.table.loading = true
+        withdrawsDelete({
+          id: row.id
+        }).then(res => {
+          this.table.loading = false
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getList()
+        }).catch(() => {
+          this.table.loading = false
+        })
+      })
+    },
+    // 翻页
+    pagin({ page, limit }) {
+      this.table.page = page
+      this.table.size = limit
+      this.getList()
+    },
+    // 修改时间
+    dateChange(date) {
+      if (date) {
+        this.search.form.start_time = date[0]
+        this.search.form.end_time = date[1]
+      } else {
+        this.search.form.start_time = ''
+        this.search.form.end_time = ''
+      }
+    },
     changeStatus(row) {
       console.log('row: ', row)
     },
     getList() {
       this.table.loading = true
-      console.log('search.form.date: ', this.search.form.date)
       withdrawsList({
         page: this.table.page,
-        size: this.table.size
+        size: this.table.size,
+        status: this.search.form.status,
+        start_time: this.search.form.start_time,
+        end_time: this.search.form.end_time
       }).then(response => {
         this.table.data = response.data.data
         this.table.total = response.data.total
+        this.table.loading = false
+      }).catch(() => {
         this.table.loading = false
       })
     },

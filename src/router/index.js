@@ -228,6 +228,25 @@ export const asyncRoutes = [
         meta: { title: '关键字回复' }
       }
     ]
+  },
+  {
+    path: '/orderManagement',
+    component: Layout,
+    redirect: '/orderManagement/list',
+    name: 'order-management',
+    alwaysShow: true,
+    meta: {
+      title: '订单管理',
+      icon: 'star'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/orderManagement/list'),
+        name: 'order-list',
+        meta: { title: '订单列表' }
+      }
+    ]
   }
 ]
 
