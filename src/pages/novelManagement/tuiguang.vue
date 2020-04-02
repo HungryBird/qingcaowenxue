@@ -45,8 +45,8 @@
             <i class="el-icon-caret-top el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="text">文本模式</el-dropdown-item>
-            <el-dropdown-item command="img">图片模式</el-dropdown-item>
+            <el-dropdown-item command="Text">文本模式</el-dropdown-item>
+            <el-dropdown-item command="Img">图片模式</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-dropdown trigger="click" @command="chooseContentTemplate">
@@ -202,11 +202,7 @@ export default {
   methods: {
     // 切换文本和图片模式
     toggleTextImg(mode) {
-      const routeUrl = this.$router.resolve({
-        path: `/tuiguang${mode}`,
-        query: { id: 96 }
-      })
-      window.replace(routeUrl.href, '_blank')
+      this.mode = mode
     },
     // 选择封面
     chooseCoverImg(cl) {

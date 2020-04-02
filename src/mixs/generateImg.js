@@ -19,7 +19,6 @@ export default {
   },
   methods: {
     generaImg() {
-      console.log('generaImg')
       const dom = document.querySelector('#wx-article-body')
       html2canvas(dom).then(function(canvas) {
         const url = canvas.toDataURL('image/png')
@@ -27,6 +26,14 @@ export default {
       }.bind(this)).catch(err => {
         console.log('err: ', err)
       })
+    }
+  },
+  watch: {
+    mode(mode) {
+      this.imgUrl = ''
+      if (mode === 'Img') {
+        this.generaImg()
+      }
     }
   }
 }

@@ -1228,7 +1228,6 @@ export default {
     // 切换页面
     toggleCurrent(current = '', obj) {
       const { path } = this.$route
-      console.log('this.$route: ', this.$route)
       this.$router.replace({
         path: '/redirect' + path,
         query: {
