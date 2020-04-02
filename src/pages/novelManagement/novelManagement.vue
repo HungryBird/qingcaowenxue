@@ -650,7 +650,7 @@ export default {
       // 选择推广模式
       chooseTuiguang(mode) {
         const routeUrl = this.$router.resolve({
-          path: `/tuiguang${mode}`,
+          path: `/tuiguang?mode=${mode}`,
           query: { id: 96 }
         })
         window.open(routeUrl.href, '_blank')

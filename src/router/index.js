@@ -61,12 +61,8 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/tuiguangImg',
-    component: () => import('@/pages/novelManagement/tuiguangImg')
-  },
-  {
-    path: '/tuiguangText',
-    component: () => import('@/pages/novelManagement/tuiguangText')
+    path: '/tuiguang',
+    component: () => import('@/pages/novelManagement/tuiguang')
   },
   {
     path: '/',

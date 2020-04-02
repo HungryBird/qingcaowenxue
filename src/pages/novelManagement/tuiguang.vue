@@ -7,17 +7,16 @@
       <div class="rich_media_content">
         <el-image :src="cover.src" style="margin-bottom: 20px;width: 100%;" />
         <div id="content">
-          <template1 v-if="template === 1" />
-          <template2 v-if="template === 2" />
-          <template3 v-if="template === 3" />
-          <template4 v-if="template === 4" />
-          <template5 v-if="template === 5" />
-          <template6 v-if="template === 6" />
-          <template7 v-if="template === 7" />
-          <template10 v-if="template === 10" />
-          <template11 v-if="template === 11" />
-          <template12 v-if="template === 12" />
-          <div id="img" />
+          <template1 v-if="template === 1" :mode="mode" />
+          <template2 v-if="template === 2" :mode="mode" />
+          <template3 v-if="template === 3" :mode="mode" />
+          <template4 v-if="template === 4" :mode="mode" />
+          <template5 v-if="template === 5" :mode="mode" />
+          <template6 v-if="template === 6" :mode="mode" />
+          <template7 v-if="template === 7" :mode="mode" />
+          <template10 v-if="template === 10" :mode="mode" />
+          <template11 v-if="template === 11" :mode="mode" />
+          <template12 v-if="template === 12" :mode="mode" />
         </div>
       </div>
     </div>
@@ -42,7 +41,8 @@
         </div>
         <el-dropdown trigger="click" @command="toggleTextImg">
           <span>
-            文本模式<i class="el-icon-caret-top el-icon--right" />
+            {{ mode === 'Text' ? '文本模式' : '图片模式' }}
+            <i class="el-icon-caret-top el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="text">文本模式</el-dropdown-item>
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-import html2canvas from 'html2canvas'
 import template1 from './templates/template1'
 import template2 from './templates/template2'
 import template3 from './templates/template3'
@@ -127,6 +126,8 @@ export default {
   },
   data() {
     return {
+      mode: '',
+      img: '',
       template: 1,
       text: '',
       title: '你以为嫁了个没钱的男人，他就一定会对你好？',
@@ -194,19 +195,18 @@ export default {
       ]
     }
   },
+  created() {
+    const { mode } = this.$route.query
+    this.mode = mode
+  },
   methods: {
     // 切换文本和图片模式
     toggleTextImg(mode) {
-      // const routeUrl = this.$router.resolve({
-      //   path: `/tuiguang${mode}`,
-      //   query: { id: 96 }
-      // })
-      // window.replace(routeUrl.href, '_blank')
-      const dom = document.querySelector('#wx-article-body')
-      const img = document.querySelector('#img')
-      html2canvas(dom).then(function(canvas) {
-        img.appendChild(img)
+      const routeUrl = this.$router.resolve({
+        path: `/tuiguang${mode}`,
+        query: { id: 96 }
       })
+      window.replace(routeUrl.href, '_blank')
     },
     // 选择封面
     chooseCoverImg(cl) {
