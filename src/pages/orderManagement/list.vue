@@ -35,28 +35,20 @@
               {{ row[cl.prop].nickname }}
             </a>
           </div>
+          <div v-else-if="cl.prop === 'pay_type'">
+            {{ row[cl.prop] | payWay }}
+          </div>
           <div v-else-if="cl.prop === 'cover'">
             <el-image :src="row[cl.prop]" />
           </div>
-          <div v-else-if="cl.prop === 'name'">
-            <div>
-              推荐精彩文章：医流高手
-              <a style="color: #069;" @click.stop="handleTest(row)">
-                [测试发送]
-              </a>
-            </div>
-            <div>
-              URL：<a href="javascript:;" style="color: #069;">http://new.fuleien.com/index/user/history/uid=1</a>
-            </div>
+          <div v-else-if="cl.prop === 'member_name'" style="text-align: left;">
+            <a style="color: #337ab7;">
+              <el-image style="vertical-align: middle;border-radius: 50%;" />
+              {{ row[cl.prop] }}
+            </a>
           </div>
           <div v-else-if="cl.prop === 'status'">
-            <!-- <el-button v-if="!row[cl.prop]" size="mini" type="danger">
-              禁用
-            </el-button>
-            <el-button v-else size="mini" type="primary">
-              开启
-            </el-button> -->
-            {{ row[cl.prop] === 1 ? '开启' : '禁用' }}
+            {{ row[cl.prop] | statusFilter }}
           </div>
           <div v-else>
             {{ row[cl.prop] }}
@@ -71,10 +63,23 @@
 <script>
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { rechargeList } from '@/api/orderManagement/list'
 
 export default {
   name: 'ComplexTable',
   components: { Pagination },
+  filters: {
+    statusFilter(status) {
+      switch (status) {
+        case 0:
+          return '已支付'
+        case 1:
+          return '未支付'
+        default:
+          return '已取消'
+      }
+    }
+  },
   mixins: [mix],
   data() {
     return {
@@ -113,7 +118,7 @@ export default {
           },
           {
             label: '订单号',
-            prop: 'ordersn',
+            prop: 'order_no',
             align: 'center'
           },
           {
@@ -123,18 +128,18 @@ export default {
           },
           {
             label: '用户',
-            prop: 'users',
+            prop: 'member_name',
             align: 'center',
-            width: 400
+            width: 200
           },
           {
             label: '订单金额',
-            prop: 'money',
+            prop: 'amount',
             align: 'center'
           },
           {
             label: '支付方式',
-            prop: 'way',
+            prop: 'pay_type',
             align: 'center'
           },
           {
@@ -149,7 +154,7 @@ export default {
           },
           {
             label: '订单日期',
-            prop: 'createtime',
+            prop: 'create_time',
             align: 'center'
           }
         ],
@@ -208,9 +213,17 @@ export default {
     },
     getList() {
       this.table.loading = true
-      this.table.data = [{}, {}]
-      this.table.total = 2
-      this.table.loading = false
+      rechargeList({
+        size: this.table.size,
+        page: this.table.page
+      }).then(res => {
+        this.table.data = res.data.data
+        this.table.total = res.data.total
+        this.table.size = res.data.size
+        this.table.loading = false
+      }).catch(() => {
+        this.table.loading = false
+      })
     },
     toggleCurrent(current = '', data) {
       const { path } = this.$route

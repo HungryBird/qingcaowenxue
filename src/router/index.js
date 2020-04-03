@@ -204,7 +204,7 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'list',
+        path: 'proxyOrder',
         component: () => import('@/pages/financialManagement/proxyOrder'),
         name: 'proxy-order',
         meta: { title: '代理提现单' }

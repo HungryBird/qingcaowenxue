@@ -31,3 +31,11 @@ export function withdrawsDelete(params) {
     params
   })
 }
+
+export function withdrawDetail(params) {
+  return request({
+    url: '/withdraws/detailed_list',
+    method: 'get',
+    params
+  })
+}

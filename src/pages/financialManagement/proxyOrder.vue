@@ -83,7 +83,7 @@
               </el-col>
               <el-col :span="12">
                 <el-form-item label="日期：">
-                  {{ detail.form.rq }}
+                  {{ detail.form.send_money_time }}
                 </el-form-item>
               </el-col>
             </el-row>
@@ -103,7 +103,7 @@
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item>
+                <el-form-item label="打款状态：">
                   未打款
                 </el-form-item>
               </el-col>
@@ -130,7 +130,12 @@
           >
             <el-table-column v-for="ec in detail.table.columns" :key="ec.prop" :prop="ec.prop" :label="ec.label" :align="ec.align">
               <template slot-scope="{ row }">
-                {{ row[cl.prop] }}
+                <div v-if="ec.prop === 'lr'">
+                  {{ row['ret_amount'] - row['amount'] }}
+                </div>
+                <div v-else>
+                  {{ row[ec.prop] }}
+                </div>
               </template>
             </el-table-column>
             <pagination v-show="detail.table.total>0" :total="detail.table.total" :page.sync="detail.table.page" :limit.sync="detail.table.limit" @pagination="getList" />
@@ -142,7 +147,7 @@
 </template>
 
 <script>
-import { withdrawsList, withdrawsDelete } from '@/api/withdraws/list'
+import { withdrawsList, withdrawsDelete, withdrawDetail } from '@/api/withdraws/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -162,22 +167,22 @@ export default {
           columns: [
             {
               label: '日期',
-              prop: 'rq',
+              prop: 'time',
               align: 'center'
             },
             {
               label: '充值金额',
-              prop: 'czje',
+              prop: 'ret_amount',
               align: 'center'
             },
             {
               label: '抽成比例',
-              prop: 'ccbl',
+              prop: 'percentage',
               align: 'center'
             },
             {
               label: '结算金额',
-              prop: 'jsje',
+              prop: 'amount',
               align: 'center'
             },
             {
@@ -259,7 +264,8 @@ export default {
           {
             label: '操作',
             prop: 'action',
-            align: 'center'
+            align: 'center',
+            width: 210
           }
         ],
         data: [],
@@ -348,6 +354,15 @@ export default {
       //
     },
     seeMore(row) {
+      this.detail.loading = true
+      withdrawDetail({
+        id: row.id
+      }).then(res => {
+        this.detail.table.data = res.data
+        this.detail.loading = false
+      }).catch(() => {
+        this.detail.loading = false
+      })
       this.detail.visible = true
       for (const key in row) {
         if (row.hasOwnProperty(key)) {
