@@ -57,6 +57,10 @@
       margin-right: 16px;
     }
 
+    .element-icon {
+      margin-right: 16px;
+    }
+
     .el-menu {
       border: none;
       height: 100%;
@@ -121,6 +125,11 @@
         .el-submenu__icon-arrow {
           display: none;
         }
+
+        .element-icon {
+          margin-left: 20px;
+        }
+
       }
     }
 
@@ -176,6 +185,9 @@
 .el-menu--vertical {
   &>.el-menu {
     .svg-icon {
+      margin-right: 16px;
+    }
+    .element-icon {
       margin-right: 16px;
     }
   }
