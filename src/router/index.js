@@ -84,7 +84,26 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-
+  {
+    path: '/notice',
+    component: Layout,
+    redirect: '/notice/list',
+    name: 'notice',
+    alwaysShow: true,
+    meta: {
+      title: '公告管理',
+      iconType: 'element',
+      icon: 'message'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/notice/list'),
+        name: 'notice-list',
+        meta: { title: '公告列表' }
+      }
+    ]
+  },
   {
     path: '/wechat',
     component: Layout,
