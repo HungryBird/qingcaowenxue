@@ -2,6 +2,7 @@
 export default {
   created() {
     const { params, query } = this.$route
+    console.log('redirect: ', this.$route)
     const { path } = params
     this.$router.replace({ path: '/' + path, query })
   },
