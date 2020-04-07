@@ -393,9 +393,9 @@
           <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :type="cl.type" :label="cl.label" :width="cl.width" :align="cl.align">
             <template slot-scope="{ row }">
               <div v-if="cl.prop === 'action'">
-                <el-button type="primary" size="mini" @click="toShare(row)">
-                  分享
-                </el-button>
+                <!-- <el-button type="primary" size="mini" @click="toShare(row)">
+                  分章
+                </el-button> -->
                 <el-button type="primary" size="mini" @click="toCopyNovel(row)">
                   复制
                 </el-button>
@@ -425,10 +425,10 @@
                   <!-- {{ row['description'] }} -->
                 </div>
                 <div style="display: flex;align-items: center;">
-                  <a style="font-size: 12px;color: #337ab7;padding-right: 4px;">http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html</a>
-                  <el-button size="mini" icon="el-icon-document" @click="handleCopy('http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html', $event)">
+                  <!-- <a style="font-size: 12px;color: #337ab7;padding-right: 4px;">http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html</a> -->
+                  <!-- <el-button size="mini" icon="el-icon-document" @click="handleCopy('http://new.fuleien.com/index/books/bookinfo/uid/1/id/31.html', $event)">
                     复制
-                  </el-button>
+                  </el-button> -->
                 </div>
                 <div style="display: flex;align-items: center;">
                   <span>
@@ -640,7 +640,7 @@ export default {
   data() {
     return {
       // 上传地址
-      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
       // 上传头部
       headers: {
         token: ''

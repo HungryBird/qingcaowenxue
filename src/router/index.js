@@ -115,12 +115,12 @@ export const asyncRoutes = [
       icon: 'wechat'
     },
     children: [
-      {
+      /* {
         path: 'base-config',
         component: () => import('@/pages/wechat/baseConfig'),
         name: 'BaseConfig',
         meta: { title: '基本配置' }
-      },
+      }, */
       {
         path: 'wechat-list',
         component: () => import('@/pages/wechat/wechatList'),

@@ -15,7 +15,7 @@
               <el-col :span="12">
                 <el-form-item label="公众号代理" prop="admin_id">
                   <el-select v-model="add.form.admin_id" clearable @visible-change="proxyListVisible">
-                    <el-option v-for="op in options.proxyList" :key="op.id" :label="op.name" :value="op.id" />
+                    <el-option v-for="op in options.proxyList" :key="op.id" :label="op.username" :value="op.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -123,7 +123,7 @@
                 <el-form-item label="公众域证明文件" prop="verify_file_id">
                   <el-upload
                     class="upload-demo"
-                    action="http://admin_api.fuleien.com/main/common/upload_files"
+                    :action="uploadFileUrl"
                     drag
                     name="files"
                     :headers="headers"
@@ -145,14 +145,14 @@
           <el-form ref="form2" :model="add.form" :rules="add.rules" label-width="100px">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="签到天数" prop="signIn_day">
+                <el-form-item label="开始签到赠送书币" prop="signIn_day">
                   <el-input v-model="add.form.signIn_day" placeholder="请输入内容" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item label="签到送书币" prop="continuity">
+                <el-form-item label="每天签到送书币" prop="continuity">
                   <el-input v-model="add.form.continuity" placeholder="请输入内容" />
                 </el-form-item>
               </el-col>
@@ -177,7 +177,7 @@
           添加
         </el-button>
         <el-select v-model="search.form.admin_id" class="filter-item" style="margin-left: 10px;" clearable @visible-change="proxyListVisible">
-          <el-option v-for="op in options.proxyList" :key="op.id" :label="op.name" :value="op.id" />
+          <el-option v-for="op in options.proxyList" :key="op.id" :label="op.username" :value="op.id" />
         </el-select>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="getList">
           搜索
@@ -219,6 +219,7 @@
 
 <script>
 import { wechatList, wechatDelete, wechatAdd, wechatUpdate } from '@/api/wechat/wechat'
+import { adminList } from '@/api/proxy/list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import mix from '@/mixs/mix'
 
@@ -240,7 +241,8 @@ export default {
         loading: false
       },
       // 上传地址
-      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
+      uploadFileUrl: process.env.VUE_APP_BASE_API + '/common/upload_files',
       // 上传头部
       headers: {
         token: ''
@@ -431,8 +433,7 @@ export default {
     // 打开代理列表下拉
     proxyListVisible(val) {
       if (val) {
-        wechatList({
-          type: 2,
+        adminList({
           size: 99999
         }).then(res => {
           this.options.proxyList = res.data.data
