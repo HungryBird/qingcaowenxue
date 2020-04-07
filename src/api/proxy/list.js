@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function adminList(query) {
   return request({
-    url: '/admin/list',
+    url: '/admin/list_agent',
     method: 'get',
     params: query
   })

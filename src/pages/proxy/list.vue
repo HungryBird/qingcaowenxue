@@ -6,7 +6,7 @@
           <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="管理员账号：" prop="username">
+                <el-form-item label="登录账号：" prop="username">
                   <el-input v-model="add.form.username" />
                 </el-form-item>
               </el-col>
@@ -41,17 +41,24 @@
                 </el-form-item>
               </el-col>
             </el-row> -->
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="手机号码：" prop="mobile">
+                  <el-input v-model="add.form.mobile" type="mobile" />
+                </el-form-item>
+              </el-col>
+            </el-row>
             <!-- <el-row>
               <el-col :span="12">
-                <el-form-item label="代理名称：" prop="username">
-                  <el-input />
+                <el-form-item label="真实名：" prop="truename">
+                  <el-input v-model="add.form.truename" />
                 </el-form-item>
               </el-col>
             </el-row> -->
             <el-row>
               <el-col :span="12">
-                <el-form-item label="手机号码：" prop="mobile">
-                  <el-input v-model="add.form.mobile" type="mobile" />
+                <el-form-item label="昵称：" prop="nickname">
+                  <el-input v-model="add.form.nickname" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -75,13 +82,13 @@
           <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="8">
-                <el-form-item label="抽成比例：" prop="percentage">
+                <el-form-item label="抽成百分比：" prop="percentage">
                   <el-input v-model="add.form.percentage" placeholder="请您输入抽成比例" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
                 <div style="line-height: 36px;padding: 0 10px;">
-                  <span>填写 0 到 1 之间的数字。</span><span style="color: #f00;">若用户充值 1000 元, 抽成比例为 0.7，则需要向该代理打款 1000 x 0.7 = 700 元</span>
+                  <span>填写 0 到 100 之间的数字。</span><span style="color: #f00;">若用户充值 1000 元, 抽成比例为 70，则需要向该代理打款 1000 x 70% = 700 元</span>
                 </div>
               </el-col>
             </el-row>
@@ -509,19 +516,19 @@ export default {
             prop: 'username',
             align: 'center'
           },
-          {
-            label: '角色',
-            prop: 'title',
-            align: 'center'
-          },
+          // {
+          //   label: '角色',
+          //   prop: 'title',
+          //   align: 'center'
+          // },
           {
             label: '上次登录时间',
             prop: 'update_time',
             align: 'center'
           },
           {
-            label: '真实姓名',
-            prop: 'truename',
+            label: '昵称',
+            prop: 'nickname',
             align: 'center'
           },
           {
@@ -539,7 +546,7 @@ export default {
         data: [],
         total: 0,
         page: 1,
-        size: 10,
+        size: 20,
         loading: false
       }
     }
@@ -580,6 +587,7 @@ export default {
       const id = this.add.form.id
       getEditOther({ id }).then(res => {
         const data = res.data
+        data.password = ''
         for (const key in data) {
           this.$set(this.add.form, key, data[key])
         }
@@ -596,6 +604,9 @@ export default {
             this.$message.success(res.message)
             this.add.loading = false
             if (this.current === 'add' && this.$refs.addForm.resetFields()) return
+            this.toggleCurrent()
+          }).catch(() => {
+            this.add.loading = false
           })
         } else {
           this.$message.error('请您填写完整数据')
@@ -613,6 +624,7 @@ export default {
     getList() {
       this.table.loading = true
       adminList({
+        type: 2,
         size: this.table.size,
         page: this.table.page
       }).then(response => {
