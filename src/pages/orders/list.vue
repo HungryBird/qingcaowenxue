@@ -63,7 +63,7 @@
 <script>
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { rechargeList } from '@/api/orderManagement/list'
+import { rechargeList } from '@/api/orders/list'
 
 export default {
   name: 'ComplexTable',

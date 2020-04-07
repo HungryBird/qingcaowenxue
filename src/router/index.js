@@ -62,7 +62,7 @@ export const constantRoutes = [
   },
   {
     path: '/tuiguang',
-    component: () => import('@/pages/novelManagement/tuiguang')
+    component: () => import('@/pages/novels/tuiguang')
   },
   {
     path: '/',
@@ -149,10 +149,10 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/novelManagement',
+    path: '/novels',
     component: Layout,
-    redirect: '/novelManagement/novelManagement',
-    name: 'novelManagement',
+    redirect: '/novels/novels',
+    name: 'novels',
     alwaysShow: true,
     meta: {
       title: '小说管理',
@@ -160,14 +160,14 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'novelManagement',
-        component: () => import('@/pages/novelManagement/novelManagement'),
+        path: 'novels',
+        component: () => import('@/pages/novels/novels'),
         name: 'novel-management',
         meta: { title: '小说管理' }
       },
       {
-        path: 'categoriesManagement',
-        component: () => import('@/pages/novelManagement/categoriesManagement'),
+        path: 'categories',
+        component: () => import('@/pages/novels/categories'),
         name: 'catogories-management',
         meta: { title: '分类管理' }
       }
@@ -193,9 +193,9 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/financialManagement',
+    path: '/financial',
     component: Layout,
-    redirect: '/financialManagement/proxyOrder',
+    redirect: '/financial/proxyOrder',
     name: 'financial-management',
     alwaysShow: true,
     meta: {
@@ -205,16 +205,16 @@ export const asyncRoutes = [
     children: [
       {
         path: 'proxyOrder',
-        component: () => import('@/pages/financialManagement/proxyOrder'),
+        component: () => import('@/pages/financial/proxyOrder'),
         name: 'proxy-order',
         meta: { title: '代理提现单' }
       }
     ]
   },
   {
-    path: '/promoteManagement',
+    path: '/promote',
     component: Layout,
-    redirect: '/promoteManagement/list',
+    redirect: '/promote/list',
     name: 'promote-management',
     alwaysShow: true,
     meta: {
@@ -224,34 +224,34 @@ export const asyncRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/pages/promoteManagement/list'),
+        component: () => import('@/pages/promote/list'),
         name: 'promote-list',
         meta: { title: '推广列表' }
       },
       {
         path: 'mass',
-        component: () => import('@/pages/promoteManagement/mass'),
+        component: () => import('@/pages/promote/mass'),
         name: 'promote-mass',
         meta: { title: '群发推广' }
       },
       {
         path: 'activity',
-        component: () => import('@/pages/promoteManagement/activity'),
+        component: () => import('@/pages/promote/activity'),
         name: 'promote-mass',
         meta: { title: '促销活动' }
       },
       {
         path: 'keywords',
-        component: () => import('@/pages/promoteManagement/keywords'),
+        component: () => import('@/pages/promote/keywords'),
         name: 'keywords',
         meta: { title: '关键字回复' }
       }
     ]
   },
   {
-    path: '/orderManagement',
+    path: '/orders',
     component: Layout,
-    redirect: '/orderManagement/list',
+    redirect: '/orders/list',
     name: 'order-management',
     alwaysShow: true,
     meta: {
@@ -262,7 +262,7 @@ export const asyncRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/pages/orderManagement/list'),
+        component: () => import('@/pages/orders/list'),
         name: 'order-list',
         meta: { title: '订单列表' }
       }
