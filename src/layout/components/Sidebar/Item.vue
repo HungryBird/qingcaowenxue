@@ -7,17 +7,27 @@ export default {
       type: String,
       default: ''
     },
+    iconType: {
+      type: String,
+      default: ''
+    },
     title: {
       type: String,
       default: ''
     }
   },
   render(h, context) {
-    const { icon, title } = context.props
+    const { icon, title, iconType } = context.props
     const vnodes = []
 
     if (icon) {
-      vnodes.push(<svg-icon icon-class={icon}/>)
+      if (iconType === 'element') {
+        const nIcon = `el-icon-${icon} element-icon`
+        const style = 'color: rgb(191, 203, 217);width: 1em;font-size: 16px;'
+        vnodes.push(<i class={nIcon} style={style} />)
+      } else {
+        vnodes.push(<svg-icon icon-class={icon} />)
+      }
     }
 
     if (title) {

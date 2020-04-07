@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
+import router from '@/router'
 import { getToken } from '@/utils/auth'
 
 // const baseURL = process.env.NODE_ENV === 'development' ? 'http://admin_api.fuleien.com' : 'http://admin_api.qc667.com'
@@ -48,7 +49,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 0) {
+    if (res.code === 1) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -69,6 +70,11 @@ service.interceptors.response.use(
         })
       }
       return Promise.reject(new Error(res.message || 'Error'))
+    } else if (res.code === 2) {
+      store.dispatch('user/logout').then(() => {
+        // router.push(`/login?redirect=${route.fullPath}`)
+        router.push('/login')
+      })
     } else {
       return res
     }

@@ -66,3 +66,18 @@ export function toThousandFilter(num) {
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+/**
+ * 支付方式
+ * @param {Number} num
+ */
+export function payWay(num) {
+  switch (num) {
+    case 1:
+      return '支付宝'
+    case 2:
+      return '微信'
+    default:
+      return '银行卡'
+  }
+}

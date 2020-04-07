@@ -23,3 +23,19 @@ export function withdrawsUpdate(data) {
     data
   })
 }
+
+export function withdrawsDelete(params) {
+  return request({
+    url: '/withdraws/delete',
+    method: 'get',
+    params
+  })
+}
+
+export function withdrawDetail(params) {
+  return request({
+    url: '/withdraws/detailed_list',
+    method: 'get',
+    params
+  })
+}

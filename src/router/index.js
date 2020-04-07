@@ -84,7 +84,26 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-
+  {
+    path: '/notice',
+    component: Layout,
+    redirect: '/notice/list',
+    name: 'notice',
+    alwaysShow: true,
+    meta: {
+      title: '公告管理',
+      iconType: 'element',
+      icon: 'message'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/notice/list'),
+        name: 'notice-list',
+        meta: { title: '公告列表' }
+      }
+    ]
+  },
   {
     path: '/wechat',
     component: Layout,
@@ -185,7 +204,7 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'list',
+        path: 'proxyOrder',
         component: () => import('@/pages/financialManagement/proxyOrder'),
         name: 'proxy-order',
         meta: { title: '代理提现单' }
@@ -226,6 +245,26 @@ export const asyncRoutes = [
         component: () => import('@/pages/promoteManagement/keywords'),
         name: 'keywords',
         meta: { title: '关键字回复' }
+      }
+    ]
+  },
+  {
+    path: '/orderManagement',
+    component: Layout,
+    redirect: '/orderManagement/list',
+    name: 'order-management',
+    alwaysShow: true,
+    meta: {
+      title: '订单管理',
+      iconType: 'element',
+      icon: 's-order'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/orderManagement/list'),
+        name: 'order-list',
+        meta: { title: '订单列表' }
       }
     ]
   }
