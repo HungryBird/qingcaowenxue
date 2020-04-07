@@ -105,6 +105,27 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/stat',
+    component: Layout,
+    redirect: '/stat/stat',
+    name: 'stat',
+    alwaysShow: true,
+    meta: {
+      title: '数据统计管理',
+      icon: 'chart'
+    },
+    children: [
+      {
+        path: 'stat',
+        component: () => import('@/pages/stat/stat'),
+        name: 'stat-stat',
+        meta: {
+          title: '数据统计'
+        }
+      }
+    ]
+  },
+  {
     path: '/wechat',
     component: Layout,
     redirect: '/wechat/base-config',
@@ -265,6 +286,114 @@ export const asyncRoutes = [
         component: () => import('@/pages/orders/list'),
         name: 'order-list',
         meta: { title: '订单列表' }
+      }
+    ]
+  },
+  {
+    path: '/members',
+    component: Layout,
+    redirect: '/members/list',
+    name: 'members',
+    alwaysShow: true,
+    meta: {
+      title: '会员管理',
+      icon: 'peoples'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/members/list'),
+        name: 'members-stat',
+        meta: {
+          title: '会员列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/lagerImages',
+    component: Layout,
+    redirect: '/lagerImages/list',
+    name: 'lager-images',
+    alwaysShow: true,
+    meta: {
+      title: '大图管理',
+      icon: 'picture',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/lagerImages/list'),
+        name: 'members-stat',
+        meta: {
+          title: '大图列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/comments',
+    component: Layout,
+    redirect: '/comments/list',
+    name: 'comments',
+    alwaysShow: true,
+    meta: {
+      title: '评论管理',
+      icon: 'chat-round',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/comments/list'),
+        name: 'comments-list',
+        meta: {
+          title: '评论列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/copywriter',
+    component: Layout,
+    redirect: '/copywriter/material',
+    name: 'comments',
+    alwaysShow: true,
+    meta: {
+      title: '文案管理',
+      icon: 's-management',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'material',
+        component: () => import('@/pages/copywriter/material'),
+        name: 'copywriter-material',
+        meta: {
+          title: '文案素材'
+        }
+      }
+    ]
+  },
+  {
+    path: '/authors',
+    component: Layout,
+    redirect: '/authors/list',
+    name: 'authors',
+    alwaysShow: true,
+    meta: {
+      title: '作者管理',
+      icon: 'people'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/authors/list'),
+        name: 'authors-list',
+        meta: {
+          title: '作者列表'
+        }
       }
     ]
   }
