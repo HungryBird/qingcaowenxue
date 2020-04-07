@@ -62,7 +62,7 @@ export const constantRoutes = [
   },
   {
     path: '/tuiguang',
-    component: () => import('@/pages/novelManagement/tuiguang')
+    component: () => import('@/pages/novels/tuiguang')
   },
   {
     path: '/',
@@ -101,6 +101,27 @@ export const asyncRoutes = [
         component: () => import('@/pages/notice/list'),
         name: 'notice-list',
         meta: { title: '公告列表' }
+      }
+    ]
+  },
+  {
+    path: '/stat',
+    component: Layout,
+    redirect: '/stat/stat',
+    name: 'stat',
+    alwaysShow: true,
+    meta: {
+      title: '数据统计管理',
+      icon: 'chart'
+    },
+    children: [
+      {
+        path: 'stat',
+        component: () => import('@/pages/stat/stat'),
+        name: 'stat-stat',
+        meta: {
+          title: '数据统计'
+        }
       }
     ]
   },
@@ -149,10 +170,10 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/novelManagement',
+    path: '/novels',
     component: Layout,
-    redirect: '/novelManagement/novelManagement',
-    name: 'novelManagement',
+    redirect: '/novels/novels',
+    name: 'novels',
     alwaysShow: true,
     meta: {
       title: '小说管理',
@@ -160,14 +181,14 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'novelManagement',
-        component: () => import('@/pages/novelManagement/novelManagement'),
+        path: 'novels',
+        component: () => import('@/pages/novels/novels'),
         name: 'novel-management',
         meta: { title: '小说管理' }
       },
       {
-        path: 'categoriesManagement',
-        component: () => import('@/pages/novelManagement/categoriesManagement'),
+        path: 'categories',
+        component: () => import('@/pages/novels/categories'),
         name: 'catogories-management',
         meta: { title: '分类管理' }
       }
@@ -193,9 +214,9 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/financialManagement',
+    path: '/financial',
     component: Layout,
-    redirect: '/financialManagement/proxyOrder',
+    redirect: '/financial/proxyOrder',
     name: 'financial-management',
     alwaysShow: true,
     meta: {
@@ -205,16 +226,16 @@ export const asyncRoutes = [
     children: [
       {
         path: 'proxyOrder',
-        component: () => import('@/pages/financialManagement/proxyOrder'),
+        component: () => import('@/pages/financial/proxyOrder'),
         name: 'proxy-order',
         meta: { title: '代理提现单' }
       }
     ]
   },
   {
-    path: '/promoteManagement',
+    path: '/promote',
     component: Layout,
-    redirect: '/promoteManagement/list',
+    redirect: '/promote/list',
     name: 'promote-management',
     alwaysShow: true,
     meta: {
@@ -224,34 +245,34 @@ export const asyncRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/pages/promoteManagement/list'),
+        component: () => import('@/pages/promote/list'),
         name: 'promote-list',
         meta: { title: '推广列表' }
       },
       {
         path: 'mass',
-        component: () => import('@/pages/promoteManagement/mass'),
+        component: () => import('@/pages/promote/mass'),
         name: 'promote-mass',
         meta: { title: '群发推广' }
       },
       {
         path: 'activity',
-        component: () => import('@/pages/promoteManagement/activity'),
+        component: () => import('@/pages/promote/activity'),
         name: 'promote-mass',
         meta: { title: '促销活动' }
       },
       {
         path: 'keywords',
-        component: () => import('@/pages/promoteManagement/keywords'),
+        component: () => import('@/pages/promote/keywords'),
         name: 'keywords',
         meta: { title: '关键字回复' }
       }
     ]
   },
   {
-    path: '/orderManagement',
+    path: '/orders',
     component: Layout,
-    redirect: '/orderManagement/list',
+    redirect: '/orders/list',
     name: 'order-management',
     alwaysShow: true,
     meta: {
@@ -262,9 +283,117 @@ export const asyncRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/pages/orderManagement/list'),
+        component: () => import('@/pages/orders/list'),
         name: 'order-list',
         meta: { title: '订单列表' }
+      }
+    ]
+  },
+  {
+    path: '/members',
+    component: Layout,
+    redirect: '/members/list',
+    name: 'members',
+    alwaysShow: true,
+    meta: {
+      title: '会员管理',
+      icon: 'peoples'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/members/list'),
+        name: 'members-stat',
+        meta: {
+          title: '会员列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/lagerImages',
+    component: Layout,
+    redirect: '/lagerImages/list',
+    name: 'lager-images',
+    alwaysShow: true,
+    meta: {
+      title: '大图管理',
+      icon: 'picture',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/lagerImages/list'),
+        name: 'members-stat',
+        meta: {
+          title: '大图列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/comments',
+    component: Layout,
+    redirect: '/comments/list',
+    name: 'comments',
+    alwaysShow: true,
+    meta: {
+      title: '评论管理',
+      icon: 'chat-round',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/comments/list'),
+        name: 'comments-list',
+        meta: {
+          title: '评论列表'
+        }
+      }
+    ]
+  },
+  {
+    path: '/copywriter',
+    component: Layout,
+    redirect: '/copywriter/material',
+    name: 'comments',
+    alwaysShow: true,
+    meta: {
+      title: '文案管理',
+      icon: 's-management',
+      iconType: 'element'
+    },
+    children: [
+      {
+        path: 'material',
+        component: () => import('@/pages/copywriter/material'),
+        name: 'copywriter-material',
+        meta: {
+          title: '文案素材'
+        }
+      }
+    ]
+  },
+  {
+    path: '/authors',
+    component: Layout,
+    redirect: '/authors/list',
+    name: 'authors',
+    alwaysShow: true,
+    meta: {
+      title: '作者管理',
+      icon: 'people'
+    },
+    children: [
+      {
+        path: 'list',
+        component: () => import('@/pages/authors/list'),
+        name: 'authors-list',
+        meta: {
+          title: '作者列表'
+        }
       }
     ]
   }
