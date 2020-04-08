@@ -24,6 +24,14 @@ export function recommendAdd(data) {
   })
 }
 
+export function recommendAddBooks(data) {
+  return request({
+    url: '/recommend/addbooks',
+    method: 'post',
+    data
+  })
+}
+
 export function recommendUpdate(data) {
   return request({
     url: '/recommend/update',

@@ -95,3 +95,11 @@ export function chapterDelete(params) {
     params
   })
 }
+
+export function bookUpdate(data) {
+  return request({
+    url: '/book/update',
+    method: 'post',
+    data
+  })
+}

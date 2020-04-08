@@ -132,21 +132,21 @@
           <div style="display: flex;align-items: center;">
             <div>
               <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" :plain="story.is_pay == 0 || story.is_pay == 1" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
                 全部
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" :plain="story.is_pay == 0 || story.is_pay === undefined" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, is_pay: 1 })">
                 收费
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain>
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" :plain="(story.is_pay && story.is_pay == 1) || story.is_pay === undefined" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, is_pay: 0 })">
                 免费
               </el-button>
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
                 添加章节
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection">
+              <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection">
                 更新章节
-              </el-button>
+              </el-button> -->
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews">
                 清除阅读量
               </el-button>
@@ -171,12 +171,12 @@
               </el-button>
             </el-input>
           </div>
-          <el-button type="primary" class="filter-item" style="margin-left: 10px;">
+          <!-- <el-button type="primary" class="filter-item" style="margin-left: 10px;">
             章节重排
-          </el-button>
+          </el-button> -->
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="story.handler.free" placeholder="输入前多少章节免费">
-              <el-button slot="append">
+              <el-button slot="append" :loading="story.loading" @click="setFree">
                 提交
               </el-button>
             </el-input>
@@ -190,7 +190,7 @@
           </div>
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="story.handler.remove" placeholder="输入要删除的章节区间：格式[1-20]" style="width: 330px;">
-              <el-button slot="append">
+              <el-button slot="append" :loading="story.loading" @click="sectionDelete">
                 提交
               </el-button>
             </el-input>
@@ -216,22 +216,25 @@
                     <i class="el-icon-trophy" />
                   </a>
                 </div>
-                <div v-else-if="sc.prop === 'tuiguang'">
+                <div v-else-if="sc.prop === 'tuiguang' && row.num <= 5">
                   <el-button size="mini" type="primary" plain @click="story.tuiguang.visible = true">
                     生成推广文案
                   </el-button>
-                  <el-button size="mini" type="danger" plain @click="getTuiguang(row)">
+                  <!-- <el-button size="mini" type="danger" plain @click="getTuiguang(row)">
                     获取推广链接
-                  </el-button>
+                  </el-button> -->
                 </div>
-                <div v-else-if="sc.prop === 'shoufei'">
-                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'">
-                    {{ row[sc.prop] ? '是' : '否' }}
+                <span v-else-if="sc.prop === 'glod'" class="code">
+                  {{ row[sc.prop] }}
+                </span>
+                <div v-else-if="sc.prop === 'is_pay'">
+                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'" @click="togglePay(row)">
+                    {{ row[sc.prop] === 1 ? '是' : '否' }}
                   </el-button>
                 </div>
                 <div v-else-if="sc.prop === 'status'">
-                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'">
-                    {{ row[sc.prop] ? '开启' : '禁用' }}
+                  <el-button size="mini" :type="row[sc.prop] ? 'primary' : 'danger'" @click="toggleStoryStatus(row)">
+                    {{ row[sc.prop] === 1 ? '开启' : '禁用' }}
                   </el-button>
                 </div>
                 <div v-else-if="sc.prop === 'action'">
@@ -354,40 +357,43 @@
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
-          <el-select placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
-            <el-option value="1">
-              全部
-            </el-option>
-            <el-option value="2">
-              本分类
-            </el-option>
+          <el-select v-model="search.form.status" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
+            <el-option :value="1" label="全部" />
+            <el-option :value="2" label="本分类" />
           </el-select>
-          <el-select placeholder="状态" class="filter-item" style="margin-left: 10px;">
-            <el-option :value="1">
-              全部
-            </el-option>
-            <el-option :value="2">
-              连载中
-            </el-option>
-            <el-option :value="3">
-              已完结
-            </el-option>
+          <el-select v-model="search.form.type" placeholder="状态" class="filter-item" style="margin-left: 10px;">
+            <el-option :value="1" label="全部" />
+            <el-option :value="2" label="连载中" />
+            <el-option :value="3" label="已完结" />
           </el-select>
           <div class="filter-item" style="margin-left: 10px;">
-            <el-input placeholder="输入需查询的小说名称">
+            <el-input v-model="search.form.name" placeholder="输入需查询的小说名称">
               <el-button slot="append" icon="el-icon-search" />
             </el-input>
           </div>
         </div>
-
-        <div>数量：共<span style="color: #f00;">{{ table.total }}</span>个</div>
+        <aside>
+          <a>数量：共<span style="color: #f00;">{{ table.total }}</span>个</a>
+        </aside>
+        <div class="filter-container">
+          <el-button class="filter-item" type="primary" @click="handleRecommend">
+            <svg-icon icon-class="guide" />推荐
+          </el-button>
+          <!-- <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>全部小说</el-button>
+          <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>本地小说</el-button>
+          <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>采集小说</el-button>
+          <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>API小说</el-button>
+          <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>更新小说</el-button> -->
+        </div>
         <el-table
+          ref="table"
           v-loading="table.loading"
           :data="table.data"
           border
           fit
           highlight-current-row
           style="width: 100%;"
+          @selection-change="handleSelectionChange"
         >
           <el-table-column width="55" type="selection" align="center" />
           <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :type="cl.type" :label="cl.label" :width="cl.width" :align="cl.align">
@@ -396,9 +402,9 @@
                 <!-- <el-button type="primary" size="mini" @click="toShare(row)">
                   分章
                 </el-button> -->
-                <el-button type="primary" size="mini" @click="toCopyNovel(row)">
+                <!-- <el-button type="primary" size="mini" @click="toCopyNovel(row)">
                   复制
-                </el-button>
+                </el-button> -->
                 <el-button type="primary" size="mini" @click="edit(row)">
                   编辑
                 </el-button>
@@ -417,8 +423,8 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num })">{{ row['name'] }}</a>
-                  <span class="code">总裁豪门</span>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null })">{{ row['name'] }}</a>
+                  <span v-for="rr in row.recommend_name" :key="rr" class="code">{{ rr }}</span>
                 </div>
                 <div style="color: #999;">
                   <!-- 开始收费备注 -->
@@ -446,11 +452,8 @@
                 </a>
               </div>
               <div v-else-if="cl.prop === 'status'">
-                <el-button v-if="!row[cl.prop]" size="mini" type="danger">
-                  下架
-                </el-button>
-                <el-button v-else size="mini" type="primary">
-                  上架
+                <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="toggleStatus(row)">
+                  {{ row[cl.prop] === 1 ? '上架' : '下架' }}
                 </el-button>
               </div>
               <div v-else-if="cl.prop === 'serial'">
@@ -485,8 +488,8 @@
     <!-- 修改小说备注 -->
     <el-dialog :visible.sync="remark.visible" title="修改小说备注" width="450px" top="35vh">
       <el-form ref="remark" :model="remark.form" :rules="remark.rules" label-width="80px">
-        <el-form-item label="备注：" prop="remark">
-          <el-input v-model="remark.form.remark" />
+        <el-form-item label="备注：" prop="remarks">
+          <el-input v-model="remark.form.remarks" />
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -496,14 +499,18 @@
     <!-- 更换作者 -->
     <el-dialog :visible.sync="update.visible" title="修改小说备注" width="800px" top="35vh">
       <el-form ref="update" :model="update.form" :rules="update.rules" label-width="140px">
-        <el-form-item label="请选择作者：" prop="author">
-          <el-input v-model="update.form.author" />
+        <el-form-item label="请选择作者：" prop="nickname">
+          <el-autocomplete
+            v-model="update.form.nickname"
+            :fetch-suggestions="queryAuthorSearch"
+            @select="handleAuthorSelect"
+          />
         </el-form-item>
         <el-form-item label="当前作者：">
           {{ update.currentAuthor }}
         </el-form-item>
       </el-form>
-      <div slot="footer">
+      <div slot="footer" style="text-align: center;">
         <el-button type="success" :loading="update.loading" @click="saveUpdate">提交</el-button>
       </div>
     </el-dialog>
@@ -515,7 +522,7 @@
     <el-dialog :visible.sync="copy.visible" title="复制小说" width="80%" top="5vh">
       <el-container>
         <el-aside width="200px">
-          <el-tree :props="defaultProps" :data="treeData" />
+          <el-tree :props="defaultProps" :default-expand-all="true" :data="treeData" />
         </el-aside>
         <el-main>
           <el-form ref="copy" :model="copy.form" :rules="copy.rules" label-width="120px">
@@ -624,13 +631,36 @@
         <el-button type="primary" :loading="copy.loading" :disabled="copy.loading" @click="copyNovel">{{ copy.loading ? '正在执行复制，时间可能比较长，请务刷新/点击/关闭页面!...' : '执行复制' }}</el-button>
       </div>
     </el-dialog>
+    <!-- 推荐小说 -->
+    <el-dialog ref="recommend" :visible.sync="recommend.visible" title="选择-推荐位">
+      <el-form ref="recommend" :model="recommend.form" :rules="recommend.rules" label-width="120px">
+        <el-row :gutter="20">
+          <el-col :span="18">
+            <el-form-item label="选择推荐位：" prop="id">
+              <el-select v-model="recommend.form.id" @visible-change="recommendVisibleChange">
+                <el-option v-for="or in options.recommend" :key="or.id" :value="or.id" :label="or.name" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="18">
+            <el-form-item>
+              <el-button type="primary" :loading="recommend.loading" @click="recommendSave">保存</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete } from '@/api/book/list'
+import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
+import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
+import { authorList } from '@/api/author/list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
 import Tinymce from '@/components/Tinymce'
@@ -639,6 +669,31 @@ export default {
   mixins: [mix],
   data() {
     return {
+      search: {
+        form: {
+          type: 1,
+          status: 1,
+          name: ''
+        }
+      },
+      options: {
+        recommend: [],
+        admin: []
+      },
+      // index选中的小说
+      selections: [],
+      recommend: {
+        visible: false,
+        loading: false,
+        form: {
+          id: ''
+        },
+        rules: {
+          id: [
+            { required: true, message: '请选择一个推荐位' }
+          ]
+        }
+      },
       // 上传地址
       uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
       // 上传头部
@@ -657,6 +712,7 @@ export default {
       },
       // 小说内容
       story: {
+        is_pay: null,
         // 小说id
         book_id: '',
         // 小说章节数量
@@ -745,17 +801,17 @@ export default {
             },
             {
               label: '阅读量',
-              prop: 'views',
+              prop: 'read_num',
               align: 'center'
             },
             {
               label: '是否收费',
-              prop: 'shoufei',
+              prop: 'is_pay',
               align: 'center'
             },
             {
               label: '书币',
-              prop: 'shubi',
+              prop: 'glod',
               align: 'center'
             },
             {
@@ -824,12 +880,12 @@ export default {
       // 备注
       remark: {
         form: {
-          remark: ''
+          remarks: ''
         },
         visible: false,
         loading: false,
         rules: {
-          remark: [
+          remarks: [
             { required: true, message: '请您输入备注' }
           ]
         }
@@ -837,13 +893,15 @@ export default {
       // 更新
       update: {
         form: {
-          author: ''
+          author_id: '',
+          nickname: '',
+          id: ''
         },
         visible: false,
         loading: false,
         currentAuthor: '',
         rules: {
-          author: [
+          nickname: [
             { required: true, message: '请您选择一个作者' }
           ]
         }
@@ -901,7 +959,7 @@ export default {
           },
           {
             label: '作者',
-            prop: 'author',
+            prop: 'author_name',
             align: 'center'
           },
           {
@@ -945,13 +1003,13 @@ export default {
       }
     // 点击了某个作品
     } else if (this.current === 'story') {
-      console.log('story: ', this.$route)
-      const { id, description, chapter_num, name } = this.$route.query
+      const { id, description, chapter_num, name, is_pay } = this.$route.query
       this.story.book_id = id
       this.story.description = description
       this.story.chapter_num = chapter_num
       this.story.name = name
       this.description = description
+      this.story.is_pay = is_pay
       this.chapterList(id)
     // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
@@ -995,6 +1053,116 @@ export default {
     }
   },
   methods: {
+    // 设置章节免费
+    setFree() {
+      this.story.loading = true
+      setcost({
+        glod: 0
+
+      }).then(res => {
+
+      })
+    },
+    // 切换章节上下架
+    toggleStoryStatus(row) {
+      const status = row.status === 1 ? 0 : 1
+      this.story.table.loading = true
+      chapterUpdate({
+        id: row.id,
+        status
+      }).then(res => {
+        this.story.table.loading = false
+        this.$message.success(res.message)
+        this.chapterList(this.story.book_id)
+      }).catch(() => {
+        this.story.table.loading = false
+      })
+    },
+    // 切换章节是否收费
+    togglePay(row) {
+      const is_pay = row.is_pay === 1 ? 0 : 1
+      this.story.table.loading = true
+      chapterUpdate({
+        id: row.id,
+        is_pay
+      }).then(res => {
+        this.story.table.loading = false
+        this.$message.success(res.message)
+        this.chapterList(this.story.book_id)
+      }).catch(() => {
+        this.story.table.loading = false
+      })
+    },
+    // 切换上下架
+    toggleStatus(row) {
+      const status = row.status === 1 ? 0 : 1
+      this.table.loading = true
+      bookUpdate({
+        id: row.id,
+        status
+      }).then(res => {
+        this.table.loading = false
+        this.$message.success(res.message)
+        this.getList(this.book_category_id)
+      }).catch(() => {
+        this.table.loading = false
+      })
+    },
+    // 选中作者
+    handleAuthorSelect(item) {
+      this.update.form.author_id = item.id
+    },
+    // 搜索作者
+    queryAuthorSearch(queryString, cb) {
+      authorList({
+        size: 9999999999,
+        author: queryString
+      }).then(res => {
+        this.options.admin = res.data.data
+        const data = res.data.data.map(item => {
+          item.value = item.nickname
+          return item
+        })
+        cb(data)
+      })
+    },
+    // 保存推荐
+    recommendSave() {
+      this.$refs.recommend.validate(valid => {
+        if (valid) {
+          this.recommend.loading = true
+          const book_ids = this.selections.map(item => {
+            return item.id
+          }).join(',')
+          recommendAddBooks({
+            book_ids,
+            id: this.recommend.form.id
+          }).then(res => {
+            this.$refs.table.clearSelection()
+            this.$refs.recommend.resetFields()
+            this.$message.success(res.message)
+            this.recommend.visible = false
+            this.recommend.loading = false
+          })
+        }
+      })
+    },
+    // 打开推荐小说下拉
+    recommendVisibleChange(val) {
+      if (val) {
+        recommendList().then(res => {
+          this.options.recommend = res.data.data
+        })
+      }
+    },
+    // 点击推荐
+    handleRecommend() {
+      if (this.selections.length === 0) {
+        this.$message.error('请选择要推荐的小说')
+        return
+      }
+      this.recommend.visible = true
+    },
     // 获取推广链接
     getTuiguang(row) {
       this.story.tuiguanglianjie.form.entry = row.name
@@ -1054,8 +1222,16 @@ export default {
     },
     // 章节删除
     sectionDelete() {
-      sectionDelete().then(res => {
-
+      this.story.loading = true
+      sectionDelete({
+        book_id: this.story.book_id,
+        section: this.story.handler.remove
+      }).then(res => {
+        this.$message.success(res.message)
+        this.story.loading = false
+        this.this.story.handler.remove = ''
+      }).catch(() => {
+        this.story.loading = false
       })
     },
     // 引入章节
@@ -1087,7 +1263,8 @@ export default {
       chapterList({
         book_id,
         page: this.story.table.page,
-        size: this.story.table.size
+        size: this.story.table.size,
+        is_pay: this.story.is_pay
       }).then(res => {
         this.story.table.total = res.data.total
         this.story.table.size = res.data.per_page
@@ -1124,9 +1301,13 @@ export default {
         console.error('err: ', err)
       })
     },
+    // index列表选中
+    handleSelectionChange(selections) {
+      this.selections = selections
+    },
     // story章节被选中
-    handleStorySelectionChange(selection) {
-      this.story.selections = selection
+    handleStorySelectionChange(selections) {
+      this.story.selections = selections
     },
     // 批量设置
     massSet() {
@@ -1238,7 +1419,8 @@ export default {
     },
     // 备注
     addRemark(row) {
-      this.remark.form.remark = row.remark
+      this.remark.form.id = row.id
+      this.remark.form.remarks = row.remarks
       this.remark.visible = true
     },
     // 保存备注
@@ -1246,7 +1428,15 @@ export default {
       this.remark.loading = true
       this.$refs.remark.validate(valid => {
         if (valid) {
-          //
+          bookUpdate(this.remark.form).then(res => {
+            this.$refs.remark.resetFields()
+            this.remark.visible = false
+            this.remark.loading = false
+            this.$message.success(res.message)
+            this.getList(this.book_category_id)
+          }).catch(() => {
+            this.remark.loading = false
+          })
         }
         this.remark.loading = false
       })
@@ -1263,7 +1453,9 @@ export default {
       this.table.loading = true
       bookList({
         page: this.table.page,
-        book_category_id
+        size: this.table.size,
+        book_category_id,
+        ...this.search.form
       }).then(response => {
         this.table.data = response.data.data
         this.table.total = response.data.total
@@ -1294,7 +1486,8 @@ export default {
     },
     // 更换作者
     toUpdate(row) {
-      this.update.currentAuthor = row.author
+      this.update.currentAuthor = row.author_name
+      this.update.form.id = row.id
       this.update.visible = true
     },
     // 保存更换作者
@@ -1302,7 +1495,15 @@ export default {
       this.update.loading = true
       this.$refs.update.validate(valid => {
         if (valid) {
-          //
+          this.update.loading = true
+          bookUpdate(this.update.form).then(res => {
+            this.$refs.update.resetFields()
+            this.update.visible = false
+            this.update.loading = false
+            this.$message.success(res.message)
+          }).catch(() => {
+            this.update.loading = false
+          })
         }
         this.update.loading = false
       })
