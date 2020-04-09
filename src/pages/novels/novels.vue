@@ -176,7 +176,7 @@
           </el-button> -->
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="story.handler.free" placeholder="输入前多少章节免费">
-              <el-button slot="append" :loading="story.loading" @click="setFree">
+              <el-button slot="append" :loading="story.loading" @click="setfree">
                 提交
               </el-button>
             </el-input>
@@ -217,7 +217,7 @@
                   </a>
                 </div>
                 <div v-else-if="sc.prop === 'tuiguang' && row.num <= 5">
-                  <el-button size="mini" type="primary" plain @click="story.tuiguang.visible = true">
+                  <el-button size="mini" type="primary" plain @click="openTuiguangwenan(row)">
                     生成推广文案
                   </el-button>
                   <!-- <el-button size="mini" type="danger" plain @click="getTuiguang(row)">
@@ -657,7 +657,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete, chapterList, chapterContent, setcost, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
+import { bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
 import { authorList } from '@/api/author/list'
@@ -704,10 +704,13 @@ export default {
       book_category_id: null,
       // 选择推广模式
       chooseTuiguang(mode) {
+        const id = this.story.tuiguang.id
+        const title = this.story.tuiguang.title
         const routeUrl = this.$router.resolve({
           path: `/tuiguang?mode=${mode}`,
-          query: { id: 96 }
+          query: { id, title }
         })
+        this.story.tuiguang.visible = false
         window.open(routeUrl.href, '_blank')
       },
       // 小说内容
@@ -774,7 +777,9 @@ export default {
         },
         // 推广
         tuiguang: {
-          visible: false
+          visible: false,
+          id: '',
+          title: ''
         },
         // 编辑
         edit: {
@@ -1053,14 +1058,24 @@ export default {
     }
   },
   methods: {
+    // 打开推广文案
+    openTuiguangwenan(row) {
+      this.story.tuiguang.visible = true
+      this.story.tuiguang.id = row.id
+      this.story.tuiguang.title = row.name
+    },
     // 设置章节免费
-    setFree() {
+    setfree() {
       this.story.loading = true
-      setcost({
-        glod: 0
-
+      setfree({
+        num: this.story.handler.free,
+        book_id: this.story.book_id
       }).then(res => {
-
+        this.story.loading = false
+        this.story.handler.free = ''
+        this.$message.success(res.message)
+      }).catch(() => {
+        this.story.loading = false
       })
     },
     // 切换章节上下架

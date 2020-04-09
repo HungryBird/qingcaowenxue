@@ -40,6 +40,14 @@ export function setcost(data) {
   })
 }
 
+export function setfree(data) {
+  return request({
+    url: '/chapter/setfree',
+    method: 'post',
+    data
+  })
+}
+
 export function sectionDelete(data) {
   return request({
     url: '/chapter/sectionDelete',

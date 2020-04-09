@@ -210,6 +210,12 @@ export const asyncRoutes = [
         component: () => import('@/pages/recommend/list'),
         name: 'recommend-list',
         meta: { title: '推荐位列表' }
+      },
+      {
+        path: 'list-2',
+        component: () => import('@/pages/recommend/list-2'),
+        name: 'recommend-list-2',
+        meta: { title: '榜单' }
       }
     ]
   },

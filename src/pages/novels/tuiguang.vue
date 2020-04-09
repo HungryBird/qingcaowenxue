@@ -1,5 +1,5 @@
 <template>
-  <div class="tuiguang text">
+  <div v-loading="loading" class="tuiguang text">
     <div class="rich_media">
       <h1 id="title" class="title">
         {{ title }}
@@ -7,16 +7,16 @@
       <div class="rich_media_content">
         <el-image :src="cover.src" style="margin-bottom: 20px;width: 100%;" />
         <div id="content">
-          <template1 v-if="template === 1" :mode="mode" />
-          <template2 v-if="template === 2" :mode="mode" />
-          <template3 v-if="template === 3" :mode="mode" />
-          <template4 v-if="template === 4" :mode="mode" />
-          <template5 v-if="template === 5" :mode="mode" />
-          <template6 v-if="template === 6" :mode="mode" />
-          <template7 v-if="template === 7" :mode="mode" />
-          <template10 v-if="template === 10" :mode="mode" />
-          <template11 v-if="template === 11" :mode="mode" />
-          <template12 v-if="template === 12" :mode="mode" />
+          <template1 v-if="template === 1" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template2 v-if="template === 2" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template3 v-if="template === 3" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template4 v-if="template === 4" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template5 v-if="template === 5" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template6 v-if="template === 6" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template7 v-if="template === 7" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template10 v-if="template === 10" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template11 v-if="template === 11" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template12 v-if="template === 12" :mode="mode" :title="chapter_title" :content="chapter_content" />
         </div>
       </div>
     </div>
@@ -26,12 +26,8 @@
           <span>
             文案标题<i class="el-icon-caret-top el-icon--right" />
           </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="黄金糕">黄金糕</el-dropdown-item>
-            <el-dropdown-item command="狮子头">狮子头</el-dropdown-item>
-            <el-dropdown-item command="螺蛳粉">螺蛳粉</el-dropdown-item>
-            <el-dropdown-item command="双皮奶">双皮奶</el-dropdown-item>
-            <el-dropdown-item command="蚵仔煎">蚵仔煎</el-dropdown-item>
+          <el-dropdown-menu slot="dropdown" class="astrict-height">
+            <el-dropdown-item v-for="ot in options.title" :key="ot.id" :command="ot.title">{{ ot.title }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <div class="el-dropdown" @click="cover.visible = true">
@@ -53,9 +49,9 @@
           <span>
             正文模板<i class="el-icon-caret-top el-icon--right" />
           </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="(sc, index) in contentSelect" :key="index" :command="sc.command" style="width: 153px;">
-              <el-image :src="sc.src" style="width: 100%;" />
+          <el-dropdown-menu slot="dropdown" class="astrict-height">
+            <el-dropdown-item v-for="(sc, index) in options.content" :key="index" :command="sc.command" style="width: 153px;">
+              <el-image :src="sc.picture_url" style="width: 100%;" />
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -63,12 +59,10 @@
           <span>
             原文引导模板<i class="el-icon-caret-top el-icon--right" />
           </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>黄金糕</el-dropdown-item>
-            <el-dropdown-item>狮子头</el-dropdown-item>
-            <el-dropdown-item>螺蛳粉</el-dropdown-item>
-            <el-dropdown-item>双皮奶</el-dropdown-item>
-            <el-dropdown-item>蚵仔煎</el-dropdown-item>
+          <el-dropdown-menu slot="dropdown" class="astrict-height">
+            <el-dropdown-item v-for="og in options.guide" :key="og.id" :command="og.title">
+              <el-image :src="og.picture_url" />
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-dropdown trigger="click" @command="handleCopy">
@@ -84,16 +78,16 @@
     </nav>
     <!-- 选择文案封面 -->
     <el-dialog :visible.sync="cover.visible" width="90%" title="选择文案封面">
-      <el-row :gutter="20" type="flex">
-        <el-col v-for="(cl, index) in cover.list" :key="index" :span="4">
-          <el-image :src="cl.src" fit="cover" style="width: 100%;height: 100%;" @click="chooseCoverImg(cl)" />
+      <el-row :gutter="20" type="flex" style="flex-wrap: wrap;max-height: 600px;overflow: auto;">
+        <el-col v-for="(cl, index) in cover.list" :key="index" :span="4" style="padding: 30px 15px;">
+          <el-image :src="cl.picture_url" fit="cover" style="width: 100%;height: 100%;" @click="chooseCoverImg(cl)" />
+        </el-col>
+        <el-col :span="24" style="text-align: center;">
+          <el-button v-if="cover.total !== cover.list.length" type="primary" plain @click="getMore">
+            加载更多
+          </el-button>
         </el-col>
       </el-row>
-      <div style="text-align: center;padding-top: 60px;">
-        <el-button type="primary" plain>
-          加载更多
-        </el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -110,6 +104,8 @@ import template10 from './templates/template10'
 import template11 from './templates/template11'
 import template12 from './templates/template12'
 import { selectText } from '@/utils'
+import { materialList } from '@/api/material/list'
+import { chapterContent } from '@/api/book/list'
 
 export default {
   components: {
@@ -126,30 +122,30 @@ export default {
   },
   data() {
     return {
+      loading: false,
+      chapter_id: '',
+      chapter_title: '',
+      chapter_content: '',
+      options: {
+        title: [],
+        content: [],
+        guide: [],
+        welcome: []
+      },
       mode: '',
       img: '',
       template: 1,
       text: '',
-      title: '你以为嫁了个没钱的男人，他就一定会对你好？',
+      title: '',
       content: '',
       test: '',
       cover: {
         visible: false,
-        list: [
-          {
-            src: 'http://new.fuleien.com/uploads/copywriting/images/1541051530.jpg'
-          },
-          {
-            src: 'http://new.fuleien.com/uploads/copywriting/images/1541051512.jpg'
-          },
-          {
-            src: 'http://new.fuleien.com/uploads/copywriting/images/1541050929.jpg'
-          }
-        ],
+        list: [],
         total: 0,
         page: 1,
         size: 20,
-        src: 'http://new.fuleien.com/uploads/copywriting/images/1541051530.jpg'
+        src: ''
       },
       contentSelect: [
         {
@@ -196,17 +192,72 @@ export default {
     }
   },
   created() {
-    const { mode } = this.$route.query
+    const { mode, id, title } = this.$route.query
+    this.chapter_id = id
+    this.chapter_title = title
     this.mode = mode
+    for (let i = 1; i <= 5; i++) {
+      this.materialList(i)
+    }
+    this.getContent()
   },
   methods: {
+    // 获取文章内容
+    getContent() {
+      this.loading = true
+      chapterContent({ id: this.chapter_id }).then(res => {
+        this.chapter_content = res.data
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    // 获取更多封面
+    getMore() {
+      this.cover.page++
+      this.materialList(2)
+    },
+    // 获取下拉
+    materialList(type) {
+      const size = type === 2 ? 30 : 9999999999
+      const page = type === 2 ? this.cover.page : 1
+      materialList({
+        type,
+        size,
+        page
+      }).then(res => {
+        switch (type) {
+          case 1:
+            var first = this.options.title.length === 0
+            this.options.title = res.data.data
+            if (first) this.title = this.options.title[0].title
+            break
+          case 2:
+            this.cover.list = this.cover.list.concat(res.data.data)
+            this.cover.total = res.data.total
+            if (this.cover.page === 1) {
+              this.cover.src = this.cover.list[0].picture_url
+            }
+            break
+          case 3:
+            this.options.content = res.data.data
+            break
+          case 4:
+            this.options.guide = res.data.data
+            break
+          case 5:
+            this.options.welcome = res.data.data
+            break
+        }
+      })
+    },
     // 切换文本和图片模式
     toggleTextImg(mode) {
       this.mode = mode
     },
     // 选择封面
     chooseCoverImg(cl) {
-      this.cover.src = cl.src
+      this.cover.src = cl.picture_url
       this.cover.visible = false
     },
     // 选择正文模板
@@ -230,6 +281,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .astrict-height{
+    max-height: 300px;
+    overflow: auto;
+  }
   .tuiguang{
     height: 100%;
     overflow-y: auto;

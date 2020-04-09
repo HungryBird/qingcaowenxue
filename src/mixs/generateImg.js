@@ -5,6 +5,18 @@ export default {
     mode: {
       Type: String,
       default: 'Text'
+    },
+    title: {
+      Type: String,
+      default: ''
+    },
+    content: {
+      Type: String,
+      default: ''
+    },
+    guide: {
+      Type: String,
+      default: ''
     }
   },
   mounted() {
