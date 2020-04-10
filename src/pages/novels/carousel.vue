@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-if="current === 'add' || current === 'edit'">
       <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="150px">
-        <el-form-item label="公告标题：" prop="name">
+        <el-form-item label="轮播名称：" prop="name">
           <el-input v-model="add.form.name" />
         </el-form-item>
         <el-form-item label="可见对象：" prop="obj">
@@ -37,7 +37,7 @@
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('add')">
-          添加公告
+          添加轮播
         </el-button>
       </div>
       <el-table
@@ -122,29 +122,35 @@ export default {
             align: 'center'
           },
           {
-            label: '公告名称',
-            prop: 'title',
+            label: '名称',
+            prop: 'name',
             align: 'center'
           },
           {
-            label: '内容',
-            prop: 'content',
+            label: 'url',
+            prop: 'url',
             align: 'center'
           },
           {
-            label: '创建时间',
-            prop: 'create_time',
+            label: '书籍',
+            prop: 'book',
             align: 'center'
           },
           {
-            label: '状态',
-            prop: 'status',
+            label: '频道',
+            prop: 'channel',
             align: 'center',
             width: 154
           },
           {
-            label: '发布人',
-            prop: 'real_name',
+            label: '图片',
+            prop: 'pic',
+            align: 'center',
+            width: 154
+          },
+          {
+            label: '生成时间',
+            prop: 'create_time',
             align: 'center',
             width: 154
           },
