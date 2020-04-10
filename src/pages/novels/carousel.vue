@@ -133,7 +133,7 @@ export default {
           },
           {
             label: '书籍',
-            prop: 'book',
+            prop: 'book_name',
             align: 'center'
           },
           {
