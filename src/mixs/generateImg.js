@@ -19,6 +19,9 @@ export default {
       default: ''
     }
   },
+  created() {
+    console.log('created chapter_bottom: ', this.chapter_bottom)
+  },
   mounted() {
     if (this.mode === 'Img') {
       this.generaImg()
@@ -46,6 +49,9 @@ export default {
       if (mode === 'Img') {
         this.generaImg()
       }
+    },
+    chapter_bottom(val) {
+      console.log('val: ', val)
     }
   }
 }

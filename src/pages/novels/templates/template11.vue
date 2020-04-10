@@ -15,7 +15,7 @@
       </template>
       <img v-if="imgUrl !== ''" :src="imgUrl">
     </div>
-    <div id="wx-article-footer"><img style="max-width:100%" src="http://new.fuleien.com/uploads/copywriting/images/footer11.gif"></div>
+    <div id="wx-article-footer"><img style="max-width:100%" :src="chapterBottom"></div>
   </div>
 </template>
 
@@ -24,6 +24,12 @@ import generateImg from '@/mixs/generateImg'
 
 export default {
   name: 'Template11',
-  mixins: [generateImg]
+  mixins: [generateImg],
+  props: {
+    chapterBottom: {
+      type: String,
+      default: 'http://new.fuleien.com/uploads/copywriting/images/footer11.gif'
+    }
+  }
 }
 </script>

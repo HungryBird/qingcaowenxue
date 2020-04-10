@@ -7,16 +7,16 @@
       <div class="rich_media_content">
         <el-image :src="cover.src" style="margin-bottom: 20px;width: 100%;" />
         <div id="content">
-          <template1 v-if="template === 1" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template2 v-if="template === 2" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template3 v-if="template === 3" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template4 v-if="template === 4" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template5 v-if="template === 5" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template6 v-if="template === 6" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template7 v-if="template === 7" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template10 v-if="template === 10" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template11 v-if="template === 11" :mode="mode" :title="chapter_title" :content="chapter_content" />
-          <template12 v-if="template === 12" :mode="mode" :title="chapter_title" :content="chapter_content" />
+          <template1 v-if="template === 1122" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template2 v-if="template === 1126" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template3 v-if="template === 1127" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template4 v-if="template === 1128" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template5 v-if="template === 1129" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template6 v-if="template === 1130" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template7 v-if="template === 1131" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template10 v-if="template === 1123" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template11 v-if="template === 1124" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
+          <template12 v-if="template === 1125" :mode="mode" :title="chapter_title" :content="chapter_content" :chapter-bottom="chapter_bottom" />
         </div>
       </div>
     </div>
@@ -50,18 +50,18 @@
             正文模板<i class="el-icon-caret-top el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown" class="astrict-height">
-            <el-dropdown-item v-for="(sc, index) in options.content" :key="index" :command="sc.command" style="width: 153px;">
+            <el-dropdown-item v-for="(sc, index) in options.content" :key="index" :command="sc.id" style="width: 153px;">
               <el-image :src="sc.picture_url" style="width: 100%;" />
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-dropdown trigger="click">
+        <el-dropdown trigger="click" @command="chooseBottom">
           <span>
             原文引导模板<i class="el-icon-caret-top el-icon--right" />
           </span>
           <el-dropdown-menu slot="dropdown" class="astrict-height">
-            <el-dropdown-item v-for="og in options.guide" :key="og.id" :command="og.title">
-              <el-image :src="og.picture_url" />
+            <el-dropdown-item v-for="og in options.guide" :key="og.id" :command="og.picture_url">
+              <el-image :src="og.picture_url" style="width: 153px;" />
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -126,6 +126,7 @@ export default {
       chapter_id: '',
       chapter_title: '',
       chapter_content: '',
+      chapter_bottom: '',
       options: {
         title: [],
         content: [],
@@ -134,7 +135,7 @@ export default {
       },
       mode: '',
       img: '',
-      template: 1,
+      template: 1122,
       text: '',
       title: '',
       content: '',
@@ -147,48 +148,7 @@ export default {
         size: 20,
         src: ''
       },
-      contentSelect: [
-        {
-          command: 1,
-          src: require('../../assets/text-select/body1.jpg')
-        },
-        {
-          command: 2,
-          src: require('../../assets/text-select/body2.jpg')
-        },
-        {
-          command: 3,
-          src: require('../../assets/text-select/body3.jpg')
-        },
-        {
-          command: 4,
-          src: require('../../assets/text-select/body4.jpg')
-        },
-        {
-          command: 5,
-          src: require('../../assets/text-select/body5.jpg')
-        },
-        {
-          command: 6,
-          src: require('../../assets/text-select/body6.jpg')
-        },
-        {
-          command: 7,
-          src: require('../../assets/text-select/body7.jpg')
-        },
-        {
-          command: 10,
-          src: require('../../assets/text-select/body10.jpg')
-        },
-        {
-          command: 11,
-          src: require('../../assets/text-select/body11.jpg')
-        },
-        {
-          command: 12,
-          src: require('../../assets/text-select/body12.jpg')
-        }
-      ]
+      contentSelect: []
     }
   },
   created() {
@@ -202,6 +162,11 @@ export default {
     this.getContent()
   },
   methods: {
+    // 选择bottom
+    chooseBottom(bottom) {
+      this.chapter_bottom = bottom
+      console.log('chapter_bottom: ', this.chapter_bottom)
+    },
     // 获取文章内容
     getContent() {
       this.loading = true
@@ -244,6 +209,7 @@ export default {
             break
           case 4:
             this.options.guide = res.data.data
+            this.chapter_bottom = res.data.data[0].picture_url
             break
           case 5:
             this.options.welcome = res.data.data
@@ -262,6 +228,7 @@ export default {
     },
     // 选择正文模板
     chooseContentTemplate(command) {
+      console.log('command: ', command)
       this.template = command
     },
     // 替换标题

@@ -156,8 +156,8 @@
             </div>
             <div style="flex: 1;display: flex;flex-direction: row-reverse;">
               <div class="filter-item" style="margin-left: 10px;">
-                <el-input placeholder="输入需查询的章节名称">
-                  <el-button slot="append" icon="el-icon-search" />
+                <el-input v-model="story.chapter_name" placeholder="输入需查询的章节名称">
+                  <el-button slot="append" icon="el-icon-search" @click="chapterList(story.book_id)" />
                 </el-input>
               </div>
             </div>
@@ -720,6 +720,8 @@ export default {
         book_id: '',
         // 小说章节数量
         chapter_num: 0,
+        // 章节名称
+        chapter_name: '',
         // 小说名字
         name: '',
         // 小说描述
@@ -1279,7 +1281,8 @@ export default {
         book_id,
         page: this.story.table.page,
         size: this.story.table.size,
-        is_pay: this.story.is_pay
+        is_pay: this.story.is_pay,
+        name: this.story.chapter_name
       }).then(res => {
         this.story.table.total = res.data.total
         this.story.table.size = res.data.per_page
