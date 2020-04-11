@@ -148,8 +148,8 @@
           <el-form ref="form2" :model="add.form" :rules="add.rules" label-width="100px">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="开始签到赠送书币" prop="signIn_day">
-                  <el-input v-model="add.form.signIn_day" placeholder="请输入内容" />
+                <el-form-item label="开始签到赠送书币" prop="signIn_first">
+                  <el-input v-model="add.form.signIn_first" placeholder="请输入内容" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -262,7 +262,7 @@ export default {
           encoding: '',
           qrcode_url: '',
           qrcode_thumb_id: '',
-          signIn_day: '',
+          signIn_first: '',
           sub_thumb_id: '',
           verify_file_id: '',
           continuity: '',
@@ -323,7 +323,7 @@ export default {
           },
           {
             label: '签到天数',
-            prop: 'signIn_day',
+            prop: 'signIn_first',
             align: 'center'
           },
           {
@@ -360,28 +360,32 @@ export default {
       this.proxyListVisible(true)
       for (const key in query) {
         if (key === 'qrcode_thumb_url') {
-          console.log('qrcode_thumb_url: ', query[key])
-          const arr = query[key].split('/')
-          const name = arr.splice(arr.length - 1, arr.length)[0]
-          this.add.kefuList = [{
-            name,
-            url: query[key]
-          }]
+          if (query[key]) {
+            const arr = query[key].split('/')
+            const name = arr.splice(arr.length - 1, arr.length)[0]
+            this.add.kefuList = [{
+              name,
+              url: query[key]
+            }]
+          }
         } else if (key === 'sub_thumb_url') {
-          console.log('sub_thumb_url: ', query[key])
-          const arr = query[key].split('/')
-          const name = arr.splice(arr.length - 1, arr.length)[0]
-          this.add.guanzhuList = [{
-            name,
-            url: query[key]
-          }]
+          if (query[key]) {
+            const arr = query[key].split('/')
+            const name = arr.splice(arr.length - 1, arr.length)[0]
+            this.add.guanzhuList = [{
+              name,
+              url: query[key]
+            }]
+          }
         } else if (key === 'verify_file_url') {
-          const arr = query[key].split('/')
-          const name = arr.splice(arr.length - 1, arr.length)[0]
-          this.add.proveList = [{
-            name,
-            url: query[key]
-          }]
+          if (query[key]) {
+            const arr = query[key].split('/')
+            const name = arr.splice(arr.length - 1, arr.length)[0]
+            this.add.proveList = [{
+              name,
+              url: query[key]
+            }]
+          }
         } else if (key !== 'current' && key) {
           this.$set(this.add.form, key, query[key])
         }
