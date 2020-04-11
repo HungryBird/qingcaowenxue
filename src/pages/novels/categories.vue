@@ -207,8 +207,10 @@ export default {
             name: '',
             url: this.$route.query[key]
           }]
-        } else if (key === 'pid' || key === 'status') {
-          this.add.form.pid = Number(this.$route.query[key])
+        } else if (key === 'pid') {
+          this.add.form[key] = this.$route.query[key] === '0' ? null : Number(this.$route.query[key])
+        } else if (key === 'status') {
+          this.add.form[key] = Number(this.$route.query[key])
         } else if (key !== 'current') {
           this.$set(this.add.form, key, this.$route.query[key])
         }

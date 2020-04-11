@@ -421,6 +421,7 @@ export default {
       })
     },
     showDataList(row) {
+      this.dataList.table.page = 1
       this.dataList.table.recommend_id = row.id
       this.dataList.visible = true
       this.getDataList()
