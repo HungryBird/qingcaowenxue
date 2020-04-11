@@ -68,6 +68,7 @@
               <el-col :span="12">
                 <el-form-item label="客服二维码" prop="qrcode_thumb_id">
                   <el-upload
+                    ref="kefuList"
                     class="upload-demo"
                     :multiple="false"
                     :limit="1"
@@ -88,6 +89,7 @@
               <el-col :span="12">
                 <el-form-item label="关注二维码" prop="sub_thumb_id">
                   <el-upload
+                    ref="guanzhuList"
                     class="upload-demo"
                     :multiple="false"
                     :limit="1"
@@ -122,6 +124,7 @@
               <el-col :span="12">
                 <el-form-item label="公众域证明文件" prop="verify_file_id">
                   <el-upload
+                    ref="proveList"
                     class="upload-demo"
                     :action="uploadFileUrl"
                     drag
@@ -450,9 +453,7 @@ export default {
             this.$message.success(res.message)
             this.add.loading = false
             if (this.current === 'add') {
-              this.add.list = []
-              this.$refs.form1.resetFields()
-              this.$refs.form2.reserFields()
+              this.toggleCurrent('add')
             }
           }).catch(() => {
             this.add.loading = false
