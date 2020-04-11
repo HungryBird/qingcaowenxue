@@ -11,12 +11,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="上级分类：" prop="pid">
-              <el-select v-model="add.form.pid">
-                <el-option value="1" label="精选" />
-                <el-option value="2" label="男生" />
-                <el-option value="3" label="女生" />
-                <el-option value="4" label="其它" />
+            <el-form-item label="上级分类：" prop="channel">
+              <el-select v-model="add.form.channel">
+                <el-option :value="1" label="精选" />
+                <el-option :value="2" label="男生" />
+                <el-option :value="3" label="女生" />
+                <el-option :value="4" label="其它" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -48,16 +48,15 @@
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { type: 'rank' })">
           添加排位
         </el-button>
-        <el-select v-model="search.form.pid" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
-          <el-option value="1" label="全部" />
-          <el-option value="2" label="精选" />
-          <el-option value="3" label="男生" />
-          <el-option value="4" label="女生" />
-          <el-option value="5" label="其它" />
+        <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
+          <el-option :value="1" label="精选" />
+          <el-option :value="2" label="男生" />
+          <el-option :value="3" label="女生" />
+          <el-option :value="4" label="其它" />
         </el-select>
         <div class="filter-item" style="margin-left: 10px;">
-          <el-input placeholder="输入需查询推荐位名臣">
-            <el-button slot="append" icon="el-icon-search" />
+          <el-input v-model="search.form.name" placeholder="输入需查询推荐位名称">
+            <el-button slot="append" icon="el-icon-search" :loading="search.loading" @click="getList" />
           </el-input>
         </div>
       </div>
@@ -204,7 +203,8 @@ export default {
       // 搜索
       search: {
         form: {
-          pid: ''
+          channel: '',
+          name: ''
         },
         loading: false
       },
@@ -215,7 +215,7 @@ export default {
           status: 1,
           name: '',
           sort: '',
-          pid: ''
+          channel: ''
         },
         rules: {
           name: [
@@ -235,7 +235,7 @@ export default {
           },
           {
             label: '频道',
-            prop: 'pid',
+            prop: 'channel',
             align: 'center'
           },
           {
@@ -346,11 +346,16 @@ export default {
     },
     getList() {
       this.table.loading = true
-      rankList().then(response => {
-        console.log('response: ', response)
+      this.search.loading = true
+      const data = Object.assign({}, this.search.form, {
+        page: this.table.page,
+        size: this.table.size
+      })
+      rankList(data).then(response => {
         this.table.data = response.data.data
         this.table.total = response.data.total
         this.table.loading = false
+        this.search.loading = false
       })
     },
     toggleCurrent(current = '', query) {
@@ -382,7 +387,7 @@ export default {
           this.table.loading = false
           this.$message({
             type: 'success',
-            message: '删除成功!'
+            message: res.message
           })
           this.getList()
         }).catch(() => {
