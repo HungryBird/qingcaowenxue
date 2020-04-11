@@ -25,7 +25,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="登录密码：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
+                  <el-input v-model="add.form.password" type="password" show-password />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -560,7 +560,9 @@ export default {
     }
     if (current === 'edit') {
       for (const key in query) {
-        this.$set(this.add.form, key, query[key])
+        if (key !== 'password') {
+          this.$set(this.add.form, key, query[key])
+        }
       }
       this.getEditOther()
     }
