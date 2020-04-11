@@ -45,16 +45,15 @@
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
           添加推荐位
         </el-button>
-        <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
-          <el-option value="1" label="全部" />
-          <el-option value="2" label="精选" />
-          <el-option value="3" label="男生" />
-          <el-option value="4" label="女生" />
-          <el-option value="5" label="其它" />
+        <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;" clearable>
+          <el-option :value="1" label="精选" />
+          <el-option :value="2" label="男生" />
+          <el-option :value="3" label="女生" />
+          <el-option :value="4" label="其它" />
         </el-select>
         <div class="filter-item" style="margin-left: 10px;">
-          <el-input placeholder="输入需查询推荐位名臣">
-            <el-button slot="append" icon="el-icon-search" />
+          <el-input v-model="search.form.name" placeholder="输入需查询推荐位名称">
+            <el-button slot="append" icon="el-icon-search" @click="getList" />
           </el-input>
         </div>
       </div>
@@ -200,7 +199,8 @@ export default {
       // 搜索
       search: {
         form: {
-          channel: ''
+          channel: '',
+          name: ''
         },
         loading: false
       },
@@ -340,11 +340,19 @@ export default {
     },
     getList() {
       this.table.loading = true
-      recommendList().then(response => {
-        console.log('response: ', response)
+      this.search.loading = true
+      const data = Object.assign({}, this.search.form, {
+        page: this.table.page,
+        size: this.table.size
+      })
+      recommendList(data).then(response => {
         this.table.data = response.data.data
         this.table.total = response.data.total
         this.table.loading = false
+        this.search.loading = false
+      }).catch(() => {
+        this.table.loading = false
+        this.search.loading = false
       })
     },
     toggleCurrent(current = '', query) {
