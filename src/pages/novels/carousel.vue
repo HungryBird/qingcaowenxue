@@ -5,13 +5,38 @@
         <el-form-item label="轮播名称：" prop="name">
           <el-input v-model="add.form.name" />
         </el-form-item>
-        <el-form-item label="可见对象：" prop="obj">
-          <el-select v-model="add.form.obj">
-            <el-option value="1" label="测试1" />
+        <el-form-item prop="thumb_id" label="轮播图">
+          <el-upload
+            ref="upload"
+            class="upload-demo"
+            :multiple="false"
+            :limit="1"
+            name="image"
+            :action="upload_picture"
+            :on-remove="handleRemove"
+            :file-list="add.list"
+            :on-success="onUploadImgSuccess"
+            list-type="picture"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="所属频道：" prop="channel">
+          <el-select v-model="add.form.channel" clearable>
+            <el-option v-for="oc in options.channel" :key="oc.value" :label="oc.name" :value="oc.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="内容：" prop="content">
-          <tinymce ref="tinymce" v-model="add.form.content" :height="300" />
+        <el-form-item label="书籍：" prop="book_id">
+          <el-autocomplete
+            v-model="add.form.book_name"
+            placeholder="输入书籍名可快速搜索"
+            class="inline-input"
+            :fetch-suggestions="querySearch"
+            @select="handleSelect"
+          />
+        </el-form-item>
+        <el-form-item label="url：" prop="url">
+          <el-input v-model="add.form.url" />
         </el-form-item>
         <el-form-item label="状 态：" prop="status">
           <el-radio-group v-model="add.form.status">
@@ -39,6 +64,14 @@
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('add')">
           添加轮播
         </el-button>
+        <div class="filter-item" style="margin-left: 10px;">
+          <el-select v-model="search.form.channel">
+            <el-option v-for="oc in options.channel" :key="oc.id" :value="oc.value" :label="oc.name" />
+          </el-select>
+        </div>
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" :loading="search.loading" @click="getList">
+          搜索
+        </el-button>
       </div>
       <el-table
         v-loading="table.loading"
@@ -55,12 +88,9 @@
               <el-button type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
-              <el-button v-if="row['pid'] !== 0" type="danger" size="mini" @click="categoryDelete(row.id)">
+              <el-button type="danger" size="mini" @click="adDelete(row.id)">
                 删除
               </el-button>
-            </div>
-            <div v-else-if="cl.prop === 'sort'">
-              <el-input v-if="row['pid'] !== 0" v-model="row.sort" @change="changeSort($event, row)" />
             </div>
             <div v-else-if="cl.prop === 'status'">
               <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="updateStatus(row)">{{ row[cl.prop] === 1 ? '开启' : '禁用' }}</el-button>
@@ -77,22 +107,46 @@
 </template>
 
 <script>
-import { categoryList, categoryUpdate, categoryDelete, categoryAdd } from '@/api/book/category'
-import Tinymce from '@/components/Tinymce'
+import { adList, adAdd, adDelete, adUpdate } from '@/api/ad/list'
+import { bookList } from '@/api/book/list'
 import Pagination from '@/components/Pagination'
+import { urlGetName } from '@/utils'
 import mix from '@/mixs/mix'
 
 export default {
   name: 'ComplexTable',
   components: {
-    Pagination,
-    Tinymce
+    Pagination
   },
   mixins: [mix],
   data() {
     return {
-      // 上传地址
-      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      search: {
+        form: {
+          channel: ''
+        },
+        loading: false
+      },
+      options: {
+        channel: [
+          {
+            name: '精选',
+            value: 1
+          },
+          {
+            name: '男生',
+            value: 2
+          },
+          {
+            name: '女生',
+            value: 3
+          },
+          {
+            name: '其他',
+            value: 4
+          }
+        ]
+      },
       // 上传头部
       headers: {
         token: ''
@@ -100,14 +154,31 @@ export default {
       add: {
         form: {
           name: '',
-          pid: null,
+          channel: '',
           thumb_id: '',
-          thumb_url: '',
+          book_id: '',
+          book_name: '',
+          url: '',
           status: 1
         },
         rules: {
           name: [
             { required: true, message: '请您输入分类名称' }
+          ],
+          thumb_id: [
+            { required: true, message: '请上传轮播图' }
+          ],
+          channel: [
+            { required: true, message: '请选择一个频道' }
+          ],
+          book_id: [
+            { required: true, message: '请选择一个书籍' }
+          ],
+          status: [
+            { required: true, message: '请选择一个状态' }
+          ],
+          url: [
+            { required: true, message: '请输入url' }
           ]
         },
         list: [],
@@ -139,25 +210,24 @@ export default {
           {
             label: '频道',
             prop: 'channel',
-            align: 'center',
-            width: 154
+            align: 'center'
           },
           {
             label: '图片',
-            prop: 'pic',
-            align: 'center',
-            width: 154
+            prop: 'picture',
+            align: 'center'
           },
           {
             label: '生成时间',
             prop: 'create_time',
             align: 'center',
-            width: 154
+            width: 200
           },
           {
             label: '操作',
             prop: 'action',
-            align: 'center'
+            align: 'center',
+            width: 154
           }
         ],
         data: [],
@@ -176,11 +246,11 @@ export default {
       for (const key in this.$route.query) {
         if (key === 'thumb_url') {
           this.add.list = [{
-            name: '',
+            name: urlGetName(this.$route.query[key]),
             url: this.$route.query[key]
           }]
-        } else if (key === 'pid' || key === 'status') {
-          this.add.form.pid = Number(this.$route.query[key])
+        } else if (key === 'status') {
+          this.$set(this.add.form, key, Number(this.$route.query[key]))
         } else if (key !== 'current') {
           this.$set(this.add.form, key, this.$route.query[key])
         }
@@ -190,6 +260,24 @@ export default {
     this.getList()
   },
   methods: {
+    // 输入查询
+    querySearch(queryString, cb) {
+      // bookList
+      bookList({
+        name: queryString,
+        size: 9999999999999
+      }).then(res => {
+        cb(res.data.data.map(item => {
+          item.value = item.name
+          return item
+        }))
+      })
+    },
+    // 上传成功
+    onUploadImgSuccess(...args) {
+      this.add.list = args[2]
+      this.add.form.thumb_id = args[0].data.id
+    },
     // 翻页
     pagin(data) {
       const { page, limit } = data
@@ -203,12 +291,13 @@ export default {
           this.add.loading = true
           const obj = Object.assign({}, this.add.form)
           obj.pid = obj.pid ? obj.pid : 0
-          const submit = this.current === 'add' ? categoryAdd : categoryUpdate
+          const submit = this.current === 'add' ? adAdd : adUpdate
           submit(obj).then(res => {
             this.$message.success(res.message)
             this.add.loading = false
-            if (this.current === 'add' && this.$refs.addForm.resetFields()) {
-              this.add.list = []
+            if (this.current === 'add') {
+              this.$refs.addForm.resetFields()
+              this.$refs.upload.clearFiles()
             }
           })
         }
@@ -228,13 +317,13 @@ export default {
       this.add.form.thumb_url = ''
     },
     // 选择
-    handleSelect() {
-
+    handleSelect(item) {
+      this.add.form.book_id = item.id
     },
     // 更新排序
     changeSort(sort, row) {
       this.table.loading = true
-      categoryUpdate({
+      adUpdate({
         id: row.id,
         sort
       }).then(res => {
@@ -250,7 +339,7 @@ export default {
     updateStatus(row) {
       const status = row.status === 1 ? 0 : 1
       this.table.loading = true
-      categoryUpdate({
+      adUpdate({
         id: row.id,
         status
       }).then(res => {
@@ -265,13 +354,19 @@ export default {
     // 获取列表
     getList() {
       this.table.loading = true
-      categoryList({
+      this.search.loading = true
+      const data = Object.assign({}, this.search.form, {
         page: this.table.page,
         size: this.table.size
-      }).then(response => {
-        this.table.data = response.data.data.reverse()
+      })
+      adList(data).then(response => {
+        this.table.data = response.data.data
         this.table.total = response.data.total
         this.table.loading = false
+        this.search.loading = false
+      }).catch(() => {
+        this.table.loading = false
+        this.search.loading = false
       })
     },
     toggleCurrent(current = '', row) {
@@ -283,12 +378,6 @@ export default {
           ...row
         }
       })
-    },
-    querySearch(queryString, cb) {
-      // 调用 callback 返回建议列表的数据
-      cb([{
-        value: '123'
-      }])
     },
     sortChange() {
       //
@@ -310,14 +399,15 @@ export default {
         //
       })
     },
-    categoryDelete(id) {
+    adDelete(id) {
+      console.log('id: ', id)
       this.$confirm('确定删除该数据？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this.table.loading = true
-        categoryDelete({
+        adDelete({
           id
         }).then(res => {
           this.$message.success(res.message)

@@ -585,3 +585,12 @@ export const clearExpiresStorage = () => {
   clearLocalStorage()
   return true
 }
+
+/**
+ * 根据url获取名称
+ */
+export const urlGetName = (url) => {
+  const arr = url.split('/')
+  const name = arr[arr.length - 1]
+  return name
+}
