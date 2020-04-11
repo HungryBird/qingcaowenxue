@@ -10,7 +10,7 @@ export function recommendList(data) {
 
 export function recommendDelete(params) {
   return request({
-    url: '/recommend/list',
+    url: '/recommend/delete',
     method: 'post',
     params
   })
