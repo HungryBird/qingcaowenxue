@@ -1301,18 +1301,8 @@ export default {
     getCategoryList() {
       categoryList().then(res => {
         const pTree = []
-        res.data.data.forEach(item => {
-          if (item.pid === 0) {
-            item.children = []
-            pTree.push(item)
-          }
-        })
-        for (const row of pTree) {
-          for (const cRow of res.data.data) {
-            if (cRow.pid === row.id) {
-              row.children.push(cRow)
-            }
-          }
+        for (const item in res.data) {
+          pTree.push(res.data[item])
         }
         this.treeData = pTree
       }).catch(err => {

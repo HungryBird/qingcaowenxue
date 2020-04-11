@@ -36,6 +36,7 @@
           <el-col :span="12">
             <el-form-item label="分类图片：" prop="thumb_url">
               <el-upload
+                ref="upload"
                 class="upload-demo"
                 :multiple="false"
                 :limit="1"
@@ -103,6 +104,9 @@
             <div v-else-if="cl.prop === 'status'">
               <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="updateStatus(row)">{{ row[cl.prop] === 1 ? '显示' : '不显示' }}</el-button>
             </div>
+            <div v-else-if="cl.prop === 'name'" style="text-align: left;">
+              {{ row['pid'] === 0 ? row[cl.prop] : `—— —— ${row[cl.prop]}` }}
+            </div>
             <div v-else-if="cl.prop === 'thumb_url'">
               <el-image v-if="row['pid'] !== 0" :src="row[cl.prop]" fit="cover" />
             </div>
@@ -119,6 +123,7 @@
 
 <script>
 import { categoryList, categoryUpdate, categoryDelete, categoryAdd } from '@/api/book/category'
+import { urlGetName } from '@/utils'
 import mix from '@/mixs/mix'
 
 export default {
@@ -154,12 +159,14 @@ export default {
           {
             label: 'ID',
             prop: 'id',
-            align: 'center'
+            align: 'center',
+            width: 50
           },
           {
             label: '排序',
             prop: 'sort',
-            align: 'center'
+            align: 'center',
+            width: 150
           },
           {
             label: '图片',
@@ -169,7 +176,8 @@ export default {
           {
             label: '分类名称',
             prop: 'name',
-            align: 'center'
+            align: 'center',
+            width: 450
           },
           {
             label: '创建时间',
@@ -180,12 +188,13 @@ export default {
             label: '状态',
             prop: 'status',
             align: 'center',
-            width: 154
+            width: 100
           },
           {
             label: '操作',
             prop: 'action',
-            align: 'center'
+            align: 'center',
+            width: 154
           }
         ],
         data: [],
@@ -204,18 +213,18 @@ export default {
       for (const key in this.$route.query) {
         if (key === 'thumb_url') {
           this.add.list = [{
-            name: '',
+            name: urlGetName(this.$route.query[key]),
             url: this.$route.query[key]
           }]
+          console.log('this.add.list: ', this.add.list)
         } else if (key === 'pid') {
-          this.add.form[key] = this.$route.query[key] === '0' ? null : Number(this.$route.query[key])
+          this.add.form[key] = this.$route.query[key] === 0 ? null : Number(this.$route.query[key])
         } else if (key === 'status') {
           this.add.form[key] = Number(this.$route.query[key])
         } else if (key !== 'current') {
           this.$set(this.add.form, key, this.$route.query[key])
         }
       }
-      console.log('this.add: ', this.add)
     }
     this.getList()
   },
@@ -230,8 +239,10 @@ export default {
           submit(obj).then(res => {
             this.$message.success(res.message)
             this.add.loading = false
-            if (this.current === 'add' && this.$refs.addForm.resetFields()) {
+            if (this.current === 'add') {
               this.add.list = []
+              this.$refs.addForm.resetFields()
+              this.$refs.upload.clearFiles()
             }
           })
         }
@@ -292,8 +303,23 @@ export default {
         page: this.table.page,
         size: this.table.size
       }).then(response => {
-        this.table.data = response.data.data.reverse()
-        this.table.total = response.data.total
+        let list = []
+        for (const item in response.data) {
+          const obj = {}
+          let children = []
+          for (const key in response.data[item]) {
+            if (key === 'children') {
+              children = response.data[item][key]
+            } else {
+              obj[key] = response.data[item][key]
+            }
+          }
+          list.push(obj)
+          list = list.concat(children)
+        }
+        this.table.data = list
+        console.log('data: ', this.table.data)
+        this.table.total = list.length
         this.table.loading = false
       })
     },
