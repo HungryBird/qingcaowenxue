@@ -110,7 +110,8 @@
           <el-col :span="6">
             <el-row>
               <el-col :span="8">
-                <el-image style="width: 100%;" />
+                <!-- <el-image style="width: 100%;" :src="story.cover" fit="fill" /> -->
+                <img :src="story.cover" style="width: 100%;object-fit: fill;display: block;">
               </el-col>
               <el-col :span="16">
                 <div style="font-weight: bold;font-size: 14px;color: rgb(51, 122, 183);">
@@ -151,7 +152,7 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews">
                 清除阅读量
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('', { id: story.book_id })">
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('index', { id: story.book_id })">
                 返回
               </el-button>
             </div>
@@ -182,13 +183,13 @@
               </el-button>
             </el-input>
           </div>
-          <div class="filter-item" style="margin-left: 10px;">
+          <!-- <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="story.handler.text" placeholder="请输入要处理的文字">
               <el-button slot="append">
                 提交
               </el-button>
             </el-input>
-          </div>
+          </div> -->
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="story.handler.remove" placeholder="输入要删除的章节区间：格式[1-20]" style="width: 330px;">
               <el-button slot="append" :loading="story.loading" @click="sectionDelete">
@@ -369,7 +370,7 @@
           </el-select>
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="search.form.name" placeholder="输入需查询的小说名称">
-              <el-button slot="append" icon="el-icon-search" />
+              <el-button slot="append" icon="el-icon-search" @click="getList(book_category_id)" />
             </el-input>
           </div>
         </div>
@@ -427,7 +428,7 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null })">{{ row['name'] }}</a>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null, thumb_url: row. thumb_url })">{{ row['name'] }}</a>
                   <span v-for="rr in row.recommend_name" :key="rr" class="code">{{ rr }}</span>
                 </div>
                 <div style="color: #999;">
@@ -757,6 +758,8 @@ export default {
       },
       // 小说内容
       story: {
+        // 小说封面
+        thumb_url: '',
         is_pay: null,
         // 小说id
         book_id: '',
@@ -1052,8 +1055,9 @@ export default {
       }
     // 点击了某个作品
     } else if (this.current === 'story') {
-      const { id, description, chapter_num, name, is_pay } = this.$route.query
+      const { id, description, chapter_num, name, is_pay, thumb_url } = this.$route.query
       this.story.book_id = id
+      this.story.cover = thumb_url
       this.story.description = description
       this.story.chapter_num = chapter_num
       this.story.name = name
@@ -1119,6 +1123,7 @@ export default {
         this.story.loading = false
         this.story.handler.free = ''
         this.$message.success(res.message)
+        this.chapterList(this.story.book_id)
       }).catch(() => {
         this.story.loading = false
       })
@@ -1330,7 +1335,7 @@ export default {
       }).then(res => {
         this.$message.success(res.message)
         this.story.loading = false
-        this.this.story.handler.remove = ''
+        this.story.handler.remove = ''
         this.chapterList(this.story.book_id)
       }).catch(() => {
         this.story.loading = false
@@ -1419,7 +1424,7 @@ export default {
       }
       this.story.massSetLoading = true
       setcost(data).then(res => {
-        this.$message.success(res.mess)
+        this.$message.success(res.message)
         this.$refs.storyTable.clearSelection()
         this.story.handler.charge = ''
         this.story.massSetLoading = false
