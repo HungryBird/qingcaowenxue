@@ -318,7 +318,6 @@ export default {
           list = list.concat(children)
         }
         this.table.data = list
-        console.log('data: ', this.table.data)
         this.table.total = list.length
         this.table.loading = false
       })

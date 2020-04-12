@@ -24,6 +24,7 @@
               <el-col :span="12">
                 <el-form-item label="封面图片：" prop="thumb_url">
                   <el-upload
+                    ref="addUpload"
                     class="upload-demo"
                     :multiple="false"
                     :limit="1"
@@ -554,6 +555,7 @@
               <el-col :span="12">
                 <el-form-item label="封面图片：" prop="thumb_url">
                   <el-upload
+                    ref="copyUpload"
                     class="upload-demo"
                     :multiple="false"
                     :headers="headers"
@@ -561,7 +563,7 @@
                     :action="uploadUrl"
                     name="image"
                     :on-preview="handlePreview"
-                    :on-remove="handleRemove"
+                    :on-remove="handleCopyRemove"
                     :file-list="copy.list"
                     :on-success="copyUploadImgSuccess"
                     list-type="picture"
@@ -689,6 +691,8 @@ import { authorList } from '@/api/author/list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
 import Tinymce from '@/components/Tinymce'
+import { urlGetName } from '@/utils'
+
 export default {
   components: { Pagination, Tinymce },
   mixins: [mix],
@@ -977,11 +981,11 @@ export default {
             align: 'center',
             width: 440
           },
-          {
-            label: '派单指数',
-            prop: 'zhishu',
-            align: 'center'
-          },
+          // {
+          //   label: '派单指数',
+          //   prop: 'zhishu',
+          //   align: 'center'
+          // },
           {
             label: '状态',
             prop: 'status',
@@ -994,7 +998,7 @@ export default {
           },
           {
             label: '时间',
-            prop: 'time',
+            prop: 'create_time',
             align: 'center'
           },
           {
@@ -1083,9 +1087,10 @@ export default {
         for (const key in query) {
           if (key === 'thumb_url') {
             this.add.list = [{
-              name: '',
+              name: urlGetName(query[key]),
               url: query[key]
             }]
+            this.add.form[key] = query[key]
           } else if (key === 'status' || key === 'is_fee') {
             this.add.form[key] = Number(query[key])
           } else if (key === 'book_length') {
@@ -1266,10 +1271,14 @@ export default {
         if (valid) {
           this.add.loading = true
           const data = Object.assign({}, this.add.form, { book_category_id: this.book_category_id, book_length: this.add.form.book_length * 10000 })
-          bookAdd(data).then(res => {
+          const submit = this.current === 'edit' ? bookUpdate : bookAdd
+          submit(data).then(res => {
             this.$message.success(res.message)
             this.add.loading = false
-            this.$refs.add.resetFields()
+            if (this.current === 'add') {
+              this.$refs.add.resetFields()
+              this.$refs.addUpload.clearFiles()
+            }
           }).catch(() => {
             this.add.loading = false
           })
@@ -1477,7 +1486,8 @@ export default {
       //
     },
     handleRemove() {
-      //
+      this.$refs.addUpload.clearFiles()
+      this.add.form.thumb_id = ''
     },
     // 新增或者编辑上传成功
     addUploadImgSuccess(res, file, fileList) {
@@ -1486,9 +1496,14 @@ export default {
       this.add.form.thumb_id = id
       this.add.list = fileList
     },
+    // 复制删除
+    handleCopyRemove() {
+      this.$refs.copyUpload.clearFiles()
+      this.copy.form.thumb_url = ''
+      this.copy.form.thumb_id = ''
+    },
     // 复制上传封面成功
     copyUploadImgSuccess(res, file, fileList) {
-      console.log('res: ', res, 'file: ', file, 'fileList: ', fileList)
       this.add.list = fileList
     },
     // 切换页面

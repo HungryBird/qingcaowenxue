@@ -296,6 +296,7 @@ export default {
           this.$set(this.add.form, key, query[key])
         }
       }
+      console.log('this.add.form: ', this.add.form)
       this.getEditOther()
     }
   },
@@ -333,6 +334,7 @@ export default {
           this.add.loading = true
           const obj = Object.assign({}, this.add.form)
           obj.pid = obj.pid ? obj.pid : 0
+          obj.id = obj.admin_id
           const submit = this.current === 'add' ? add_agent : update_agent
           submit(obj).then(res => {
             this.$message.success(res.message)
