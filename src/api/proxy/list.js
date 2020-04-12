@@ -2,23 +2,15 @@ import request from '@/utils/request'
 
 export function adminList(query) {
   return request({
-    url: '/admin/list_agent',
+    url: '/agent/list',
     method: 'get',
     params: query
   })
 }
 
-export function agentAdd(data) {
-  return request({
-    url: '/agent/add',
-    method: 'post',
-    data
-  })
-}
-
 export function add_agent(data) {
   return request({
-    url: '/admin/add_agent',
+    url: '/agent/add',
     method: 'post',
     data
   })
@@ -34,7 +26,7 @@ export function getEditOther(params) {
 
 export function update_agent(data) {
   return request({
-    url: '/admin/update_agent',
+    url: '/agent/update',
     method: 'post',
     data
   })

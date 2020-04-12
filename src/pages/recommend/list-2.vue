@@ -42,11 +42,8 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { type: 'recommend' })">
-          添加推荐位
-        </el-button>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { type: 'rank' })">
-          添加排位
+          添加榜单
         </el-button>
         <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
           <el-option :value="1" label="精选" />
@@ -83,6 +80,11 @@
                 删除
               </el-button>
             </div>
+            <div v-else-if="cl.prop === 'sex'">
+              <span style="background-color: #F9F2F4;border-radius: 4px;color: #ca4440;font-size: 90%;padding: 2px 4px;white-space: nowrap;">
+                {{ row.sex===0 ? '男频' : '女频' }}
+              </span>
+            </div>
             <div v-else-if="cl.prop === 'sort'">
               <el-input v-model="row.sort" />
             </div>
@@ -93,7 +95,7 @@
             </div>
             <div v-else-if="cl.prop === 'number'">
               <span style="background-color: #F9F2F4;border-radius: 4px;color: #ca4440;font-size: 90%;padding: 2px 4px;white-space: nowrap;">
-                {{ row[cl.prop] || 0 }}
+                {{ row.number }}
               </span>
             </div>
             <div v-else>
@@ -149,7 +151,7 @@
 
 <script>
 import { recommendAdd } from '@/api/recommend/recommend'
-import { rankList, rankUpdate, rankDelete, rankAdd } from '@/api/rank/list'
+import { rankList, rankUpdate, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
 import { bookList, bookDelete } from '@/api/book/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -235,7 +237,7 @@ export default {
           },
           {
             label: '频道',
-            prop: 'channel',
+            prop: 'sex',
             align: 'center'
           },
           {
@@ -245,7 +247,7 @@ export default {
           },
           {
             label: '数量',
-            prop: 'num',
+            prop: 'number',
             align: 'center'
           },
           {
@@ -404,7 +406,20 @@ export default {
         type: 'warning'
       }).then(() => {
         this.dataList.table.loading = true
-        bookDelete({
+        delBooks({
+          id: this.dataList.table.recommend_id,
+          book_ids: row.id
+        }).then(res => {
+          this.dataList.table.loading = false
+          this.$message({
+            type: 'success',
+            message: res.message
+          })
+          this.getDataList()
+        }).catch(() => {
+          this.table.loading = false
+        })
+        /* bookDelete({
           id: row.id
         }).then(res => {
           this.dataList.table.loading = false
@@ -415,7 +430,7 @@ export default {
           this.getDataList()
         }).catch(() => {
           this.dataList.table.loading = false
-        })
+        }) */
       }).catch(() => {
         //
       })
@@ -429,13 +444,9 @@ export default {
     // 获取数据列表
     getDataList(recommend_id) {
       this.dataList.table.loading = true
-      bookList({
-        page: this.dataList.table.page,
-        size: this.dataList.table.size,
-        recommend_id: this.dataList.table.recommend_id
-      }).then(res => {
-        this.dataList.table.total = res.data.total
-        this.dataList.table.data = res.data.data
+      getBooks({ id: this.dataList.table.recommend_id }).then(res => {
+        // this.dataList.table.total = 10
+        this.dataList.table.data = res.data
         this.dataList.table.loading = false
       }).catch(() => {
         this.dataList.table.loading = false

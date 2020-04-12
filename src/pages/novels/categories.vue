@@ -132,7 +132,7 @@ export default {
   data() {
     return {
       // 上传地址
-      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
+      uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
       // 上传头部
       headers: {
         token: ''

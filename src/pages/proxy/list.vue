@@ -29,18 +29,6 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <!-- <el-row>
-              <el-col :span="12">
-                <el-form-item label="上级代理：" prop="username">
-                  <el-select>
-                    <el-option value="1">一级代理</el-option>
-                    <el-option value="2">二级代理</el-option>
-                    <el-option value="3">作者管理员</el-option>
-                    <el-option value="4">作者</el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row> -->
             <el-row>
               <el-col :span="12">
                 <el-form-item label="手机号码：" prop="mobile">
@@ -141,13 +129,6 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <!-- <el-row>
-                  <el-col :span="12">
-                    <el-form-item label="姓名：" prop="password">
-                      <el-input v-model="add.form.password" />
-                    </el-form-item>
-                  </el-col>
-                </el-row> -->
               </el-col>
             </el-row>
             <el-row>
@@ -159,254 +140,13 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <!-- <el-row>
-                  <el-col :span="12">
-                    <el-form-item label="昵称：" prop="password">
-                      <el-input v-model="add.form.password" />
-                    </el-form-item>
-                  </el-col>
-                </el-row> -->
               </el-col>
             </el-row>
           </el-form>
         </el-tab-pane>
-        <!-- <el-tab-pane label="等级划分" name="fourth">
-          <el-form label-position="left" label-width="100px">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="等级：" prop="username">
-                  <el-select filterable>
-                    <el-option value="admin">admin</el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="备注：" prop="level">
-                  <el-input type="textarea" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane> -->
-        <!-- <el-tab-pane v-if="current === 'edit'" label="联系信息" name="five">
-          <el-form label-position="left" label-width="100px">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="联系人姓名：" prop="level">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="联系电话：" prop="level">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="公司名称：" prop="level">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="对接公众号昵称：" prop="level">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane> -->
       </el-tabs>
       <div />
       <el-button type="success" :loading="add.loading" @click="saveAdd">保存</el-button>
-      <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
-    </div>
-    <div v-else-if="current === 'wechatConfig'">
-      <el-tabs v-model="wechatConfig.active">
-        <el-tab-pane label="公众号配置" name="gzhpz">
-          <el-form label-position="left" label-width="100px">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="类型：" prop="username">
-                  <el-radio>
-                    认证服务号
-                  </el-radio>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="原始ID：" prop="level">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12" style="padding: 10px;">
-                注意: 上线后请不要更改公众号，否则会影响先前的粉丝，如需换号请申请开新号
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="微信号：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="微信公众号名称：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="App ID：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="App Secret：" prop="password">
-                  <el-input v-model="add.form.password" type="password" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="客服二维码：" prop="switch">
-                  <el-upload
-                    class="upload-demo"
-                    :multiple="false"
-                    :limit="1"
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    :on-preview="handlePreview"
-                    :on-remove="handleRemove"
-                    :file-list="wechatConfig.kefu"
-                    :on-success="onUploadKefuSuccess"
-                    list-type="picture"
-                  >
-                    <el-button size="small" type="primary">点击上传</el-button>
-                  </el-upload>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane>
-        <el-tab-pane name="gzhjr" label="公众号接入">
-          <el-row>
-            <el-col :span="12">
-              <el-alert
-                title="注意: 接入公众号必须是&quot;认证服务号&quot;"
-                :closable="false"
-              />
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12" style="line-height: 36px;">
-              公众号设置 (微信后台 > 公众号设置 > 功能设置)
-            </el-col>
-          </el-row>
-          <el-form label-width="187px">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="业务域名：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="JS接口安全域名：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="网页授权域名：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col style="line-height: 36px;" :span="12">
-                公众号回复 (微信后台 > 基本配置)
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="URL(服务器地址)：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="Token(令牌)：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-button type="success">
-                  生成token
-                </el-button>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item label="EncodingAESKey(消息加解密密钥)：">
-                  <el-input :disabled="true" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-button type="success">
-                  生成解密秘钥
-                </el-button>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="消息加解密方式：">
-                  明文模式
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane>
-        <el-tab-pane name="qdpz" label="签到配置">
-          <el-form label-width="187px">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="签到送书币：">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="连续签到书币：">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="最高赠送书币：">
-                  <el-input />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-tab-pane>
-      </el-tabs>
-      <el-button type="success">保存</el-button>
       <el-button type="danger" @click="toggleCurrent('')">返回</el-button>
     </div>
     <div v-else>
@@ -429,9 +169,6 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <!-- <el-button type="primary" size="mini" @click="recommend(row)">
-                推荐微信菜单
-              </el-button> -->
               <el-button type="primary" size="mini" @click="see(row)">
                 公众号查看
               </el-button>
@@ -516,11 +253,6 @@ export default {
             prop: 'username',
             align: 'center'
           },
-          // {
-          //   label: '角色',
-          //   prop: 'title',
-          //   align: 'center'
-          // },
           {
             label: '上次登录时间',
             prop: 'update_time',

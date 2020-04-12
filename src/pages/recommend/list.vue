@@ -145,7 +145,7 @@
 </template>
 
 <script>
-import { recommendList, recommendUpdate, recommendDelete, recommendAdd } from '@/api/recommend/recommend'
+import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks } from '@/api/recommend/recommend'
 import { bookList, bookDelete } from '@/api/book/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -424,8 +424,21 @@ export default {
         type: 'warning'
       }).then(() => {
         this.dataList.table.loading = true
-        bookDelete({
-          id: row.id
+        delBooks({
+          id: this.dataList.table.recommend_id,
+          book_ids: row.id
+        }).then(res => {
+          this.dataList.table.loading = false
+          this.$message({
+            type: 'success',
+            message: res.message
+          })
+          this.getDataList()
+        }).catch(() => {
+          this.table.loading = false
+        })
+        /* bookDelete({
+          id: this.dataList.table.recommend_id,
         }).then(res => {
           this.dataList.table.loading = false
           this.$message({
@@ -435,7 +448,7 @@ export default {
           this.getDataList()
         }).catch(() => {
           this.dataList.table.loading = false
-        })
+        }) */
       }).catch(() => {
         //
       })
@@ -449,13 +462,9 @@ export default {
     // 获取数据列表
     getDataList(recommend_id) {
       this.dataList.table.loading = true
-      bookList({
-        page: this.dataList.table.page,
-        size: this.dataList.table.size,
-        recommend_id: this.dataList.table.recommend_id
-      }).then(res => {
-        this.dataList.table.total = res.data.total
-        this.dataList.table.data = res.data.data
+      getBooks({ id: this.dataList.table.recommend_id }).then(res => {
+        // this.dataList.table.total = 10
+        this.dataList.table.data = res.data
         this.dataList.table.loading = false
       }).catch(() => {
         this.dataList.table.loading = false

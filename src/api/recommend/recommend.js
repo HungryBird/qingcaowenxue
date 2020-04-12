@@ -39,3 +39,27 @@ export function recommendUpdate(data) {
     data
   })
 }
+
+export function getBooks(data) {
+  return request({
+    url: '/recommend/getbooks',
+    method: 'post',
+    data
+  })
+}
+
+export function addBooks(data) {
+  return request({
+    url: '/recommend/addbooks',
+    method: 'post',
+    data
+  })
+}
+
+export function delBooks(data) {
+  return request({
+    url: '/recommend/delbooks',
+    method: 'post',
+    data
+  })
+}

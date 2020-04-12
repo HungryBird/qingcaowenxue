@@ -66,6 +66,7 @@
         </el-button>
         <div class="filter-item" style="margin-left: 10px;">
           <el-select v-model="search.form.channel">
+            <el-option key="" label="全部" value="" />
             <el-option v-for="oc in options.channel" :key="oc.id" :value="oc.value" :label="oc.name" />
           </el-select>
         </div>
@@ -94,6 +95,14 @@
             </div>
             <div v-else-if="cl.prop === 'status'">
               <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="updateStatus(row)">{{ row[cl.prop] === 1 ? '开启' : '禁用' }}</el-button>
+            </div>
+            <div v-else-if="cl.prop === 'channel'">
+              <el-button size="mini">
+                {{ options.channel[row[cl.prop]-1].name }}
+              </el-button>
+            </div>
+            <div v-else-if="cl.prop === 'thumb_url'">
+              <el-image v-if="row['pid'] !== 0" :src="row[cl.prop]" fit="cover" />
             </div>
             <div v-else>
               {{ row[cl.prop] }}
@@ -127,6 +136,7 @@ export default {
         },
         loading: false
       },
+      aaaa: '2222',
       options: {
         channel: [
           {
@@ -212,11 +222,11 @@ export default {
             prop: 'channel',
             align: 'center'
           },
-          {
+          /* {
             label: '图片',
-            prop: 'picture',
+            prop: 'thumb_url',
             align: 'center'
-          },
+          }, */
           {
             label: '生成时间',
             prop: 'create_time',

@@ -47,3 +47,20 @@ export function rankDelbooks(params) {
     params
   })
 }
+
+export function getBooks(data) {
+  return request({
+    url: '/rank/getbooks',
+    method: 'post',
+    data
+  })
+}
+
+export function delBooks(data) {
+  return request({
+    url: '/rank/delbooks',
+    method: 'post',
+    data
+  })
+}
+

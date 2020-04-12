@@ -379,6 +379,9 @@
           <el-button class="filter-item" type="primary" @click="handleRecommend">
             <svg-icon icon-class="guide" />推荐
           </el-button>
+          <el-button class="filter-item" type="primary" @click="handleRand">
+            <svg-icon icon-class="guide" />榜单
+          </el-button>
           <!-- <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>全部小说</el-button>
           <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>本地小说</el-button>
           <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>采集小说</el-button>
@@ -415,7 +418,7 @@
               <div v-else-if="cl.prop === 'sort'">
                 <el-input v-model="row.sort" />
               </div>
-              <div v-else-if="cl.prop === 'img'">
+              <div v-else-if="cl.prop === 'thumb_url'">
                 <el-image style="width: 50px;" fit="fill" :src="row[cl.prop]" />
               </div>
               <div v-else-if="cl.prop === 'is_fee'">
@@ -632,11 +635,11 @@
       </div>
     </el-dialog>
     <!-- 推荐小说 -->
-    <el-dialog ref="recommend" :visible.sync="recommend.visible" title="选择-推荐位">
+    <el-dialog ref="recommend" :visible.sync="recommend.visible" title="选择-榜单">
       <el-form ref="recommend" :model="recommend.form" :rules="recommend.rules" label-width="120px">
         <el-row :gutter="20">
           <el-col :span="18">
-            <el-form-item label="选择推荐位：" prop="id">
+            <el-form-item label="选择榜单：" prop="id">
               <el-select v-model="recommend.form.id" @visible-change="recommendVisibleChange">
                 <el-option v-for="or in options.recommend" :key="or.id" :value="or.id" :label="or.name" />
               </el-select>
@@ -652,6 +655,27 @@
         </el-row>
       </el-form>
     </el-dialog>
+    <!-- 榜单小说 -->
+    <el-dialog ref="rank" :visible.sync="rank.visible" title="选择-推荐位">
+      <el-form ref="rank" :model="rank.form" :rules="rank.rules" label-width="120px">
+        <el-row :gutter="20">
+          <el-col :span="18">
+            <el-form-item label="选择推荐位：" prop="id">
+              <el-select v-model="rank.form.id" @visible-change="rankVisibleChange">
+                <el-option v-for="or in options.rank" :key="or.id" :value="or.id" :label="or.name" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="18">
+            <el-form-item>
+              <el-button type="primary" :loading="rank.loading" @click="rankSave">保存</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -660,6 +684,7 @@ import mix from '@/mixs/mix'
 import { bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
 import { categoryList } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
+import { rankList, rankAddbooks } from '@/api/rank/list'
 import { authorList } from '@/api/author/list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
@@ -678,6 +703,7 @@ export default {
       },
       options: {
         recommend: [],
+        rank: [],
         admin: []
       },
       // index选中的小说
@@ -691,6 +717,18 @@ export default {
         rules: {
           id: [
             { required: true, message: '请选择一个推荐位' }
+          ]
+        }
+      },
+      rank: {
+        visible: false,
+        loading: false,
+        form: {
+          id: ''
+        },
+        rules: {
+          id: [
+            { required: true, message: '请选择一个榜单' }
           ]
         }
       },
@@ -871,10 +909,10 @@ export default {
           ],
           description: [
             { required: true, message: '请输入小说描述' }
-          ],
-          thumb_url: [
-            { required: true, message: '请您上传封面' }
           ]
+          /* thumb_url: [
+            { required: true, message: '请您上传封面' }
+          ] */
         },
         list: [],
         loading: false
@@ -930,7 +968,7 @@ export default {
           },
           {
             label: '封面',
-            prop: 'img',
+            prop: 'thumb_url',
             align: 'center'
           },
           {
@@ -1164,11 +1202,41 @@ export default {
         }
       })
     },
+    // 保存推荐
+    rankSave() {
+      this.$refs.rank.validate(valid => {
+        if (valid) {
+          this.rank.loading = true
+          const book_ids = this.selections.map(item => {
+            return item.id
+          }).join(',')
+          rankAddbooks({
+            book_ids,
+            id: this.rank.form.id
+          }).then(res => {
+            this.$refs.table.clearSelection()
+            this.$refs.rank.resetFields()
+            this.$message.success(res.message)
+            this.rank.visible = false
+            this.rank.loading = false
+          })
+        }
+      })
+    },
     // 打开推荐小说下拉
     recommendVisibleChange(val) {
       if (val) {
         recommendList().then(res => {
           this.options.recommend = res.data.data
+        })
+      }
+    },
+    // 打开榜单小说下拉
+    rankVisibleChange(val) {
+      // debugger
+      if (val) {
+        rankList().then(res => {
+          this.options.rank = res.data.data
         })
       }
     },
@@ -1179,6 +1247,13 @@ export default {
         return
       }
       this.recommend.visible = true
+    },
+    handleRand() {
+      if (this.selections.length === 0) {
+        this.$message.error('请选择要上榜单的小说')
+        return
+      }
+      this.rank.visible = true
     },
     // 获取推广链接
     getTuiguang(row) {
@@ -1247,6 +1322,7 @@ export default {
         this.$message.success(res.message)
         this.story.loading = false
         this.this.story.handler.remove = ''
+        this.chapterList(this.story.book_id)
       }).catch(() => {
         this.story.loading = false
       })
@@ -1330,7 +1406,7 @@ export default {
       const data = {
         chapter_ids,
         book_id: this.story.book_id,
-        cost: this.story.handler.charge
+        glod: this.story.handler.charge
       }
       this.story.massSetLoading = true
       setcost(data).then(res => {
@@ -1338,6 +1414,7 @@ export default {
         this.$refs.storyTable.clearSelection()
         this.story.handler.charge = ''
         this.story.massSetLoading = false
+        this.chapterList(this.story.book_id)
       }).catch(() => {
         this.story.massSetLoading = false
       })
