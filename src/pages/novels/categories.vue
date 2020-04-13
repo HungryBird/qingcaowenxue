@@ -243,7 +243,10 @@ export default {
               this.add.list = []
               this.$refs.addForm.resetFields()
               this.$refs.upload.clearFiles()
+              this.toggleCurrent('')
             }
+          }).catch(() => {
+            this.add.loading = false
           })
         }
       })

@@ -685,7 +685,7 @@
 <script>
 import mix from '@/mixs/mix'
 import { bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
-import { categoryList } from '@/api/book/category'
+import { categoryList, categoryListAll } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
 import { rankList, rankAddbooks } from '@/api/rank/list'
 import { authorList } from '@/api/author/list'
@@ -1283,6 +1283,7 @@ export default {
             if (this.current === 'add') {
               this.$refs.add.resetFields()
               this.$refs.addUpload.clearFiles()
+              this.toggleCurrent('index', { book_category_id: this.book_category_id })
             }
           }).catch(() => {
             this.add.loading = false
@@ -1571,7 +1572,7 @@ export default {
     // 输入查询
     querySearch(queryString, cb) {
       // categoryList
-      categoryList({
+      categoryListAll({
         category_name: queryString
       }).then(res => {
         cb(res.data.data.filter(item => {

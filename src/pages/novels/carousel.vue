@@ -136,7 +136,6 @@ export default {
         },
         loading: false
       },
-      aaaa: '2222',
       options: {
         channel: [
           {
@@ -308,6 +307,7 @@ export default {
             if (this.current === 'add') {
               this.$refs.addForm.resetFields()
               this.$refs.upload.clearFiles()
+              this.toggleCurrent('')
             }
           })
         }

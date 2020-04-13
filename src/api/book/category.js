@@ -31,3 +31,11 @@ export function categoryAdd(data) {
     data
   })
 }
+
+export function categoryListAll(params) {
+  return request({
+    url: '/category/listall',
+    method: 'get',
+    params
+  })
+}
