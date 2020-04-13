@@ -204,9 +204,9 @@
               <el-button type="primary" size="mini" @click="edit(row)">
                 配置
               </el-button>
-              <!-- <el-button type="primary" size="mini" @click="serverJoin(row.id)">
+              <el-button type="primary" size="mini" @click="serverJoint(row)">
                 服务器对接
-              </el-button> -->
+              </el-button>
             </div>
             <div v-else>
               {{ row[cl.prop] }}
@@ -217,6 +217,44 @@
       <!-- <el-button type="primary" style="margin-top: 20px;">排序</el-button> -->
       <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.limit" @pagination="pagin" />
     </div>
+    <!-- 弹出接口弹窗 -->
+    <el-dialog v-loading="joint.loading" :visible.sync="joint.visible" title="服务器对接" top="15vh">
+      <el-form ref="joint" :model="joint.form" label-width="120px">
+        <el-form-item label="业务域名" prop="ywym">
+          {{ joint.form.ywym }}
+        </el-form-item>
+        <el-form-item label="JS接口安全域名" prop="aqym">
+          {{ joint.form.ywym }}
+        </el-form-item>
+        <el-form-item label="网页域名授权" prop="ymsq">
+          {{ joint.form.ywym }}
+        </el-form-item>
+        <el-form-item label="url(服务器地址)" prop="url">
+          {{ joint.form.url }}
+        </el-form-item>
+        <el-form-item label="提示">
+          <div class="imgs-wrap">
+            <div class="img-wrap">
+              <div class="mask">
+                <i class="el-icon-zoom-in preview-btn" @click="toPreview(1)" />
+              </div>
+              <img src="../../assets/images/tishi-1.png">
+            </div>
+            <div class="img-wrap">
+              <div class="mask">
+                <i class="el-icon-zoom-in preview-btn" @click="toPreview(2)" />
+              </div>
+              <img src="../../assets/images/tishi-2.png">
+            </div>
+          </div>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <!-- 显示放大图片 -->
+    <el-dialog :visible.sync="preview.visible" top="15vh" title="查看提示">
+      <img v-if="preview.type === 1" src="../../assets/images/tishi-1.png" width="100%">
+      <img v-else src="../../assets/images/tishi-2.png" width="100%">
+    </el-dialog>
   </div>
 </template>
 
@@ -234,6 +272,22 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 放大图片
+      preview: {
+        visible: false,
+        type: 1
+      },
+      // 接口
+      joint: {
+        visible: false,
+        form: {
+          url: '',
+          ywym: '',
+          aqym: '',
+          ymsq: ''
+        },
+        loading: false
+      },
       options: {
         proxyList: []
       },
@@ -399,6 +453,11 @@ export default {
     }
   },
   methods: {
+    // 打开显示
+    toPreview(type) {
+      this.preview.type = type
+      this.preview.visible = true
+    },
     // 返回
     goback() {
       const admin_id = this.$route.query.admin_id
@@ -531,9 +590,49 @@ export default {
       this.toggleCurrent('edit', query)
     },
     // 服务器对接
-    serverJoin(id) {
-      //
+    serverJoint(row) {
+      this.joint.form.url = row.url
+      this.joint.visible = true
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .imgs-wrap{
+    display: flex;
+    .img-wrap{
+      position: relative;
+      margin-right: 20px;
+      width: 160px;
+      &:hover{
+        .mask{
+          display: block;
+        }
+      }
+      .mask{
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        .preview-btn{
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          cursor: pointer;
+          color: #fff;
+          font-size: 24px;
+        }
+      }
+      img{
+        display: block;
+        width: 100%;
+        object-fit: fill;
+      }
+    }
+  }
+</style>
