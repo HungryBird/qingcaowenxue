@@ -366,6 +366,7 @@
                   ref="storyImportUpload"
                   :action="upload_novfiles"
                   class="upload-demo"
+                  name="files"
                   :file-list="storyImport.list"
                   :on-remove="handleImportRemove"
                   :on-success="handleImportSuccess"
@@ -754,8 +755,7 @@ export default {
       storyImport: {
         form: {
           is_div: 1,
-          file: null,
-          file_id: ''
+          file: ''
         },
         rules: {
           file: [
@@ -1188,11 +1188,11 @@ export default {
   methods: {
     // 导入删除时
     handleImportRemove(file, fileList) {
-      //
+      this.storyImport.form.file = ''
     },
     // 导入上传成功后
     handleImportSuccess(res, file, fileList) {
-      this.storyImport.form.file_id = res.data.id
+      this.storyImport.form.file = res.data.url
     },
     // 导入上传前
     handleImportBeforeUplod(file) {
