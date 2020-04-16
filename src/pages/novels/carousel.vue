@@ -165,6 +165,7 @@ export default {
           name: '',
           channel: '',
           thumb_id: '',
+          thumb_url: '',
           book_id: '',
           book_name: '',
           url: '',

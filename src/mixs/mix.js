@@ -10,6 +10,13 @@ export default {
     token() {
       const token = this.$store.getters.token
       return token
+    },
+    headers() {
+      const token = this.$store.getters.token
+      const obj = {
+        token
+      }
+      return obj
     }
   },
   methods: {

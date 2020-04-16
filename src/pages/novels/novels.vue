@@ -92,6 +92,15 @@
             </el-row>
             <el-row>
               <el-col :span="12">
+                <el-form-item label="限免结束时间：" prop="fee_time">
+                  <el-radio-group v-model="add.form.fee_time">
+                    <el-date-picker v-model="add.form.fee_time" type="datetime" value-format="yyyy-MM-dd hh:mm:ss" />
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
                 <el-form-item label="是否上架：" prop="status">
                   <el-radio-group v-model="add.form.status">
                     <el-radio :label="1">是</el-radio>
@@ -978,7 +987,8 @@ export default {
           remarks: '',
           status: 1,
           thumb_url: '',
-          thumb_id: ''
+          thumb_id: '',
+          fee_time: ''
         },
         rules: {
           name: [
