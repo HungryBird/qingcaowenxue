@@ -71,7 +71,6 @@
                     ref="kefuList"
                     class="upload-demo"
                     :multiple="false"
-                    :limit="1"
                     :action="uploadUrl"
                     name="image"
                     :headers="headers"
@@ -92,7 +91,6 @@
                     ref="guanzhuList"
                     class="upload-demo"
                     :multiple="false"
-                    :limit="1"
                     :action="uploadUrl"
                     name="image"
                     :headers="headers"
@@ -133,7 +131,6 @@
                     :on-remove="proveRemove"
                     :file-list="add.proveList"
                     :multiple="false"
-                    :limit="1"
                     :on-success="proveUploadSuccess"
                   >
                     <i class="el-icon-upload" />
@@ -468,6 +465,7 @@ export default {
     // 客服上传成功
     kefuUploadSuccess(res, file, fileList) {
       this.add.form.qrcode_thumb_id = res.data.id
+      this.add.kefuList = fileList.splice(fileList.length - 1)
     },
     // 客服删除图片
     kefuRemove() {
@@ -476,6 +474,7 @@ export default {
     // 关注二维码上传成功
     guanzhuUploadSuccess(res, file, fileList) {
       this.add.form.sub_thumb_id = res.data.id
+      this.add.guanzhuList = fileList.splice(fileList.length - 1)
     },
     // 关注二维码删除图片
     guanzhuRemove() {
@@ -484,6 +483,7 @@ export default {
     // 证明文件上传成功
     proveUploadSuccess(res, file, fileList) {
       this.add.form.verify_file_id = res.data.id
+      this.add.proveList = fileList.splice(fileList.length - 1)
     },
     // 证明文件删除
     proveRemove() {

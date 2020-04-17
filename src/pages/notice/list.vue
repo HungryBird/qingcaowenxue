@@ -179,7 +179,6 @@ export default {
           this.$set(this.add.form, key, this.$route.query[key])
         }
       }
-      console.log('this.add: ', this.add)
     }
     this.getList()
   },
@@ -263,7 +262,7 @@ export default {
         page: this.table.page,
         size: this.table.size
       }).then(response => {
-        this.table.data = response.data.data.reverse()
+        // this.table.data = response.data.data.reverse()
         this.table.total = response.data.total
         this.table.loading = false
       })

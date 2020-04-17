@@ -27,7 +27,6 @@
                     ref="addUpload"
                     class="upload-demo"
                     :multiple="false"
-                    :limit="1"
                     :action="uploadUrl"
                     name="image"
                     :headers="headers"
@@ -381,7 +380,6 @@
                   :on-success="handleImportSuccess"
                   :before-upload="handleImportBeforeUplod"
                   accept="application/x-zip-compressed"
-                  :limit="1"
                 >
                   <el-button size="small" type="primary">选择压缩包</el-button>
                 </el-upload>
@@ -1202,6 +1200,7 @@ export default {
     },
     // 导入上传成功后
     handleImportSuccess(res, file, fileList) {
+      this.storyImport.list = fileList.splice(fileList.length - 1)
       this.storyImport.form.file = res.data.url
     },
     // 导入上传前
@@ -1618,7 +1617,7 @@ export default {
       const { id, url } = res.data
       this.add.form.thumb_url = url
       this.add.form.thumb_id = id
-      this.add.list = fileList
+      this.add.list = fileList.splice(fileList.length - 1)
     },
     // 复制删除
     handleCopyRemove() {
@@ -1628,7 +1627,7 @@ export default {
     },
     // 复制上传封面成功
     copyUploadImgSuccess(res, file, fileList) {
-      this.add.list = fileList
+      this.add.list = fileList.splice(fileList.length - 1)
     },
     // 切换页面
     toggleCurrent(current = '', obj) {

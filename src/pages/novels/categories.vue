@@ -254,7 +254,6 @@ export default {
       const { id, url } = res.data
       this.add.form.thumb_url = url
       this.add.form.thumb_id = id
-      this.add.list = fileList
       this.add.list = fileList.splice(fileList.length - 1)
     },
     handlePreview() {

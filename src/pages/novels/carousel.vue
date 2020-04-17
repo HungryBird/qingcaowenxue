@@ -282,7 +282,6 @@ export default {
     onUploadImgSuccess(...args) {
       this.add.list = args[2].splice(args[2].length - 1)
       this.add.form.thumb_id = args[0].data.id
-      console.log('success: ', this.add.list)
     },
     // 翻页
     pagin(data) {
