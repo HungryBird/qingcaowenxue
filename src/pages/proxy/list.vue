@@ -255,7 +255,7 @@ export default {
           },
           {
             label: '上次登录时间',
-            prop: 'update_time',
+            prop: 'last_time',
             align: 'center'
           },
           {

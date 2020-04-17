@@ -92,6 +92,15 @@
             </el-row>
             <el-row>
               <el-col :span="12">
+                <el-form-item label="限免结束时间：" prop="fee_time">
+                  <el-radio-group v-model="add.form.fee_time">
+                    <el-date-picker v-model="add.form.fee_time" type="datetime" value-format="yyyy-MM-dd hh:mm:ss" />
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
                 <el-form-item label="是否上架：" prop="status">
                   <el-radio-group v-model="add.form.status">
                     <el-radio :label="1">是</el-radio>
@@ -145,6 +154,9 @@
               </el-button>
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
                 添加章节
+              </el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="warning" plain @click="toggleCurrent('storyImport', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
+                章节导入
               </el-button>
               <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="updateSelection">
                 更新章节
@@ -353,6 +365,55 @@
           </el-form-item>
         </el-form>
       </div>
+      <!-- 章节导入 -->
+      <div v-else-if="current === 'storyImport'">
+        <el-form ref="storyImport" :model="storyImport.form" :rules="storyImport.rules" label-width="150px">
+          <el-row :gutter="20">
+            <el-col :span="6">
+              <el-form-item label="章节标题：" prop="file">
+                <el-upload
+                  ref="storyImportUpload"
+                  :action="upload_novfiles"
+                  class="upload-demo"
+                  name="files"
+                  :file-list="storyImport.list"
+                  :on-remove="handleImportRemove"
+                  :on-success="handleImportSuccess"
+                  :before-upload="handleImportBeforeUplod"
+                  accept="application/x-zip-compressed"
+                  :limit="1"
+                >
+                  <el-button size="small" type="primary">选择压缩包</el-button>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+            <el-col :span="18">
+              <el-form-item>
+                <el-alert type="error" :closable="false" title="说明：自动添加小说，上传zip文件，压缩包内直接为txt格式文件内容，文件名不能为中文，压缩前，如果文档内每一行有书名或者其它信息，请删除再压缩上传！" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="是否分享导入：" prop="is_div">
+            <el-radio-group v-model="storyImport.form.is_div">
+              <el-radio :label="1">
+                开启
+              </el-radio>
+              <el-radio :label="0">
+                关闭
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="mini" type="primary" :loading="storyImport.loading" @click="importChapter">
+              保存
+            </el-button>
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
+              返回
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+      <!-- 主页 -->
       <div v-else-if="current === 'index'">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
@@ -685,7 +746,7 @@
 <script>
 import mix from '@/mixs/mix'
 import { bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
-import { categoryList } from '@/api/book/category'
+import { categoryList, categoryListAll } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
 import { rankList, rankAddbooks } from '@/api/rank/list'
 import { authorList } from '@/api/author/list'
@@ -699,6 +760,21 @@ export default {
   mixins: [mix],
   data() {
     return {
+      // 章节导入
+      storyImport: {
+        form: {
+          is_div: 1,
+          file: ''
+        },
+        rules: {
+          file: [
+            { required: true, message: '请选择一个上传的文件' }
+          ]
+        },
+        list: [],
+        loading: false
+      },
+      // 首页搜索
       search: {
         form: {
           type: 1,
@@ -706,6 +782,7 @@ export default {
           name: ''
         }
       },
+      // 所有下拉选项
       options: {
         recommend: [],
         rank: [],
@@ -713,6 +790,7 @@ export default {
       },
       // index选中的小说
       selections: [],
+      // 推荐
       recommend: {
         visible: false,
         loading: false,
@@ -725,6 +803,7 @@ export default {
           ]
         }
       },
+      // 排名
       rank: {
         visible: false,
         loading: false,
@@ -908,7 +987,8 @@ export default {
           remarks: '',
           status: 1,
           thumb_url: '',
-          thumb_id: ''
+          thumb_id: '',
+          fee_time: ''
         },
         rules: {
           name: [
@@ -1064,6 +1144,15 @@ export default {
       this.description = description
       this.story.is_pay = is_pay
       this.chapterList(id)
+    // 导入章节
+    } else if (this.current === 'storyImport') {
+      const { num, book_id, description, chapter_num, name } = this.$route.query
+      this.story.add.form.num = num + 1
+      this.story.book_id = book_id
+      this.story.description = description
+      this.story.chapter_num = chapter_num
+      this.story.name = name
+      this.description = description
     // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
       const { num, book_id, description, chapter_num, name } = this.$route.query
@@ -1107,6 +1196,23 @@ export default {
     }
   },
   methods: {
+    // 导入删除时
+    handleImportRemove(file, fileList) {
+      this.storyImport.form.file = ''
+    },
+    // 导入上传成功后
+    handleImportSuccess(res, file, fileList) {
+      this.storyImport.form.file = res.data.url
+    },
+    // 导入上传前
+    handleImportBeforeUplod(file) {
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isLt10M) {
+        this.$refs.storyImportUpload.clearFiles()
+        this.$message.error('上传压缩包体积不能超过 10MB!')
+        return false
+      }
+    },
     // 打开推广文案
     openTuiguangwenan(row) {
       this.story.tuiguang.visible = true
@@ -1283,6 +1389,7 @@ export default {
             if (this.current === 'add') {
               this.$refs.add.resetFields()
               this.$refs.addUpload.clearFiles()
+              this.toggleCurrent('index', { book_category_id: this.book_category_id })
             }
           }).catch(() => {
             this.add.loading = false
@@ -1343,8 +1450,20 @@ export default {
     },
     // 引入章节
     importChapter() {
-      importChapter().then(res => {
-
+      this.$refs.storyImport.validate(valid => {
+        if (valid) {
+          this.storyImport.loading = true
+          const data = Object.assign({
+            book_id: this.story.book_id
+          }, this.storyImport.form)
+          importChapter(data).then(res => {
+            this.$message.success(res.message)
+            this.storyImport.loading = false
+            this.toggleCurrent('story', { id: this.story.book_id, description: this.story.description, name: this.story.name, chapter_num: this.story.chapter_num })
+          }).catch(() => {
+            this.storyImport.loading = false
+          })
+        }
       })
     },
     // 章节列表翻页
@@ -1571,7 +1690,7 @@ export default {
     // 输入查询
     querySearch(queryString, cb) {
       // categoryList
-      categoryList({
+      categoryListAll({
         category_name: queryString
       }).then(res => {
         cb(res.data.data.filter(item => {

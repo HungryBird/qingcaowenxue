@@ -1,7 +1,22 @@
 export default {
   data() {
     return {
-      upload_picture: `${process.env.VUE_APP_BASE_API}/common/upload_picture`
+      upload_picture: `${process.env.VUE_APP_BASE_API}/common/upload_picture`,
+      upload_novfiles: `${process.env.VUE_APP_BASE_API}/common/upload_novfiles`,
+      importChapter_upload_url: `${process.env.VUE_APP_BASE_API}/chapter/importChapter`
+    }
+  },
+  computed: {
+    token() {
+      const token = this.$store.getters.token
+      return token
+    },
+    headers() {
+      const token = this.$store.getters.token
+      const obj = {
+        token
+      }
+      return obj
     }
   },
   methods: {

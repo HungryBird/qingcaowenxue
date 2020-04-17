@@ -146,7 +146,6 @@
 
 <script>
 import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks } from '@/api/recommend/recommend'
-import { bookList, bookDelete } from '@/api/book/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 

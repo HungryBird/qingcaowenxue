@@ -10,7 +10,6 @@
             ref="upload"
             class="upload-demo"
             :multiple="false"
-            :limit="1"
             name="image"
             :action="upload_picture"
             :on-remove="handleRemove"
@@ -136,7 +135,6 @@ export default {
         },
         loading: false
       },
-      aaaa: '2222',
       options: {
         channel: [
           {
@@ -157,15 +155,12 @@ export default {
           }
         ]
       },
-      // 上传头部
-      headers: {
-        token: ''
-      },
       add: {
         form: {
           name: '',
           channel: '',
           thumb_id: '',
+          thumb_url: '',
           book_id: '',
           book_name: '',
           url: '',
@@ -285,8 +280,9 @@ export default {
     },
     // 上传成功
     onUploadImgSuccess(...args) {
-      this.add.list = args[2]
+      this.add.list = args[2].splice(args[2].length - 1)
       this.add.form.thumb_id = args[0].data.id
+      console.log('success: ', this.add.list)
     },
     // 翻页
     pagin(data) {
@@ -308,6 +304,7 @@ export default {
             if (this.current === 'add') {
               this.$refs.addForm.resetFields()
               this.$refs.upload.clearFiles()
+              this.toggleCurrent('')
             }
           })
         }

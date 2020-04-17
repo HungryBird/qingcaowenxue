@@ -133,7 +133,7 @@ export default {
         guide: [],
         welcome: []
       },
-      mode: '',
+      mode: 'Text',
       img: '',
       template: 1122,
       text: '',
@@ -152,10 +152,9 @@ export default {
     }
   },
   created() {
-    const { mode, id, title } = this.$route.query
+    const { id, title } = this.$route.query
     this.chapter_id = id
     this.chapter_title = title
-    this.mode = mode
     for (let i = 1; i <= 5; i++) {
       this.materialList(i)
     }
@@ -165,13 +164,16 @@ export default {
     // 选择bottom
     chooseBottom(bottom) {
       this.chapter_bottom = bottom
-      console.log('chapter_bottom: ', this.chapter_bottom)
     },
     // 获取文章内容
     getContent() {
       this.loading = true
       chapterContent({ id: this.chapter_id }).then(res => {
         this.chapter_content = res.data
+        const { mode } = this.$route.query
+        this.$nextTick(() => {
+          this.mode = mode
+        })
         this.loading = false
       }).catch(() => {
         this.loading = false
@@ -237,7 +239,7 @@ export default {
     },
     // 复制
     handleCopy(command) {
-      const dom = command === 'title' ? '#title' : '#content'
+      const dom = command === 'title' ? '#title' : '.rich_media_content'
       selectText(dom).then(res => {
         document.execCommand('Copy')
         this.$message.success('复制成功')
