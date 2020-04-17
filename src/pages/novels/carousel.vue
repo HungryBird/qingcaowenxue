@@ -10,7 +10,6 @@
             ref="upload"
             class="upload-demo"
             :multiple="false"
-            :limit="1"
             name="image"
             :action="upload_picture"
             :on-remove="handleRemove"
@@ -156,10 +155,6 @@ export default {
           }
         ]
       },
-      // 上传头部
-      headers: {
-        token: ''
-      },
       add: {
         form: {
           name: '',
@@ -285,8 +280,9 @@ export default {
     },
     // 上传成功
     onUploadImgSuccess(...args) {
-      this.add.list = args[2]
+      this.add.list = args[2].splice(args[2].length - 1)
       this.add.form.thumb_id = args[0].data.id
+      console.log('success: ', this.add.list)
     },
     // 翻页
     pagin(data) {
