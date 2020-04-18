@@ -323,9 +323,9 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/lagerImages',
+    path: '/lageImages',
     component: Layout,
-    redirect: '/lagerImages/list',
+    redirect: '/lageImages/list',
     name: 'lager-images',
     alwaysShow: true,
     meta: {
@@ -336,7 +336,7 @@ export const asyncRoutes = [
     children: [
       {
         path: 'list',
-        component: () => import('@/pages/lagerImages/list'),
+        component: () => import('@/pages/lageImages/list'),
         name: 'members-stat',
         meta: {
           title: '大图列表'

@@ -126,16 +126,12 @@ import { urlGetName } from '@/utils'
 import mix from '@/mixs/mix'
 
 export default {
-  name: 'ComplexTable',
+  name: 'LageImages',
   mixins: [mix],
   data() {
     return {
       // 上传地址
       uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
-      // 上传头部
-      headers: {
-        token: ''
-      },
       add: {
         form: {
           name: '',
