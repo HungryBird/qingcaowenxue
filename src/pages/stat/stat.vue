@@ -1,133 +1,59 @@
 <template>
   <div class="app-container">
-    <div v-if="current === 'add' || current === 'edit'">
-      <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="150px">
-        <el-form-item label="公告标题：" prop="name">
-          <el-input v-model="add.form.name" />
-        </el-form-item>
-        <el-form-item label="可见对象：" prop="obj">
-          <el-select v-model="add.form.obj">
-            <el-options value="1" label="测试1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="内容：" prop="content">
-          <tinymce ref="tinymce" v-model="add.form.content" :height="300" />
-        </el-form-item>
-        <el-form-item label="状 态：" prop="status">
-          <el-radio-group v-model="add.form.status">
-            <el-radio :label="1">
-              开启
-            </el-radio>
-            <el-radio :label="0">
-              关闭
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-button size="mini" type="primary" :loading="add.addLoading" @click="save">
-            保存
-          </el-button>
-          <el-button size="mini" type="danger" @click="toggleCurrent('')">
-            返回
-          </el-button>
-        </el-form-item>
-      </el-form>
+    <el-alert :title="title" type="error" effect="dark" style="margin-bottom: 10px;" />
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <el-tabs v-model="tabActive" type="card" @tab-click="toggleTab">
+          <el-tab-pane name="order" label="订单统计" />
+          <el-tab-pane name="user" label="用户统计" />
+        </el-tabs>
+      </el-col>
+      <el-col :span="18" style="display: flex;">
+        <el-select v-model="search.form.role" style="flex: 1;">
+          <el-option v-for="or in options.roles" :key="or.id" :label="or.label" :value="or.value" />
+        </el-select>
+        <el-button icon="el-icon-search" type="primary" style="margin-left: 10px;" />
+      </el-col>
+    </el-row>
+    <div v-show="tabActive === 'order'">
+      <orders :role="search.form.role" />
     </div>
-    <div v-else>
-      <el-alert :title="title" type="error" effect="dark" style="margin-bottom: 10px;" />
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-tabs v-model="tabActive" type="card" @tab-click="toggleTab">
-            <el-tab-pane name="order" label="订单统计" />
-            <el-tab-pane name="user" label="用户统计" />
-          </el-tabs>
-        </el-col>
-        <el-col :span="18" style="display: flex;">
-          <el-select style="flex: 1;">
-            <el-option v-for="or in options.roles" :key="or.id" :label="or.label" :value="or.value" />
-          </el-select>
-          <el-button icon="el-icon-search" type="primary" style="margin-left: 10px;" />
-        </el-col>
-      </el-row>
-      <el-table
-        v-loading="table.loading"
-        :data="table.data"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%;"
-        @sort-change="sortChange"
-      >
-        <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
-          <template slot-scope="{ row }">
-            <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="edit(row)">
-                编辑
-              </el-button>
-              <el-button v-if="row['pid'] !== 0" type="danger" size="mini" @click="categoryDelete(row.id)">
-                删除
-              </el-button>
-            </div>
-            <div v-else-if="cl.prop === 'sort'">
-              <el-input v-if="row['pid'] !== 0" v-model="row.sort" @change="changeSort($event, row)" />
-            </div>
-            <div v-else-if="cl.prop === 'status'">
-              <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="updateStatus(row)">{{ row[cl.prop] === 1 ? '开启' : '禁用' }}</el-button>
-            </div>
-            <div v-else>
-              {{ row[cl.prop] }}
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-      <pagination v-show="table.total>0" :total="table.total" :page.sync="table.page" :limit.sync="table.size" @pagination="pagin" />
+    <div v-show="tabActive === 'user'">
+      <users :role="search.form.role" />
     </div>
   </div>
 </template>
 
 <script>
-import { categoryList, categoryUpdate, categoryDelete, categoryAdd } from '@/api/book/category'
-import Tinymce from '@/components/Tinymce'
-import Pagination from '@/components/Pagination'
+import Orders from './orders'
+import Users from './users'
 import mix from '@/mixs/mix'
 
 export default {
-  name: 'ComplexTable',
+  name: 'Stat',
   components: {
-    Pagination,
-    Tinymce
+    Orders,
+    Users
   },
   mixins: [mix],
   data() {
     return {
       tabActive: 'order',
-      title: '您好老哥',
-      // 上传地址
-      uploadUrl: 'http://admin_api.fuleien.com/main/common/upload_picture',
-      // 上传头部
-      headers: {
-        token: ''
-      },
-      options: {
-        roles: []
-      },
-      add: {
+      title: '',
+      search: {
         form: {
-          name: '',
-          pid: null,
-          thumb_id: '',
-          thumb_url: '',
-          status: 1
+          role: ''
         },
-        rules: {
-          name: [
-            { required: true, message: '请您输入分类名称' }
-          ]
-        },
-        list: [],
         loading: false
       },
-      current: '',
+      options: {
+        roles: [
+          {
+            label: '超级管理员',
+            value: 1
+          }
+        ]
+      },
       table: {
         columns: [
           {
@@ -161,11 +87,6 @@ export default {
             prop: 'real_name',
             align: 'center',
             width: 154
-          },
-          {
-            label: '操作',
-            prop: 'action',
-            align: 'center'
           }
         ],
         data: [],
@@ -193,11 +114,30 @@ export default {
           this.$set(this.add.form, key, this.$route.query[key])
         }
       }
-      console.log('this.add: ', this.add)
     }
+    this.showTime()
     this.getList()
   },
   methods: {
+    // 展示时间
+    showTime() {
+      const timer = setInterval(() => {
+        const date = new Date()
+        const time_quantum = date.getHours > 12 ? '下午' : '上午'
+        const role = '超级管理员'
+        const year = date.getFullYear()
+        const M = date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)
+        const d = date.getDate()
+        const h = date.getHours() > 9 ? date.getHours() : '0' + date.getHours()
+        const m = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()
+        const s = date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()
+        const D = date.getDay()
+        this.title = `尊敬的${role}，${time_quantum}好！现在时间是：${year}年${M}月${d}日 星期${D} ${h}:${m}:${s}`
+      }, 500)
+      this.$once('hook:beforeDestroy', () => {
+        clearInterval(timer)
+      })
+    },
     // 切换tab
     toggleTab(tab) {
       //
@@ -209,82 +149,17 @@ export default {
       this.table.size = limit
       this.getList()
     },
-    save() {
-      this.$refs.addForm.validate(valid => {
-        if (valid) {
-          this.add.loading = true
-          const obj = Object.assign({}, this.add.form)
-          obj.pid = obj.pid ? obj.pid : 0
-          const submit = this.current === 'add' ? categoryAdd : categoryUpdate
-          submit(obj).then(res => {
-            this.$message.success(res.message)
-            this.add.loading = false
-            if (this.current === 'add' && this.$refs.addForm.resetFields()) {
-              this.add.list = []
-            }
-          })
-        }
-      })
-    },
-    addUploadImgSuccess(res, file, fileList) {
-      const { id, url } = res.data
-      this.add.form.thumb_url = url
-      this.add.form.thumb_id = id
-      this.add.list = fileList
-    },
-    handlePreview() {
-      //
-    },
-    handleRemove() {
-      this.add.form.thumb_id = ''
-      this.add.form.thumb_url = ''
-    },
-    // 选择
-    handleSelect() {
-
-    },
-    // 更新排序
-    changeSort(sort, row) {
-      this.table.loading = true
-      categoryUpdate({
-        id: row.id,
-        sort
-      }).then(res => {
-        this.$message.success(res.message)
-        this.getList()
-        this.table.loading = false
-      }).catch((err) => {
-        this.table.loading = false
-        this.$message.error(err.message)
-      })
-    },
-    // 更新状态
-    updateStatus(row) {
-      const status = row.status === 1 ? 0 : 1
-      this.table.loading = true
-      categoryUpdate({
-        id: row.id,
-        status
-      }).then(res => {
-        this.$message.success(res.message)
-        this.getList()
-        this.table.loading = false
-      }).catch((err) => {
-        this.table.loading = false
-        this.$message.error(err.message)
-      })
-    },
     // 获取列表
     getList() {
-      this.table.loading = true
-      categoryList({
-        page: this.table.page,
-        size: this.table.size
-      }).then(response => {
-        this.table.data = response.data.data.reverse()
-        this.table.total = response.data.total
-        this.table.loading = false
-      })
+      // this.table.loading = true
+      // categoryList({
+      //   page: this.table.page,
+      //   size: this.table.size
+      // }).then(response => {
+      //   this.table.data = this.table.data.concat(response.data.data)
+      //   this.table.total = response.data.total
+      //   this.table.loading = false
+      // })
     },
     toggleCurrent(current = '', row) {
       const { path } = this.$route
@@ -295,57 +170,6 @@ export default {
           ...row
         }
       })
-    },
-    querySearch(queryString, cb) {
-      // 调用 callback 返回建议列表的数据
-      cb([{
-        value: '123'
-      }])
-    },
-    sortChange() {
-      //
-    },
-    handleClick(row) {
-      console.log('handleClick: ', row)
-    },
-    recommend(row) {
-      this.$confirm('确认要推荐微信菜单吗?此操作覆盖之前的菜单，新的菜单生效时间24小时内!', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '推送成功!'
-        })
-      }).catch(() => {
-        //
-      })
-    },
-    categoryDelete(id) {
-      this.$confirm('确定删除该数据？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.table.loading = true
-        categoryDelete({
-          id
-        }).then(res => {
-          this.$message.success(res.message)
-          this.getList()
-          this.table.loading = false
-        }).catch((err) => {
-          this.table.loading = false
-          this.$message.error(err.message)
-        })
-      })
-    },
-    edit(row) {
-      this.toggleCurrent('edit', row)
-    },
-    onUploadKefuSuccess(res, file, fileList) {
-      this.wechatConfig.kefu = fileList
     }
   }
 }
