@@ -418,14 +418,14 @@
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
-          <el-select v-model="search.form.status" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
+          <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="本分类" />
           </el-select>
           <el-select v-model="search.form.serial" placeholder="状态" class="filter-item" style="margin-left: 10px;">
-            <el-option :value="1" label="全部" />
-            <el-option :value="2" label="连载中" />
-            <el-option :value="3" label="已完结" />
+            <el-option :value="null" label="全部" />
+            <el-option :value="1" label="连载中" />
+            <el-option :value="2" label="已完结" />
           </el-select>
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="search.form.name" placeholder="输入需查询的小说名称">
@@ -776,7 +776,7 @@ export default {
       search: {
         form: {
           serial: 1,
-          status: 1,
+          category_id: 1,
           name: ''
         }
       },
