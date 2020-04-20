@@ -19,11 +19,10 @@
       </el-button>
       <el-input class="filter-item" style="width: 160px;" placeholder="输入需要查询的链接备注" />
       <el-select v-model="search.form.proxy" placeholder="我的代理" class="filter-item" style="margin-left: 10px;">
-        <el-option value="1" label="全部代理" />
-        <el-option value="2" label="精选" />
-        <el-option value="3" label="男生" />
-        <el-option value="4" label="女生" />
-        <el-option value="5" label="其它" />
+        <el-option :value="1" label="精选" />
+        <el-option :value="2" label="男生" />
+        <el-option :value="3" label="女生" />
+        <el-option :value="4" label="其它" />
       </el-select>
       <el-button class="filter-item" style="margin-left: 10px;" icon="el-icon-search" type="primary" />
     </div>

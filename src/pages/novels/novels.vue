@@ -89,7 +89,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
+            <el-row v-show="add.form.is_fee === 1">
               <el-col :span="12">
                 <el-form-item label="限免结束时间：" prop="fee_time">
                   <el-radio-group v-model="add.form.fee_time">
@@ -422,7 +422,7 @@
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="本分类" />
           </el-select>
-          <el-select v-model="search.form.type" placeholder="状态" class="filter-item" style="margin-left: 10px;">
+          <el-select v-model="search.form.serial" placeholder="状态" class="filter-item" style="margin-left: 10px;">
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="连载中" />
             <el-option :value="3" label="已完结" />
@@ -441,7 +441,7 @@
             <svg-icon icon-class="guide" />推荐
           </el-button>
           <el-button class="filter-item" type="primary" @click="handleRand">
-            <svg-icon icon-class="guide" />榜单
+            榜单
           </el-button>
           <!-- <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>全部小说</el-button>
           <el-button class="filter-item" type="primary" style="margin-left: 10px;" plain>本地小说</el-button>
@@ -586,7 +586,7 @@
     <el-dialog :visible.sync="copy.visible" title="复制小说" width="80%" top="5vh">
       <el-container>
         <el-aside width="200px">
-          <el-tree :props="defaultProps" :default-expand-all="true" :data="treeData" />
+          <el-tree :props="defaultProps" :default-expand-all="true" highlight-current :data="treeData" />
         </el-aside>
         <el-main>
           <el-form ref="copy" :model="copy.form" :rules="copy.rules" label-width="120px">
@@ -697,11 +697,11 @@
       </div>
     </el-dialog>
     <!-- 推荐小说 -->
-    <el-dialog ref="recommend" :visible.sync="recommend.visible" title="选择-榜单">
+    <el-dialog ref="recommend" :visible.sync="recommend.visible" title="选择-推荐位">
       <el-form ref="recommend" :model="recommend.form" :rules="recommend.rules" label-width="120px">
         <el-row :gutter="20">
           <el-col :span="18">
-            <el-form-item label="选择榜单：" prop="id">
+            <el-form-item label="选择推荐位：" prop="id">
               <el-select v-model="recommend.form.id" @visible-change="recommendVisibleChange">
                 <el-option v-for="or in options.recommend" :key="or.id" :value="or.id" :label="or.name" />
               </el-select>
@@ -718,11 +718,11 @@
       </el-form>
     </el-dialog>
     <!-- 榜单小说 -->
-    <el-dialog ref="rank" :visible.sync="rank.visible" title="选择-推荐位">
+    <el-dialog ref="rank" :visible.sync="rank.visible" title="选择-榜单">
       <el-form ref="rank" :model="rank.form" :rules="rank.rules" label-width="120px">
         <el-row :gutter="20">
           <el-col :span="18">
-            <el-form-item label="选择推荐位：" prop="id">
+            <el-form-item label="选择榜单：" prop="id">
               <el-select v-model="rank.form.id" @visible-change="rankVisibleChange">
                 <el-option v-for="or in options.rank" :key="or.id" :value="or.id" :label="or.name" />
               </el-select>
@@ -775,7 +775,7 @@ export default {
       // 首页搜索
       search: {
         form: {
-          type: 1,
+          serial: 1,
           status: 1,
           name: ''
         }
@@ -816,10 +816,6 @@ export default {
       },
       // 上传地址
       uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
-      // 上传头部
-      headers: {
-        token: ''
-      },
       // 小说类型
       book_category_id: null,
       // 选择推广模式
@@ -1313,6 +1309,11 @@ export default {
             this.$message.success(res.message)
             this.recommend.visible = false
             this.recommend.loading = false
+            this.toggleCurrent('index', {
+              book_category_id: this.book_category_id
+            })
+          }).catch(() => {
+            this.recommend.loading = false
           })
         }
       })
@@ -1332,7 +1333,12 @@ export default {
             this.$refs.table.clearSelection()
             this.$refs.rank.resetFields()
             this.$message.success(res.message)
+            this.toggleCurrent('index', {
+              book_category_id: this.book_category_id
+            })
             this.rank.visible = false
+            this.rank.loading = false
+          }).catch(() => {
             this.rank.loading = false
           })
         }
@@ -1507,7 +1513,9 @@ export default {
     },
     // 获取分类
     getCategoryList() {
-      categoryList().then(res => {
+      categoryList({
+        size: 9999999
+      }).then(res => {
         const pTree = []
         for (const item in res.data) {
           pTree.push(res.data[item])
@@ -1684,6 +1692,8 @@ export default {
         this.table.total = response.data.total
         this.table.loading = false
         this.table.size = response.data.per_size
+      }).catch(() => {
+        this.table.loading = false
       })
     },
     // 输入查询

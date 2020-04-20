@@ -83,6 +83,9 @@
             <div v-else-if="cl.prop === 'sort'">
               <el-input v-model="row.sort" />
             </div>
+            <div v-else-if="cl.prop === 'channel'">
+              {{ row[cl.prop] | channelFilter }}
+            </div>
             <div v-else-if="cl.prop === 'status'">
               <el-button size="mini" :type="row[cl.prop] === 1 ? 'primary' : 'danger'" @click="changeStatus(row)">
                 {{ row[cl.prop] === 1 ? '开启' : '禁用' }}
@@ -152,6 +155,20 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 export default {
   name: 'ComplexTable',
   components: { Pagination },
+  filters: {
+    channelFilter(val) {
+      switch (val) {
+        case 1:
+          return '精选'
+        case 2:
+          return '男生'
+        case 3:
+          return '女生'
+        case 4:
+          return '其他'
+      }
+    }
+  },
   mixins: [mix],
   data() {
     return {
@@ -239,7 +256,7 @@ export default {
           },
           {
             label: '数量',
-            prop: 'num',
+            prop: 'number',
             align: 'center'
           },
           {

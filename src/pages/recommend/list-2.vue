@@ -13,10 +13,8 @@
           <el-col :span="12">
             <el-form-item label="上级分类：" prop="channel">
               <el-select v-model="add.form.channel">
-                <el-option :value="1" label="精选" />
-                <el-option :value="2" label="男生" />
-                <el-option :value="3" label="女生" />
-                <el-option :value="4" label="其它" />
+                <el-option :value="0" label="男频" />
+                <el-option :value="1" label="女频" />
               </el-select>
             </el-form-item>
           </el-col>
