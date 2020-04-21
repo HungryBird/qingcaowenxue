@@ -225,25 +225,25 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/financial',
-    component: Layout,
-    redirect: '/financial/proxyOrder',
-    name: 'financial-management',
-    alwaysShow: true,
-    meta: {
-      title: '财务管理',
-      icon: 'money'
-    },
-    children: [
-      {
-        path: 'proxyOrder',
-        component: () => import('@/pages/financial/proxyOrder'),
-        name: 'proxy-order',
-        meta: { title: '代理提现单' }
-      }
-    ]
-  },
+  // {
+  //   path: '/financial',
+  //   component: Layout,
+  //   redirect: '/financial/proxyOrder',
+  //   name: 'financial-management',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '财务管理',
+  //     icon: 'money'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'proxyOrder',
+  //       component: () => import('@/pages/financial/proxyOrder'),
+  //       name: 'proxy-order',
+  //       meta: { title: '代理提现单' }
+  //     }
+  //   ]
+  // },
   // {
   //   path: '/promote',
   //   component: Layout,
@@ -281,26 +281,26 @@ export const asyncRoutes = [
   //     }
   //   ]
   // },
-  {
-    path: '/orders',
-    component: Layout,
-    redirect: '/orders/list',
-    name: 'order-management',
-    alwaysShow: true,
-    meta: {
-      title: '订单管理',
-      iconType: 'element',
-      icon: 's-order'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/orders/list'),
-        name: 'order-list',
-        meta: { title: '订单列表' }
-      }
-    ]
-  },
+  // {
+  //   path: '/orders',
+  //   component: Layout,
+  //   redirect: '/orders/list',
+  //   name: 'order-management',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '订单管理',
+  //     iconType: 'element',
+  //     icon: 's-order'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/orders/list'),
+  //       name: 'order-list',
+  //       meta: { title: '订单列表' }
+  //     }
+  //   ]
+  // },
   {
     path: '/members',
     component: Layout,
@@ -322,28 +322,28 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/lageImages',
-    component: Layout,
-    redirect: '/lageImages/list',
-    name: 'lager-images',
-    alwaysShow: true,
-    meta: {
-      title: '大图管理',
-      icon: 'picture',
-      iconType: 'element'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/lageImages/list'),
-        name: 'members-stat',
-        meta: {
-          title: '大图列表'
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/lageImages',
+  //   component: Layout,
+  //   redirect: '/lageImages/list',
+  //   name: 'lager-images',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '大图管理',
+  //     icon: 'picture',
+  //     iconType: 'element'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/lageImages/list'),
+  //       name: 'members-stat',
+  //       meta: {
+  //         title: '大图列表'
+  //       }
+  //     }
+  //   ]
+  // },
   // {
   //   path: '/comments',
   //   component: Layout,
