@@ -531,6 +531,7 @@
                 <div>
                   <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null, thumb_url: row. thumb_url, book_category_id })">{{ row['name'] }}</a>
                   <span v-for="rr in row.recommend_name" :key="rr" class="code">{{ rr }}</span>
+                  <span v-for="rr in row.rank_name" :key="rr" class="code" style="color: #46a6ff;">{{ rr }}</span>
                 </div>
                 <div style="color: #999;">
                   <!-- 开始收费备注 -->
@@ -745,7 +746,7 @@
           <el-col :span="18">
             <el-form-item label="选择推荐位：" prop="id">
               <el-select v-model="recommend.form.id" @visible-change="recommendVisibleChange">
-                <el-option v-for="or in options.recommend" :key="or.id" :value="or.id" :label="or.name" />
+                <el-option v-for="or in options.recommend" :key="or.id" :value="or.id" :label="or.recommend_name" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -766,7 +767,7 @@
           <el-col :span="18">
             <el-form-item label="选择榜单：" prop="id">
               <el-select v-model="rank.form.id" @visible-change="rankVisibleChange">
-                <el-option v-for="or in options.rank" :key="or.id" :value="or.id" :label="or.name" />
+                <el-option v-for="or in options.rank" :key="or.id" :value="or.id" :label="or.bank_name" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -1419,7 +1420,9 @@ export default {
     rankVisibleChange(val) {
       // debugger
       if (val) {
-        rankList().then(res => {
+        rankList({
+          size: 999999
+        }).then(res => {
           this.options.rank = res.data.data
         })
       }
