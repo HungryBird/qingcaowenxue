@@ -1408,7 +1408,9 @@ export default {
     // 打开推荐小说下拉
     recommendVisibleChange(val) {
       if (val) {
-        recommendList().then(res => {
+        recommendList({
+          size: 999999
+        }).then(res => {
           this.options.recommend = res.data.data
         })
       }
