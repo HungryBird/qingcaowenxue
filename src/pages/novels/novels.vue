@@ -423,7 +423,7 @@
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
-          <!-- <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
+          <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="本分类" />
           </el-select>
@@ -431,20 +431,20 @@
             <el-option :value="null" label="全部" />
             <el-option :value="1" label="连载中" />
             <el-option :value="2" label="已完结" />
-          </el-select> -->
+          </el-select>
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="search.form.name" placeholder="输入需查询的小说名称">
               <el-button slot="append" icon="el-icon-search" @click="getList(book_category_id)" />
             </el-input>
           </div>
         </div>
-        <el-form label-width="100px">
-          <!-- <el-form-item label="小说属性：">
+        <!-- <el-form label-width="100px">
+          <el-form-item label="小说属性：">
             <el-radio-group v-model="search.form.category_id">
               <el-radio :label="1">全部</el-radio>
               <el-radio :label="2">本分类</el-radio>
             </el-radio-group>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="读者性别：">
             <el-radio-group v-model="search.form.sex">
               <el-radio-button :label="null">全部</el-radio-button>
@@ -467,14 +467,14 @@
               </el-radio-button>
             </el-radio-group>
           </el-form-item>
-          <!-- <el-form-item label="派单指数：">
+          <el-form-item label="派单指数：">
             <el-radio-group v-model="search.form.sex">
               <el-radio :label="null">全部</el-radio>
               <el-radio :label="1">男频</el-radio>
               <el-radio :label="2">女频</el-radio>
             </el-radio-group>
-          </el-form-item> -->
-        </el-form>
+          </el-form-item>
+        </el-form> -->
         <aside>
           <a>数量：共<span style="color: #f00;">{{ table.total }}</span>个</a>
         </aside>
@@ -1085,7 +1085,7 @@ export default {
       categoryName: '',
       treeData: [],
       dialogTableVisible: false,
-      current: '',
+      current: 'index',
       table: {
         columns: [
           {
