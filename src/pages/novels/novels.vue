@@ -423,10 +423,10 @@
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
-          <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
+          <!-- <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="本分类" />
-          </el-select>
+          </el-select> -->
           <el-select v-model="search.form.serial" placeholder="状态" class="filter-item" style="margin-left: 10px;">
             <el-option :value="null" label="全部" />
             <el-option :value="1" label="连载中" />
@@ -793,7 +793,7 @@ import { authorList } from '@/api/author/list'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import clip from '@/utils/clipboard' // use clipboard directly
 import Tinymce from '@/components/Tinymce'
-import { urlGetName } from '@/utils'
+import { urlGetName, isEmpty } from '@/utils'
 
 export default {
   components: { Pagination, Tinymce },
@@ -819,7 +819,7 @@ export default {
         form: {
           sex: null,
           serial: null,
-          book_category_id: null,
+          category_id: null,
           name: ''
         }
       },
@@ -1157,7 +1157,7 @@ export default {
   created() {
     const { current } = this.$route.query
     this.headers.token = this.$store.getters.token
-    this.current = current
+    this.current = current || 'index'
     this.getCategory()
   },
   mounted() {
@@ -1172,7 +1172,7 @@ export default {
         this.book_category_id = book_category_id
         this.getList(book_category_id)
       } else {
-        this.getList()
+        this.getList(this.book_category_id)
       }
     // 点击了某个作品
     } else if (this.current === 'story') {
@@ -1447,7 +1447,13 @@ export default {
       this.$refs.add.validate(valid => {
         if (valid) {
           this.add.loading = true
-          const data = Object.assign({}, this.add.form, { book_category_id: this.book_category_id, book_length: this.add.form.book_length * 10000 })
+          console.log('this.add.form', this.add.form)
+          let fee_time
+          if (!isEmpty(this.add.form.fee_time)) {
+            const date = new Date(this.add.form.fee_time)
+            fee_time = Math.ceil(date.getTime() / 1000)
+          }
+          const data = Object.assign({}, this.add.form, { fee_time }, { book_category_id: this.book_category_id, book_length: this.add.form.book_length * 10000 })
           const submit = this.current === 'edit' ? bookUpdate : bookAdd
           submit(data).then(res => {
             this.$message.success(res.message)
@@ -1583,6 +1589,15 @@ export default {
           pTree.push(res.data[item])
         }
         this.treeData = pTree
+        if (isEmpty(this.book_category_id)) {
+          for (let i = 0; i < pTree.length; i++) {
+            if (pTree[i].children && pTree[i].children.length !== 0) {
+              this.book_category_id = pTree[i].children[0].id
+              this.getList(this.book_category_id)
+              break
+            }
+          }
+        }
         this.$nextTick(() => {
           this.$refs.tree.setCurrentKey(this.book_category_id)
         })
@@ -1747,6 +1762,7 @@ export default {
     },
     // 获取列表
     getList(book_category_id) {
+      console.log('book_category_id: ', book_category_id)
       this.table.loading = true
       bookList({
         page: this.table.page,
@@ -1800,7 +1816,7 @@ export default {
             this.update.visible = false
             this.update.loading = false
             this.$message.success(res.message)
-            this.getList()
+            this.getList(this.book_category_id)
           }).catch(() => {
             this.update.loading = false
           })
