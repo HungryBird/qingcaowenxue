@@ -163,7 +163,7 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="clearViews">
                 清除阅读量
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('index', { id: story.book_id })">
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" @click="toggleCurrent('index', { id: story.book_id, book_category_id })">
                 返回
               </el-button>
             </div>
@@ -226,7 +226,7 @@
                       [{{ row['num'] }}]
                     </b>
                     {{ row[sc.prop] }}
-                    <i class="el-icon-trophy" />
+                    <i v-if="row.is_pay === 1" class="el-icon-trophy" />
                   </a>
                 </div>
                 <div v-else-if="sc.prop === 'tuiguang' && row.num <= 5">
@@ -251,7 +251,7 @@
                   </el-button>
                 </div>
                 <div v-else-if="sc.prop === 'action'">
-                  <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num})">
+                  <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: row.num})">
                     编辑
                   </el-button>
                   <el-button size="mini" type="danger" plain @click="handleStoryRemove(row)">
@@ -319,21 +319,24 @@
           <el-form-item label="章节标题：" prop="name">
             <el-input v-model="story.add.form.name" />
           </el-form-item>
-          <el-form-item label="输入章节：" prop="num">
-            <el-input v-model="story.add.form.num" />
+          <el-form-item label="输入章节：" prop="chapter_num">
+            <el-input v-model="story.add.form.chapter_num" />
           </el-form-item>
           <el-form-item label="章节内容：" prop="content">
             <tinymce ref="tinymce" v-model="story.add.form.content" :height="300" />
           </el-form-item>
           <el-form-item label="是否免费：" prop="is_pay">
             <el-radio-group v-model="story.add.form.is_pay">
-              <el-radio :label="1">
+              <el-radio :label="0">
                 免费
               </el-radio>
-              <el-radio :label="0">
+              <el-radio :label="1">
                 收费
               </el-radio>
             </el-radio-group>
+          </el-form-item>
+          <el-form-item v-show="story.add.form.is_pay === 1" label="收费书币：" prop="glod">
+            <el-input v-model="story.add.form.glod" />
           </el-form-item>
           <el-form-item label="状 态：" prop="status">
             <el-radio-group v-model="story.add.form.status">
@@ -487,7 +490,7 @@
               </div>
               <div v-else-if="cl.prop === 'name'" style="text-align: left;">
                 <div>
-                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null, thumb_url: row. thumb_url })">{{ row['name'] }}</a>
+                  <a href="javascript:;" style="font-size: 12px;color: #337ab7;cursor: pointer;" @click="toggleCurrent('story', { id: row.id, description: row.description, name: row.name, chapter_num: row.chapter_num, is_pay: null, thumb_url: row. thumb_url, book_category_id })">{{ row['name'] }}</a>
                   <span v-for="rr in row.recommend_name" :key="rr" class="code">{{ rr }}</span>
                 </div>
                 <div style="color: #999;">
@@ -865,16 +868,18 @@ export default {
             id: '',
             name: '',
             num: '',
+            chapter_num: '',
             content: '',
             is_pay: 1,
-            status: 1
+            status: 1,
+            glod: 0
           },
           rules: {
             name: [
               { required: true, message: '请输入小说标题' }
             ],
-            num: [
-              { required: true, message: '请输入小说ID' }
+            chapter_num: [
+              { required: true, message: '请输入小说章节' }
             ],
             content: [
               { required: true, message: '请您输入章节内容' }
@@ -1129,7 +1134,8 @@ export default {
       }
     // 点击了某个作品
     } else if (this.current === 'story') {
-      const { id, description, chapter_num, name, is_pay, thumb_url } = this.$route.query
+      const { id, description, chapter_num, name, is_pay, thumb_url, book_category_id } = this.$route.query
+      this.book_category_id = book_category_id
       this.story.book_id = id
       this.story.cover = thumb_url
       this.story.description = description
@@ -1157,10 +1163,13 @@ export default {
       this.story.name = name
       this.description = description
       if (this.current === 'storyEdit') {
-        const { id, is_pay, status, name, book_name } = this.$route.query
+        const { id, is_pay, status, name, book_name, glod, num, chapter_num } = this.$route.query
         this.story.add.form.id = id
         this.story.name = book_name
         this.story.add.form.name = name
+        this.story.add.form.num = num
+        this.story.add.form.chapter_num = chapter_num
+        this.story.add.form.glod = glod
         this.story.add.form.is_pay = Number(is_pay)
         this.story.add.form.status = Number(status)
         this.chapterContent(id)
@@ -1404,6 +1413,7 @@ export default {
     },
     // 切换编辑章节
     handleStoryEdit(row) {
+      console.log('切换编辑 row: ', row)
       this.toggleCurrent('storyEdit', row)
     },
     // 添加编辑章节
@@ -1595,7 +1605,7 @@ export default {
     // 点击章节
     clickSection(row) {
       const { query } = this.$route
-      this.toggleCurrent('storyEdit', { id: row.id, ...query })
+      this.toggleCurrent('storyEdit', { id: row.id, glod: row.glod, ...query })
     },
     // 复制小说
     toCopyNovel(row) {
@@ -1639,6 +1649,7 @@ export default {
     },
     // 切换页面
     toggleCurrent(current = '', obj) {
+      console.log('obj: ', obj)
       const { path } = this.$route
       this.$router.replace({
         path: '/redirect' + path,
@@ -1734,6 +1745,7 @@ export default {
             this.update.visible = false
             this.update.loading = false
             this.$message.success(res.message)
+            this.getList()
           }).catch(() => {
             this.update.loading = false
           })
