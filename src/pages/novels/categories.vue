@@ -78,6 +78,43 @@
           添加
         </el-button>
       </div>
+      <el-form label-width="100px">
+        <!-- <el-form-item label="小说属性：">
+          <el-radio-group v-model="search.form.category_id">
+            <el-radio :label="1">全部</el-radio>
+            <el-radio :label="2">本分类</el-radio>
+          </el-radio-group>
+        </el-form-item> -->
+        <el-form-item label="读者性别：">
+          <el-radio-group v-model="search.form.sex" @change="getList">
+            <el-radio-button :label="null">全部</el-radio-button>
+            <el-radio-button :label="1">男频</el-radio-button>
+            <el-radio-button :label="2">女频</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="连载状态：">
+          <el-radio-group v-model="search.form.serial" @change="getList">
+            <el-radio-button :label="null">全部</el-radio-button>
+            <el-radio-button :label="1">连载中</el-radio-button>
+            <el-radio-button :label="2">已完结</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="小说类型：">
+          <el-radio-group v-model="search.form.book_category_id" @change="getList">
+            <el-radio-button :label="null">全部</el-radio-button>
+            <el-radio-button v-for="ot in options.types" :key="ot.id" :label="ot.id" style="margin-bottom: 10px;">
+              {{ ot.name }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <!-- <el-form-item label="派单指数：">
+          <el-radio-group v-model="search.form.sex">
+            <el-radio :label="null">全部</el-radio>
+            <el-radio :label="1">男频</el-radio>
+            <el-radio :label="2">女频</el-radio>
+          </el-radio-group>
+        </el-form-item> -->
+      </el-form>
       <el-table
         v-loading="table.loading"
         :data="table.data"
@@ -121,7 +158,7 @@
 </template>
 
 <script>
-import { categoryList, categoryUpdate, categoryDelete, categoryAdd } from '@/api/book/category'
+import { categoryList, categoryUpdate, categoryDelete, categoryAdd, categoryListAll } from '@/api/book/category'
 import { urlGetName } from '@/utils'
 import mix from '@/mixs/mix'
 
@@ -133,8 +170,15 @@ export default {
       // 上传地址
       uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
       // 上传头部
-      headers: {
-        token: ''
+      search: {
+        form: {
+          sex: null,
+          serial: null,
+          book_category_id: null
+        }
+      },
+      options: {
+        types: []
       },
       add: {
         form: {
@@ -226,8 +270,16 @@ export default {
       }
     }
     this.getList()
+    this.getCategory()
   },
   methods: {
+    getCategory() {
+      categoryListAll({
+        category_name: ''
+      }).then(res => {
+        this.options.types = res.data.data
+      })
+    },
     save() {
       this.$refs.addForm.validate(valid => {
         if (valid) {
@@ -302,6 +354,7 @@ export default {
     getList() {
       this.table.loading = true
       categoryList({
+        ...this.search.form,
         page: this.table.page,
         size: this.table.size
       }).then(response => {

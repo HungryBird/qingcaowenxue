@@ -2,10 +2,12 @@
   <el-container style="height: calc(100vh - 84px);" class="novel-management">
     <el-aside width="200px">
       <el-tree
+        ref="tree"
         :props="defaultProps"
         :data="treeData"
         default-expand-all
         highlight-current
+        node-key="id"
         @node-click="handlerCategory"
       />
     </el-aside>
@@ -151,7 +153,7 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" :plain="(story.is_pay && story.is_pay == 1) || story.is_pay === undefined" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, is_pay: 0 })">
                 免费
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_category_id, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
                 添加章节
               </el-button>
               <el-button class="filter-item" style="margin-left: 10px;" type="warning" plain @click="toggleCurrent('storyImport', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
@@ -221,7 +223,7 @@
             <el-table-column v-for="sc in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
               <template slot-scope="{ row }">
                 <div v-if="sc.prop === 'name'" style="text-align: left;">
-                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num})">
+                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num, book_category_id})">
                     <b style="color: #900;">
                       [{{ row['num'] }}]
                     </b>
@@ -352,7 +354,7 @@
             <el-button size="mini" type="primary" :loading="story.add.addLoading" @click="chapterAdd">
               保存
             </el-button>
-            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, book_category_id })">
               返回
             </el-button>
             <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
@@ -421,7 +423,7 @@
           <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
-          <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
+          <!-- <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
             <el-option :value="1" label="全部" />
             <el-option :value="2" label="本分类" />
           </el-select>
@@ -429,13 +431,50 @@
             <el-option :value="null" label="全部" />
             <el-option :value="1" label="连载中" />
             <el-option :value="2" label="已完结" />
-          </el-select>
+          </el-select> -->
           <div class="filter-item" style="margin-left: 10px;">
             <el-input v-model="search.form.name" placeholder="输入需查询的小说名称">
               <el-button slot="append" icon="el-icon-search" @click="getList(book_category_id)" />
             </el-input>
           </div>
         </div>
+        <el-form label-width="100px">
+          <!-- <el-form-item label="小说属性：">
+            <el-radio-group v-model="search.form.category_id">
+              <el-radio :label="1">全部</el-radio>
+              <el-radio :label="2">本分类</el-radio>
+            </el-radio-group>
+          </el-form-item> -->
+          <el-form-item label="读者性别：">
+            <el-radio-group v-model="search.form.sex">
+              <el-radio-button :label="null">全部</el-radio-button>
+              <el-radio-button :label="1">男频</el-radio-button>
+              <el-radio-button :label="2">女频</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="连载状态：">
+            <el-radio-group v-model="search.form.serial">
+              <el-radio-button :label="null">全部</el-radio-button>
+              <el-radio-button :label="1">连载中</el-radio-button>
+              <el-radio-button :label="2">已完结</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="小说类型：">
+            <el-radio-group v-model="search.form.book_category_id">
+              <el-radio-button :label="null">全部</el-radio-button>
+              <el-radio-button v-for="ot in options.types" :key="ot.id" :label="ot.id" style="margin-bottom: 10px;">
+                {{ ot.name }}
+              </el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+          <!-- <el-form-item label="派单指数：">
+            <el-radio-group v-model="search.form.sex">
+              <el-radio :label="null">全部</el-radio>
+              <el-radio :label="1">男频</el-radio>
+              <el-radio :label="2">女频</el-radio>
+            </el-radio-group>
+          </el-form-item> -->
+        </el-form>
         <aside>
           <a>数量：共<span style="color: #f00;">{{ table.total }}</span>个</a>
         </aside>
@@ -778,8 +817,9 @@ export default {
       // 首页搜索
       search: {
         form: {
-          serial: 1,
-          category_id: 1,
+          sex: null,
+          serial: null,
+          book_category_id: null,
           name: ''
         }
       },
@@ -787,7 +827,8 @@ export default {
       options: {
         recommend: [],
         rank: [],
-        admin: []
+        admin: [],
+        types: []
       },
       // index选中的小说
       selections: [],
@@ -1117,6 +1158,7 @@ export default {
     const { current } = this.$route.query
     this.headers.token = this.$store.getters.token
     this.current = current
+    this.getCategory()
   },
   mounted() {
     this.getCategoryList()
@@ -1155,13 +1197,15 @@ export default {
       this.description = description
     // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
-      const { num, book_id, description, chapter_num, name } = this.$route.query
+      const { num, book_id, description, chapter_num, name, book_category_id } = this.$route.query
       this.story.add.form.num = num + 1
       this.story.book_id = book_id
       this.story.description = description
       this.story.chapter_num = chapter_num
       this.story.name = name
       this.description = description
+      this.book_category_id = book_category_id
+      console.log('book_category_id: ', book_category_id)
       if (this.current === 'storyEdit') {
         const { id, is_pay, status, name, book_name, glod, num, chapter_num } = this.$route.query
         this.story.add.form.id = id
@@ -1199,6 +1243,14 @@ export default {
     }
   },
   methods: {
+    // 获取分类
+    getCategory() {
+      categoryListAll({
+        category_name: ''
+      }).then(res => {
+        this.options.types = res.data.data
+      })
+    },
     // 导入删除时
     handleImportRemove(file, fileList) {
       this.storyImport.form.file = ''
@@ -1531,6 +1583,9 @@ export default {
           pTree.push(res.data[item])
         }
         this.treeData = pTree
+        this.$nextTick(() => {
+          this.$refs.tree.setCurrentKey(this.book_category_id)
+        })
       }).catch(err => {
         console.error('err: ', err)
       })
@@ -1605,7 +1660,7 @@ export default {
     // 点击章节
     clickSection(row) {
       const { query } = this.$route
-      this.toggleCurrent('storyEdit', { id: row.id, glod: row.glod, ...query })
+      this.toggleCurrent('storyEdit', { id: row.id, book_category_id: this.book_category_id, glod: row.glod, ...query })
     },
     // 复制小说
     toCopyNovel(row) {
@@ -1890,6 +1945,10 @@ export default {
         width: 100%;
         color: #fff;
       }
+    }
+    /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+      background: #f00;
+      color: #fff;
     }
   }
 </style>

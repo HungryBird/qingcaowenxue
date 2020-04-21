@@ -84,47 +84,47 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/notice',
-    component: Layout,
-    redirect: '/notice/list',
-    name: 'notice',
-    alwaysShow: true,
-    meta: {
-      title: '公告管理',
-      iconType: 'element',
-      icon: 'message'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/notice/list'),
-        name: 'notice-list',
-        meta: { title: '公告列表' }
-      }
-    ]
-  },
-  {
-    path: '/stat',
-    component: Layout,
-    redirect: '/stat/stat',
-    name: 'stat',
-    alwaysShow: true,
-    meta: {
-      title: '数据统计管理',
-      icon: 'chart'
-    },
-    children: [
-      {
-        path: 'stat',
-        component: () => import('@/pages/stat/stat'),
-        name: 'stat-stat',
-        meta: {
-          title: '数据统计'
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/notice',
+  //   component: Layout,
+  //   redirect: '/notice/list',
+  //   name: 'notice',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '公告管理',
+  //     iconType: 'element',
+  //     icon: 'message'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/notice/list'),
+  //       name: 'notice-list',
+  //       meta: { title: '公告列表' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/stat',
+  //   component: Layout,
+  //   redirect: '/stat/stat',
+  //   name: 'stat',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '数据统计管理',
+  //     icon: 'chart'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'stat',
+  //       component: () => import('@/pages/stat/stat'),
+  //       name: 'stat-stat',
+  //       meta: {
+  //         title: '数据统计'
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: '/wechat',
     component: Layout,
@@ -244,43 +244,43 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/promote',
-    component: Layout,
-    redirect: '/promote/list',
-    name: 'promote-management',
-    alwaysShow: true,
-    meta: {
-      title: '推广管理',
-      icon: 'star'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/promote/list'),
-        name: 'promote-list',
-        meta: { title: '推广列表' }
-      },
-      {
-        path: 'mass',
-        component: () => import('@/pages/promote/mass'),
-        name: 'promote-mass',
-        meta: { title: '群发推广' }
-      },
-      {
-        path: 'activity',
-        component: () => import('@/pages/promote/activity'),
-        name: 'promote-mass',
-        meta: { title: '促销活动' }
-      },
-      {
-        path: 'keywords',
-        component: () => import('@/pages/promote/keywords'),
-        name: 'keywords',
-        meta: { title: '关键字回复' }
-      }
-    ]
-  },
+  // {
+  //   path: '/promote',
+  //   component: Layout,
+  //   redirect: '/promote/list',
+  //   name: 'promote-management',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '推广管理',
+  //     icon: 'star'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/promote/list'),
+  //       name: 'promote-list',
+  //       meta: { title: '推广列表' }
+  //     },
+  //     {
+  //       path: 'mass',
+  //       component: () => import('@/pages/promote/mass'),
+  //       name: 'promote-mass',
+  //       meta: { title: '群发推广' }
+  //     },
+  //     {
+  //       path: 'activity',
+  //       component: () => import('@/pages/promote/activity'),
+  //       name: 'promote-mass',
+  //       meta: { title: '促销活动' }
+  //     },
+  //     {
+  //       path: 'keywords',
+  //       component: () => import('@/pages/promote/keywords'),
+  //       name: 'keywords',
+  //       meta: { title: '关键字回复' }
+  //     }
+  //   ]
+  // },
   {
     path: '/orders',
     component: Layout,
@@ -344,50 +344,50 @@ export const asyncRoutes = [
       }
     ]
   },
-  {
-    path: '/comments',
-    component: Layout,
-    redirect: '/comments/list',
-    name: 'comments',
-    alwaysShow: true,
-    meta: {
-      title: '评论管理',
-      icon: 'chat-round',
-      iconType: 'element'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/comments/list'),
-        name: 'comments-list',
-        meta: {
-          title: '评论列表'
-        }
-      }
-    ]
-  },
-  {
-    path: '/copywriter',
-    component: Layout,
-    redirect: '/copywriter/material',
-    name: 'comments',
-    alwaysShow: true,
-    meta: {
-      title: '文案管理',
-      icon: 's-management',
-      iconType: 'element'
-    },
-    children: [
-      {
-        path: 'material',
-        component: () => import('@/pages/copywriter/material'),
-        name: 'copywriter-material',
-        meta: {
-          title: '文案素材'
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/comments',
+  //   component: Layout,
+  //   redirect: '/comments/list',
+  //   name: 'comments',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '评论管理',
+  //     icon: 'chat-round',
+  //     iconType: 'element'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/comments/list'),
+  //       name: 'comments-list',
+  //       meta: {
+  //         title: '评论列表'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/copywriter',
+  //   component: Layout,
+  //   redirect: '/copywriter/material',
+  //   name: 'comments',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '文案管理',
+  //     icon: 's-management',
+  //     iconType: 'element'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'material',
+  //       component: () => import('@/pages/copywriter/material'),
+  //       name: 'copywriter-material',
+  //       meta: {
+  //         title: '文案素材'
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: '/authors',
     component: Layout,
