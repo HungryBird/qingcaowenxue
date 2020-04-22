@@ -153,7 +153,7 @@
               <el-button class="filter-item" style="margin-left: 10px;" type="primary" :plain="(story.is_pay && story.is_pay == 1) || story.is_pay === undefined" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, is_pay: 0 })">
                 免费
               </el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_category_id, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, page: story.table.page })">
+              <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('storyAdd', { num: story.table.total, book_category_id, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, page: story.table.page, size: story.table.size })">
                 添加章节
               </el-button>
               <el-button class="filter-item" style="margin-left: 10px;" type="warning" plain @click="toggleCurrent('storyImport', { num: story.table.total, book_id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num })">
@@ -223,7 +223,7 @@
             <el-table-column v-for="sc in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
               <template slot-scope="{ row }">
                 <div v-if="sc.prop === 'name'" style="text-align: left;">
-                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page})">
+                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page, size: story.table.size})">
                     <b style="color: #900;">
                       [{{ row['num'] }}]
                     </b>
@@ -253,7 +253,7 @@
                   </el-button>
                 </div>
                 <div v-else-if="sc.prop === 'action'">
-                  <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: row.num, page: story.table.page})">
+                  <el-button size="mini" type="primary" plain @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: row.num, page: story.table.page, size: story.table.size})">
                     编辑
                   </el-button>
                   <el-button size="mini" type="danger" plain @click="handleStoryRemove(row)">
@@ -266,7 +266,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <pagination v-if="showPagin" :total="story.table.total" :page.sync="story.table.page" :limit.sync="story.table.size" @pagination="storyPagein" />
+          <pagination v-if="showPagin" :total="story.table.total" :page-sizes="[10, 20, 30, 50, 100, 200, 300, 400, 500]" :page.sync="story.table.page" :limit.sync="story.table.size" @pagination="storyPagein" />
         </div>
         <!-- 生成推广链接 -->
         <el-dialog :visible.sync="story.tuiguanglianjie.visible" title="生成推广链接">
@@ -354,7 +354,7 @@
             <el-button size="mini" type="primary" :loading="story.add.addLoading" @click="chapterAdd">
               保存
             </el-button>
-            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page })">
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page, size: story.table.size })">
               返回
             </el-button>
             <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
@@ -410,7 +410,7 @@
             <el-button size="mini" type="primary" :loading="storyImport.loading" @click="importChapter">
               保存
             </el-button>
-            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, page: story.table.page })">
+            <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, page: story.table.page, size: story.table.size })">
               返回
             </el-button>
           </el-form-item>
@@ -1178,7 +1178,7 @@ export default {
       }
     // 点击了某个作品
     } else if (this.current === 'story') {
-      const { id, description, chapter_num, name, is_pay, thumb_url, book_category_id, page } = this.$route.query
+      const { id, description, chapter_num, name, is_pay, thumb_url, book_category_id, page, size } = this.$route.query
       this.book_category_id = book_category_id
       this.story.book_id = id
       this.story.cover = thumb_url
@@ -1188,6 +1188,7 @@ export default {
       this.description = description
       this.story.is_pay = is_pay
       this.story.table.page = Number(page)
+      this.story.table.size = size
       this.chapterList(id)
     // 导入章节
     } else if (this.current === 'storyImport') {
@@ -1200,7 +1201,7 @@ export default {
       this.description = description
     // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
-      const { num, book_id, description, chapter_num, name, book_category_id, page } = this.$route.query
+      const { num, book_id, description, chapter_num, name, book_category_id, page, size } = this.$route.query
       console.log('添加或者编辑; ', page)
       this.story.add.form.num = num + 1
       this.story.book_id = book_id
@@ -1210,6 +1211,7 @@ export default {
       this.description = description
       this.book_category_id = book_category_id
       this.story.table.page = page
+      this.story.table.size = size
       if (this.current === 'storyEdit') {
         const { id, is_pay, status, name, book_name, glod, num, chapter_num } = this.$route.query
         this.story.add.form.id = id

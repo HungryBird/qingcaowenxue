@@ -34,9 +34,9 @@
             @select="handleSelect"
           />
         </el-form-item>
-        <el-form-item label="url：" prop="url">
+        <!-- <el-form-item label="url：" prop="url">
           <el-input v-model="add.form.url" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="状 态：" prop="status">
           <el-radio-group v-model="add.form.status">
             <el-radio :label="1">
@@ -181,10 +181,10 @@ export default {
           ],
           status: [
             { required: true, message: '请选择一个状态' }
-          ],
-          url: [
-            { required: true, message: '请输入url' }
           ]
+          // url: [
+          //   { required: true, message: '请输入url' }
+          // ]
         },
         list: [],
         loading: false
@@ -202,11 +202,11 @@ export default {
             prop: 'name',
             align: 'center'
           },
-          {
-            label: 'url',
-            prop: 'url',
-            align: 'center'
-          },
+          // {
+          //   label: 'url',
+          //   prop: 'url',
+          //   align: 'center'
+          // },
           {
             label: '书籍',
             prop: 'book_name',
