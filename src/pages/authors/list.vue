@@ -3,7 +3,7 @@
     <div v-if="current === 'add' || current === 'edit'">
       <el-tabs v-model="add.active" @tab-click="handleClick">
         <el-tab-pane label="基本信息" name="first">
-          <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
+          <el-form ref="addForm1" :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="12">
                 <el-form-item label="登录账号：" prop="username">
@@ -67,7 +67,7 @@
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="抽成设置" name="second">
-          <el-form ref="addForm" :model="add.form" :rules="add.rules" label-width="120px">
+          <el-form :model="add.form" :rules="add.rules" label-width="120px">
             <el-row>
               <el-col :span="8">
                 <el-form-item label="抽成百分比：" prop="percentage">
@@ -335,26 +335,32 @@ export default {
       })
     },
     saveAdd() {
-      this.$refs.addForm.validate(valid => {
-        if (valid) {
-          this.add.loading = true
-          const obj = Object.assign({}, this.add.form)
-          obj.pid = obj.pid ? obj.pid : 0
-          obj.id = obj.admin_id
-          const submit = this.current === 'add' ? authorAdd : authorUpdate
-          submit(obj).then(res => {
-            this.$message.success(res.message)
-            this.add.loading = false
-            if (this.current === 'add' && this.$refs.addForm.resetFields()) return
-            this.toggleCurrent()
-          }).catch(() => {
-            this.add.loading = false
-          })
-        } else {
-          this.$message.error('请您填写完整数据')
-          this.add.loading = false
-        }
+      let isTrue1 = false
+      let isTrue2 = false
+      this.$refs.addForm1.validate(valid => {
+        isTrue1 = valid
       })
+      this.$refs.addForm.validate(valid => {
+        isTrue2 = valid
+      })
+      if (isTrue1 && isTrue2) {
+        this.add.loading = true
+        const obj = Object.assign({}, this.add.form)
+        obj.pid = obj.pid ? obj.pid : 0
+        obj.id = obj.admin_id
+        const submit = this.current === 'add' ? authorAdd : authorUpdate
+        submit(obj).then(res => {
+          this.$message.success(res.message)
+          this.add.loading = false
+          if (this.current === 'add' && this.$refs.addForm.resetFields()) return
+          this.toggleCurrent()
+        }).catch(() => {
+          this.add.loading = false
+        })
+      } else {
+        this.$message.error('请您填写完整数据')
+        this.add.loading = false
+      }
     },
     // 翻页
     pagin(data) {

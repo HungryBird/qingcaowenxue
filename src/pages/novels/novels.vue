@@ -223,7 +223,7 @@
             <el-table-column v-for="sc in story.table.columns" :key="sc.prop" :type="sc.type" :label="sc.label" :prop="sc.prop" :width="sc.width" :align="sc.align">
               <template slot-scope="{ row }">
                 <div v-if="sc.prop === 'name'" style="text-align: left;">
-                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page, size: story.table.size})">
+                  <a href="javascript:;" style="color: #337ab7;" @click="handleStoryEdit({...row, num: story.table.total, book_id: story.book_id, description: story.description, book_name: story.name, chapter_num: row.num, book_category_id, page: story.table.page, size: story.table.size})">
                     <b style="color: #900;">
                       [{{ row['num'] }}]
                     </b>
@@ -357,13 +357,13 @@
             <el-button size="mini" type="danger" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page, size: story.table.size })">
               返回
             </el-button>
-            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary" @click="toggleCurrent('story', { id: story.book_id, description: story.description, name: story.name, chapter_num: story.chapter_num, book_category_id, page: story.table.page, size: story.table.size })">
               目录
             </el-button>
-            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary" @click="goFont">
               上一章
             </el-button>
-            <el-button v-if="current === 'storyEdit'" size="mini" type="primary">
+            <el-button v-if="current === 'storyEdit'" size="mini" type="primary" @click="goNext">
               下一章
             </el-button>
           </el-form-item>
@@ -1249,6 +1249,14 @@ export default {
     }
   },
   methods: {
+    // 上一章
+    goFont() {
+      //
+    },
+    // 下一章
+    goNext() {
+      //
+    },
     // 获取分类
     getCategory() {
       categoryListAll({
@@ -1481,7 +1489,6 @@ export default {
     },
     // 切换编辑章节
     handleStoryEdit(row) {
-      console.log('切换编辑 row: ', row)
       this.toggleCurrent('storyEdit', row)
     },
     // 添加编辑章节

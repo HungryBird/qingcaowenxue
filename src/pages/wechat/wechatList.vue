@@ -297,10 +297,6 @@ export default {
       // 上传地址
       uploadUrl: process.env.VUE_APP_BASE_API + '/common/upload_picture',
       uploadFileUrl: process.env.VUE_APP_BASE_API + '/common/upload_files',
-      // 上传头部
-      headers: {
-        token: ''
-      },
       add: {
         form: {
           admin_id: '',
