@@ -396,7 +396,7 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="是否分享导入：" prop="is_div">
+          <el-form-item label="是否分章导入：" prop="is_div">
             <el-radio-group v-model="storyImport.form.is_div">
               <el-radio :label="1">
                 开启
