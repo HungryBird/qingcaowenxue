@@ -431,7 +431,7 @@ export default {
       this.$router.push({
         path: '/wechat/wechat-list',
         query: {
-          admin_id: row.id
+          sAdmin_id: row.id
         }
       })
     }

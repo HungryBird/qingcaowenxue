@@ -269,6 +269,7 @@ export default {
   mixins: [mix],
   data() {
     return {
+      action: '',
       // 放大图片
       preview: {
         visible: false,
@@ -438,8 +439,8 @@ export default {
         }
       }
     } else if (!current) {
-      if (query.admin_id) {
-        this.search.form.admin_id = Number(query.admin_id)
+      if (query.sAdmin_id) {
+        this.search.form.admin_id = Number(query.sAdmin_id)
       }
       this.proxyListVisible(true)
       this.getList()
@@ -580,7 +581,7 @@ export default {
     },
     edit(row) {
       const query = {
-        admin_id: this.search.form.admin_id,
+        sAdmin_id: this.search.form.admin_id,
         ...row
       }
       this.toggleCurrent('edit', query)

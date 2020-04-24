@@ -786,7 +786,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
+import { chapterAllId, bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
 import { categoryList, categoryListAll } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
 import { rankList, rankAddbooks } from '@/api/rank/list'
@@ -1153,7 +1153,9 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
+      ids: [],
+      currentId: ''
     }
   },
   created() {
@@ -1202,7 +1204,6 @@ export default {
     // 添加或者编辑章节
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
       const { num, book_id, description, chapter_num, name, book_category_id, page, size } = this.$route.query
-      console.log('添加或者编辑; ', page)
       this.story.add.form.num = num + 1
       this.story.book_id = book_id
       this.story.description = description
@@ -1223,6 +1224,7 @@ export default {
         this.story.add.form.is_pay = Number(is_pay)
         this.story.add.form.status = Number(status)
         this.chapterContent(id)
+        this.chapterAllId(id)
       }
       // 添加或者编辑小说
     } else if (this.current === 'add' || this.current === 'edit') {
@@ -1249,6 +1251,14 @@ export default {
     }
   },
   methods: {
+    // 获取章节的所有id
+    chapterAllId(book_id) {
+      chapterAllId({
+        book_id
+      }).then(res => {
+
+      })
+    },
     // 上一章
     goFont() {
       //

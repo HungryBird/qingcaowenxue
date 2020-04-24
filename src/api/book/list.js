@@ -111,3 +111,11 @@ export function bookUpdate(data) {
     data
   })
 }
+
+export function chapterAllId(data) {
+  return request({
+    url: '/chapter/all',
+    method: 'get',
+    data
+  })
+}
