@@ -63,3 +63,12 @@ export function delBooks(data) {
     data
   })
 }
+
+// 排序
+export function sortData(data) {
+  return request({
+    url: '/recommend/bookSort',
+    method: 'post',
+    data
+  })
+}

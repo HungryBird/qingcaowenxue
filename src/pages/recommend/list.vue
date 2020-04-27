@@ -138,9 +138,9 @@
             </template>
           </el-table-column>
         </el-table>
-        <!-- <el-button type="primary">
+        <el-button type="primary" style="margin-top:20px" @click="sortList">
           排序
-        </el-button> -->
+        </el-button>
         <pagination :total="dataList.table.total" :page.sync="dataList.table.page" :limit.sync="dataList.table.size" @pagination="dPagin" />
       </el-dialog>
     </div>
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks } from '@/api/recommend/recommend'
+import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks, sortData } from '@/api/recommend/recommend'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -339,6 +339,37 @@ export default {
         this.$message.success(res.message)
         this.dataList.table.loading = false
         this.getDataList()
+      })
+    },
+    // 排序
+    sortList() {
+      // console.log('dataList',this.dataList.table.data)
+      const list = []
+      const sortList = []
+      this.dataList.table.data.map(item => {
+        const json = { id: item.pivot.id, sort: item.sort }
+        list.push(json)
+        sortList.push(item.sort)
+      })
+      const arr = sortList.sort()
+      // console.log(arr)
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == arr[i + 1]) {
+          this.$message({
+            type: 'warning',
+            message: '不能有重复的数字'
+          })
+          return
+        }
+      }
+      sortData({ sortArr: list }).then(res => {
+        if (res.code == 0) {
+          this.$message({
+            type: 'success',
+            message: '排序成功!'
+          })
+          this.getList()
+        }
       })
     },
     // 切换开启禁用
