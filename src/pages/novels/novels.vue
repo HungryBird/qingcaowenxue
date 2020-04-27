@@ -94,9 +94,7 @@
             <el-row v-show="add.form.is_fee === 1">
               <el-col :span="12">
                 <el-form-item label="限免结束时间：" prop="fee_time">
-                  <el-radio-group v-model="add.form.fee_time">
-                    <el-date-picker v-model="add.form.fee_time" type="datetime" value-format="yyyy-MM-dd hh:mm:ss" />
-                  </el-radio-group>
+                  <el-date-picker v-model="add.form.fee_time" type="datetime" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -921,6 +919,9 @@ export default {
             name: [
               { required: true, message: '请输入小说标题' }
             ],
+            thumb_url: [
+              { required: true, message: '请选择小说封面' }
+            ],
             chapter_num: [
               { required: true, message: '请输入小说章节' }
             ],
@@ -1214,7 +1215,7 @@ export default {
       this.story.table.page = page
       this.story.table.size = size
       if (this.current === 'storyEdit') {
-        const { id, is_pay, status, name, book_name, glod, num, chapter_num } = this.$route.query
+        const { id, is_pay, status, name, book_name, glod, num, chapter_num, book_id } = this.$route.query
         this.story.add.form.id = id
         this.story.name = book_name
         this.story.add.form.name = name
@@ -1223,8 +1224,9 @@ export default {
         this.story.add.form.glod = glod
         this.story.add.form.is_pay = Number(is_pay)
         this.story.add.form.status = Number(status)
+        this.currentId = id
         this.chapterContent(id)
-        this.chapterAllId(id)
+        this.chapterAllId(book_id)
       }
       // 添加或者编辑小说
     } else if (this.current === 'add' || this.current === 'edit') {
@@ -1256,12 +1258,22 @@ export default {
       chapterAllId({
         book_id
       }).then(res => {
-
+        this.ids = res.data
       })
     },
     // 上一章
     goFont() {
-      //
+      const currentId = Number(this.currentId)
+      if (this.ids.indexOf(currentId) === 0) {
+        this.$message.warning('没有上一章')
+        return
+      }
+      const index = this.ids.indexOf(currentId) - 1
+      const id = this.ids[index]
+      chapterList({
+        id,
+        book_id: this.story.book_id
+      })
     },
     // 下一章
     goNext() {
@@ -1458,6 +1470,7 @@ export default {
       }
       this.recommend.visible = true
     },
+    // 打开上榜小说模态窗
     handleRand() {
       if (this.selections.length === 0) {
         this.$message.error('请选择要上榜单的小说')

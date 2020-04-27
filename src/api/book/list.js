@@ -112,10 +112,10 @@ export function bookUpdate(data) {
   })
 }
 
-export function chapterAllId(data) {
+export function chapterAllId(params) {
   return request({
-    url: '/chapter/all',
+    url: '/chapter/all_id',
     method: 'get',
-    data
+    params
   })
 }

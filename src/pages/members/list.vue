@@ -152,7 +152,7 @@ export default {
           },
           {
             label: '取关时间',
-            prop: 'delete_time',
+            prop: 'unsub_time',
             align: 'center'
           },
           {
