@@ -64,10 +64,19 @@ export function delBooks(data) {
   })
 }
 
-// 排序
+// 推荐位排序
 export function sortData(data) {
   return request({
     url: '/recommend/bookSort',
+    method: 'post',
+    data
+  })
+}
+
+// 榜单排序
+export function sortDataList(data) {
+  return request({
+    url: '/rank/bookSort',
     method: 'post',
     data
   })

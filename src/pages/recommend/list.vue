@@ -368,7 +368,7 @@ export default {
             type: 'success',
             message: '排序成功!'
           })
-          this.getList()
+          this.getDataList()
         }
       })
     },
