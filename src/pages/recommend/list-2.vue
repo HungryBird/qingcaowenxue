@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { recommendAdd,sortDataList } from '@/api/recommend/recommend'
+import { recommendAdd, sortDataList } from '@/api/recommend/recommend'
 import { rankList, rankUpdate, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -323,7 +323,7 @@ export default {
       const status = row.status === 1 ? 0 : 1
       rankUpdate({
         status,
-        id: row.id
+        id: row.pivot.id
       }).then(res => {
         this.$message.success(res.message)
         this.dataList.table.loading = false
@@ -450,7 +450,7 @@ export default {
         this.dataList.table.loading = false
       })
     },
-     // 排序
+    // 排序
     sortList() {
       // console.log('dataList',this.dataList.table.data)
       const list = []
@@ -460,17 +460,17 @@ export default {
         list.push(json)
         sortList.push(item.sort)
       })
-      const arr = sortList.sort()
-      // console.log(arr)
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == arr[i + 1]) {
-          this.$message({
-            type: 'warning',
-            message: '不能有重复的数字'
-          })
-          return
-        }
-      }
+      // const arr = sortList.sort()
+      // // console.log(arr)
+      // for (var i = 0; i < arr.length; i++) {
+      //   if (arr[i] == arr[i + 1]) {
+      //     this.$message({
+      //       type: 'warning',
+      //       message: '不能有重复的数字'
+      //     })
+      //     return
+      //   }
+      // }
       sortDataList({ sortArr: list }).then(res => {
         if (res.code == 0) {
           this.$message({
@@ -480,7 +480,7 @@ export default {
           this.getDataList()
         }
       })
-    },
+    }
   }
 }
 </script>

@@ -26,7 +26,7 @@ export function rankAdd(data) {
 
 export function rankUpdate(data) {
   return request({
-    url: '/rank/update',
+    url: '/rank/updateStatus',
     method: 'post',
     data
   })

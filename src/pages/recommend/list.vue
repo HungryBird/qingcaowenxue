@@ -334,7 +334,7 @@ export default {
       const status = row.status === 1 ? 0 : 1
       recommendUpdate({
         status,
-        id: row.id
+        id: row.pivot.id
       }).then(res => {
         this.$message.success(res.message)
         this.dataList.table.loading = false
@@ -351,17 +351,17 @@ export default {
         list.push(json)
         sortList.push(item.sort)
       })
-      const arr = sortList.sort()
-      // console.log(arr)
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == arr[i + 1]) {
-          this.$message({
-            type: 'warning',
-            message: '不能有重复的数字'
-          })
-          return
-        }
-      }
+      // const arr = sortList.sort()
+      // // console.log(arr)
+      // for (var i = 0; i < arr.length; i++) {
+      //   if (arr[i] == arr[i + 1]) {
+      //     this.$message({
+      //       type: 'warning',
+      //       message: '不能有重复的数字'
+      //     })
+      //     return
+      //   }
+      // }
       sortData({ sortArr: list }).then(res => {
         if (res.code == 0) {
           this.$message({
