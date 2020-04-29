@@ -784,7 +784,7 @@
 
 <script>
 import mix from '@/mixs/mix'
-import { chapterAllId, bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate } from '@/api/book/list'
+import { chapterAllId, bookList, bookDelete, chapterList, chapterContent, setcost, setfree, sectionDelete, clearRead, importChapter, chapterAdd, chapterUpdate, bookAdd, chapterDelete, bookUpdate, getNextChapter } from '@/api/book/list'
 import { categoryList, categoryListAll } from '@/api/book/category'
 import { recommendList, recommendAddBooks } from '@/api/recommend/recommend'
 import { rankList, rankAddbooks } from '@/api/rank/list'
@@ -1225,6 +1225,7 @@ export default {
         this.story.add.form.is_pay = Number(is_pay)
         this.story.add.form.status = Number(status)
         this.currentId = id
+        console.log('story', this.story)
         this.chapterContent(id)
         this.chapterAllId(book_id)
       }
@@ -1265,19 +1266,55 @@ export default {
     goFont() {
       const currentId = Number(this.currentId)
       if (this.ids.indexOf(currentId) === 0) {
+        console.log(currentId)
         this.$message.warning('没有上一章')
         return
       }
       const index = this.ids.indexOf(currentId) - 1
       const id = this.ids[index]
-      chapterList({
-        id,
-        book_id: this.story.book_id
+      getNextChapter({
+        id
+      }).then(res => {
+        console.log(res)
+        this.story.add.form.id = res.data.id
+        this.story.name = res.data.book_name
+        this.story.add.form.name = res.data.name
+        this.story.add.form.num = res.data.num
+        this.story.add.form.chapter_num = res.data.chapter_num
+        this.story.add.form.glod = res.data.glod
+        this.story.add.form.is_pay = Number(res.data.is_pay)
+        this.story.add.form.status = Number(res.data.status)
+        this.currentId = res.data.id
+        this.$refs.tinymce.setContent(res.data.content)
+        this.chapterAllId(res.data.book_id)
       })
     },
     // 下一章
     goNext() {
-      //
+      const currentId = Number(this.currentId)
+      const index = this.ids.indexOf(currentId) + 1
+      // console.log('index',index)
+      if (index > this.ids.length - 1) {
+        this.$message.warning('没有下一章')
+        return
+      }
+      const id = this.ids[index]
+      getNextChapter({
+        id
+      }).then(res => {
+        console.log(res)
+        this.story.add.form.id = res.data.id
+        this.story.name = res.data.book_name
+        this.story.add.form.name = res.data.name
+        this.story.add.form.num = res.data.num
+        this.story.add.form.chapter_num = res.data.chapter_num
+        this.story.add.form.glod = res.data.glod
+        this.story.add.form.is_pay = Number(res.data.is_pay)
+        this.story.add.form.status = Number(res.data.status)
+        this.currentId = res.data.id
+        this.$refs.tinymce.setContent(res.data.content)
+        this.chapterAllId(res.data.book_id)
+      })
     },
     // 获取分类
     getCategory() {
@@ -1592,6 +1629,7 @@ export default {
         id
       }).then(res => {
         this.story.add.form.content = res.data
+        console.log('res', res)
       }).catch(() => {
         this.story.add.form.content = '<p>获取数据失败...</p>'
       })

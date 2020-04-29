@@ -197,6 +197,12 @@ export const asyncRoutes = [
         component: () => import('@/pages/novels/carousel'),
         name: 'carousel-management',
         meta: { title: '轮播管理' }
+      },
+      {
+        path: 'filtration',
+        component: () => import('@/pages/novels/filtration'),
+        name: 'filtration',
+        meta: { title: '过滤管理' }
       }
     ]
   },

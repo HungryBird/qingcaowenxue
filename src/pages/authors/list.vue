@@ -303,7 +303,7 @@ export default {
         }
       }
       console.log('this.add.form: ', this.add.form)
-      this.getEditOther()
+      // this.getEditOther()
     }
   },
   methods: {
@@ -347,7 +347,9 @@ export default {
         this.add.loading = true
         const obj = Object.assign({}, this.add.form)
         obj.pid = obj.pid ? obj.pid : 0
-        obj.id = obj.admin_id
+        // obj.id = obj.admin_id
+        obj.id = obj.id
+        console.log('obj', obj)
         const submit = this.current === 'add' ? authorAdd : authorUpdate
         submit(obj).then(res => {
           this.$message.success(res.message)

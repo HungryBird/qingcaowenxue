@@ -119,3 +119,48 @@ export function chapterAllId(params) {
     params
   })
 }
+
+// 获取上一章下一章
+export function getNextChapter(data) {
+  return request({
+    url: '/chapter/info',
+    method: 'post',
+    params: data
+  })
+}
+
+// 获取过滤管理列表
+export function getFiltrationList(data) {
+  return request({
+    url: '/filter/list',
+    method: 'get',
+    params: data
+  })
+}
+
+// 过滤管理列表编辑接口
+export function editorFiltrationList(data) {
+  return request({
+    url: '/filter/update',
+    method: 'post',
+    params: data
+  })
+}
+
+// 过滤管理列表删除接口
+export function delFiltrationList(data) {
+  return request({
+    url: '/filter/delete',
+    method: 'post',
+    params: data
+  })
+}
+
+// 过滤管理列表新增接口
+export function addFiltrationList(data) {
+  return request({
+    url: '/filter/add',
+    method: 'post',
+    params: data
+  })
+}
