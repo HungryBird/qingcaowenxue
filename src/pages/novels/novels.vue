@@ -13,8 +13,14 @@
     </el-aside>
     <el-main style="position: relative;">
       <div v-if="current === 'add' || current === 'edit'">
-        <div>
           <el-form ref="add" :model="add.form" :rules="add.rules" label-width="120px">
+            <el-row>
+              <el-col :span="12">
+                <el-form-item label="小说分类：" prop="book_category_value">
+                  <el-input v-model="add.form.book_category_value" :disabled="true"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-row>
               <el-col :span="12">
                 <el-form-item label="小说名称：" prop="name">
@@ -1020,6 +1026,7 @@ export default {
       // 添加或者编辑
       add: {
         form: {
+          book_category_value:'',
           name: '',
           author_id: '',
           serial: 1,
@@ -1034,6 +1041,9 @@ export default {
           fee_time: ''
         },
         rules: {
+          book_category_value: [
+            { required: true, message: '请选择小说分类' }
+          ],
           name: [
             { required: true, message: '请输入小说名称' }
           ],
@@ -1250,6 +1260,25 @@ export default {
             this.$set(this.add.form, key, query[key])
           }
         }
+        categoryList({
+          size: 9999999
+        }).then(res => {
+          const pTree = []
+          for (const item in res.data) {
+            pTree.push(res.data[item])
+          }
+          let treeData = pTree
+          // console.log('treeData',treeData )
+          treeData.map((item,i)=>{
+            item.children.map((list,j)=>{
+              if(list.id == this.book_category_id){
+                this.add.form.book_category_value = item.name +'-'+list.name
+              }
+            })
+          })
+        }).catch(err => {
+          console.error('err: ', err)
+        })
       }
     }
   },
@@ -1680,6 +1709,7 @@ export default {
             }
           }
         }
+        console.log('this.treeData',this.treeData )
         this.$nextTick(() => {
           this.$refs.tree.setCurrentKey(this.book_category_id)
         })
@@ -1875,11 +1905,18 @@ export default {
     // 选择查询结果
     handleSelect(data) {
       this.dialogTableVisible = false
-      this.toggleCurrent('index', {
-        book_category_id: data.id
-      })
       this.book_category_id = data.id
-      this.getList(data.id)
+      if(this.current == 'index'){
+         this.getList(data.id)
+      }else{
+        this.treeData.map((item,i)=>{
+          item.children.map((list,j)=>{
+            if(list.id == this.book_category_id){
+              this.add.form.book_category_value = item.name +'-'+list.name
+            }
+          })
+        })
+      }
     },
     // 更换作者
     toUpdate(row) {

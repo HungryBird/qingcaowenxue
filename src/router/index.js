@@ -414,6 +414,43 @@ export const asyncRoutes = [
         }
       }
     ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/list',
+    name: 'system',
+    alwaysShow: true,
+    meta: {
+      title: '系统管理',
+      icon: 'people'
+    },
+    children: [
+      {
+        path: 'user-list',
+        component: () => import('@/pages/system/user-list'),
+        name: 'user-list',
+        meta: {
+          title: '用户管理'
+        }
+      },
+      {
+        path: 'role-list',
+        component: () => import('@/pages/system/role-list'),
+        name: 'role-list',
+        meta: {
+          title: '角色管理'
+        }
+      },
+      {
+        path: 'menu-list',
+        component: () => import('@/pages/system/menu-list'),
+        name: 'menu-list',
+        meta: {
+          title: '菜单管理'
+        }
+      }
+    ]
   }
 ]
 

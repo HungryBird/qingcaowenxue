@@ -100,21 +100,21 @@
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="持卡人姓名：" prop="name">
-                      <el-input v-model="add.form.author.name" />
+                      <el-input v-model="add.form.name" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="银行卡号：" prop="bank_card">
-                      <el-input v-model="add.form.author.bank_card" />
+                      <el-input v-model="add.form.bank_card" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="开户行：" prop="bank_address">
-                      <el-input v-model="add.form.author.bank_address" />
+                      <el-input v-model="add.form.bank_address" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -125,7 +125,7 @@
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="支付宝账号：" prop="alipay">
-                      <el-input v-model="add.form.author.alipay" />
+                      <el-input v-model="add.form.alipay" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -136,7 +136,7 @@
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="微信号：" prop="wepay">
-                      <el-input v-model="add.form.author.wepay" />
+                      <el-input v-model="add.form.wepay" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -216,7 +216,14 @@ export default {
           name: '',
           wepay: '',
           alipay: '',
-          bank_card: ''
+          bank_card: '',
+          // author:{
+          //   name:"",
+          //   bank_card:"",
+          //   bank_address:"",
+          //   alipay:"",
+          //   wepay:""
+          // }
         },
         loading: false,
         rules: {
@@ -302,7 +309,7 @@ export default {
           this.$set(this.add.form, key, query[key])
         }
       }
-      console.log('this.add.form.author: ', JSON.stringify(this.add.form.author))
+      console.log('this.add.form.author: ', this.add.form.author)
       // this.getEditOther()
     }
   },

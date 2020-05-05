@@ -171,7 +171,7 @@ export default {
           columns: [
             {
               label: 'ID',
-              prop: 'id',
+              prop: 'book_id',
               align: 'center',
               width: 55
             },
@@ -182,7 +182,7 @@ export default {
             },
             {
               label: '小说名称',
-              prop: 'name',
+              prop: 'book_name',
               align: 'center'
             },
             {
@@ -405,7 +405,7 @@ export default {
         this.dataList.table.loading = true
         delBooks({
           id: this.dataList.table.recommend_id,
-          book_ids: row.id
+          book_ids: row.book_id
         }).then(res => {
           this.dataList.table.loading = false
           this.$message({
@@ -442,9 +442,9 @@ export default {
     // 获取数据列表
     getDataList(recommend_id) {
       this.dataList.table.loading = true
-      getBooks({ id: this.dataList.table.recommend_id }).then(res => {
-        // this.dataList.table.total = 10
-        this.dataList.table.data = res.data
+      getBooks({ id: this.dataList.table.recommend_id,page:this.dataList.table.page,size:this.dataList.table.size }).then(res => {
+        this.dataList.table.total = res.data.total
+        this.dataList.table.data = res.data.data
         this.dataList.table.loading = false
       }).catch(() => {
         this.dataList.table.loading = false
