@@ -133,7 +133,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '公众号管理',
-      icon: 'wechat'
+      icon: 'fa fa-wechat'
     },
     children: [
       /* {
@@ -158,7 +158,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '代理管理',
-      icon: 'peoples'
+      icon: 'fa fa-user'
     },
     children: [
       {
@@ -177,7 +177,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '小说管理',
-      icon: 'list'
+      icon: 'fa fa-bars'
     },
     children: [
       {
@@ -214,7 +214,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '推荐位管理',
-      icon: 'guide'
+      icon: 'fa fa-space-shuttle'
     },
     children: [
       {
@@ -315,7 +315,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '会员管理',
-      icon: 'peoples'
+      icon: 'fa fa-user'
     },
     children: [
       {
@@ -402,7 +402,7 @@ export const asyncRoutes = [
     alwaysShow: true,
     meta: {
       title: '作者管理',
-      icon: 'people'
+      icon: 'fa fa-meh-o'
     },
     children: [
       {
@@ -418,12 +418,12 @@ export const asyncRoutes = [
   {
     path: '/system',
     component: Layout,
-    redirect: '/system/list',
+    redirect: '/system/user-list',
     name: 'system',
     alwaysShow: true,
     meta: {
       title: '系统管理',
-      icon: 'people'
+      icon: 'fa fa-cog'
     },
     children: [
       {
@@ -449,7 +449,16 @@ export const asyncRoutes = [
         meta: {
           title: '菜单管理'
         }
-      }
+      },
+      {
+        path: 'wechat-conf',
+        component: () => import('@/pages/system/wechat-conf'),
+        name: 'wechat-conf',
+        meta: {
+          title: '微信配置'
+        },
+        hidden:true
+      },
     ]
   }
 ]

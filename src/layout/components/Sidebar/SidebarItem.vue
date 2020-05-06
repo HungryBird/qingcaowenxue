@@ -10,7 +10,11 @@
 
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
-        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" :icon-type="item.meta.iconType" />
+        <i :class="item.meta && item.meta.icon" aria-hidden="true" class="menu-left-icon"></i>
+        <item v-if="item.meta"  :title="item.meta.title" :icon-type="item.meta.iconType" >
+          <!-- :icon="item.meta && item.meta.icon" -->
+        </item>
+
       </template>
       <sidebar-item
         v-for="child in item.children"
@@ -93,3 +97,12 @@ export default {
   }
 }
 </script>
+<style>
+.menu-left-icon{
+  font-size:14px;
+  margin-right:5px
+}
+.sidebar-container .is-active .menu-left-icon {
+    color: #f4f4f5 !important;
+}
+</style>
