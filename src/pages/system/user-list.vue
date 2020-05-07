@@ -98,14 +98,12 @@ export default {
   data() {
     return {
       loading: false,
-      listQuery: [
-        {
+      listQuery:{
           username:'',
           page: 1,
           size: 20,
           total: 0
-        }
-      ],
+        },
       tableData: [],
       dialogTableVisible: false,
       jiexiurlzifucuan: "",
@@ -145,7 +143,7 @@ export default {
         this.listQuery.page = parseInt(json.page);
         this.listQuery.size = parseInt(json.limit);
       }
-      const params = {
+      let params = {
         page: this.listQuery.page,
         size: this.listQuery.size,
         username:this.listQuery.username
@@ -291,7 +289,7 @@ export default {
         id: row.id,
         status: status
       };
-      editorFiltrationList(params).then(res => {
+      editorList(params).then(res => {
         if (res.code == 0) {
           this.$message({
             message: "修改成功",

@@ -35,3 +35,11 @@ export function logout() {
     resolve()
   })
 }
+
+export function getRouter(data) {
+  return request({
+    url: '/admin/getAdminInfo',
+    method: 'get',
+    data
+  })
+}

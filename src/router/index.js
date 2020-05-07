@@ -442,23 +442,23 @@ export const asyncRoutes = [
           title: '角色管理'
         }
       },
-      {
-        path: 'menu-list',
-        component: () => import('@/pages/system/menu-list'),
-        name: 'menu-list',
-        meta: {
-          title: '菜单管理'
-        }
-      },
-      {
-        path: 'wechat-conf',
-        component: () => import('@/pages/system/wechat-conf'),
-        name: 'wechat-conf',
-        meta: {
-          title: '微信配置'
-        },
-        hidden:true
-      },
+      // {
+      //   path: 'menu-list',
+      //   component: () => import('@/pages/system/menu-list'),
+      //   name: 'menu-list',
+      //   meta: {
+      //     title: '菜单管理'
+      //   }
+      // },
+      // {
+      //   path: 'wechat-conf',
+      //   component: () => import('@/pages/system/wechat-conf'),
+      //   name: 'wechat-conf',
+      //   meta: {
+      //     title: '微信配置'
+      //   },
+      //   hidden:true
+      // },
     ]
   }
 ]

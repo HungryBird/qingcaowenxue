@@ -5,18 +5,18 @@
         <el-button type="primary" @click="addData">添加</el-button>
         <span style="margin-left:20px;">
           <el-input
-            v-model="listQuery.description"
+            v-model="listQuery.title"
             placeholder="输入需查询的角色名"
             style="width: 200px;"
             class="filter-item"
           />
         </span>
-        <el-button class="filter-item" type="primary" icon="el-icon-search">搜索</el-button>
+        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </el-header>
       <el-main>
         <el-table v-loading="loading" :data="tableData" border style="width: 100%">
           <el-table-column prop="id" label="ID" width="80" align="center" />
-          <el-table-column prop="name" label="角色名称" align="center" />
+          <el-table-column prop="title" label="角色名称" align="center" />
           <el-table-column label="状态" width="240" align="center">
             <template slot-scope="scope">
               <span
@@ -53,7 +53,7 @@
     <el-dialog :title="titlePop" :visible.sync="dialogTableVisible" width="60%">
       <el-form ref="formPop" :model="formPop" label-width="120px">
         <el-form-item label="角色名称：" style="width:80%">
-          <el-input v-model="formPop.name" />
+          <el-input v-model="formPop.title" />
         </el-form-item>
         <el-form-item label="状态：" style="width:80%">
           <el-radio-group v-model="formPop.status">
@@ -71,26 +71,27 @@
     </el-dialog>
     <!-- 权限分配弹窗 -->
     <el-dialog title="权限分配" :visible.sync="dialogRightVisible" width="20%">
-      <div style="tree-wrap-box">
+      <div class="tree-wrap-box">
         <el-tree
-          :data="data"
+          ref="tree"
+          :data="treeData"
           show-checkbox
           node-key="id"
           default-expand-all
           :props="defaultProps"
+          :default-checked-keys="defaultCheckedTree"
+          @check-change="handleCheckChange"
         ></el-tree>
+      </div>
+       <div class="pop-bottom-btn">
+        <el-button type="primary" @click="handleSure">确认分配</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  getFiltrationList,
-  editorFiltrationList,
-  delFiltrationList,
-  addFiltrationList
-} from "@/api/book/list";
+import {roleList,delList,addList,editorList,roleRightList,setRoleRightList} from "@/api//system/role-list";
 import Pagination from "@/components/Pagination"; // 分页
 
 export default {
@@ -99,88 +100,41 @@ export default {
   data() {
     return {
       loading: false,
-      listQuery: [
-        {
+      listQuery: {
           page: 1,
           size: 20,
-          total: 0
-        }
-      ],
+          total: 0,
+          title:'',
+      },
       tableData: [],
       dialogTableVisible: false,
       jiexiurlzifucuan: "",
       dialogTableVisible: false,
       titlePop: "",
       formPop: {
-        name: "",
+        title: "",
         status: 0
       },
       statusList: [
         {
-          label: "关闭",
-          id: 0
-        },
-        {
           label: "开启",
           id: 1
+        },
+        {
+          label: "禁用",
+          id: 0
         }
       ],
       editorId: "",
       dialogRightVisible: false,
-      data: [
-        {
-          id: 1,
-          label: "一级 1",
-          children: [
-            {
-              id: 4,
-              label: "二级 1-1",
-              children: [
-                {
-                  id: 9,
-                  label: "三级 1-1-1"
-                },
-                {
-                  id: 10,
-                  label: "三级 1-1-2"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          label: "一级 2",
-          children: [
-            {
-              id: 5,
-              label: "二级 2-1"
-            },
-            {
-              id: 6,
-              label: "二级 2-2"
-            }
-          ]
-        },
-        {
-          id: 3,
-          label: "一级 3",
-          children: [
-            {
-              id: 7,
-              label: "二级 3-1"
-            },
-            {
-              id: 8,
-              label: "二级 3-2"
-            }
-          ]
-        }
-      ],
+      treeData: [],
       defaultProps: {
         children: "children",
-        label: "label"
-      }
+        label: "title"
+      },
+      checkoutTree:[],
+      defaultCheckedTree:[],
+      roleId:""
     };
   },
   created() {
@@ -194,19 +148,51 @@ export default {
         this.listQuery.page = parseInt(json.page);
         this.listQuery.size = parseInt(json.limit);
       }
-      const params = {
+      let params = {
         page: this.listQuery.page,
-        size: this.listQuery.size
+        size: this.listQuery.size,
+        title:this.listQuery.title
       };
-      getFiltrationList(params).then(response => {
+      roleList(params).then(response => {
         // console.log(response);
         this.loading = false;
         this.tableData = response.data.data;
         this.listQuery.total = response.data.total;
       });
     },
+    search(){
+      this.listQuery.page = 1
+      this.getList();
+    },
     handleRight(row) {
         this.dialogRightVisible = true
+        this.defaultCheckedTree = []
+        this.roleId = row.id
+        let params ={
+          rules:row.rules
+        }
+        roleRightList(params).then(res=>{
+          this.treeData = res.data
+          this.treeData.map(item=>{
+            if(item.isChecked == 'checked'){
+              this.defaultCheckedTree.push(item.id)
+            }
+            if(item.children.length>0){
+              item.children.map(item2=>{
+                if(item2.isChecked == 'checked'){
+                  this.defaultCheckedTree.push(item2.id)
+                }
+                if(item2.children.length>0){
+                  item2.children.map(item3=>{
+                    if(item3.isChecked == 'checked'){
+                      this.defaultCheckedTree.push(item3.id)
+                    }
+                  })
+                }
+              })
+            }
+          })
+        })
     },
     handleDelete(row) {
       this.$confirm("确认要删除吗", "提示", {
@@ -218,7 +204,7 @@ export default {
           const params = {
             id: row.id
           };
-          delFiltrationList(params).then(res => {
+          delList(params).then(res => {
             if (res.message === "sucessfull!") {
               this.$message({
                 type: "success",
@@ -240,22 +226,22 @@ export default {
       this.dialogTableVisible = true;
       this.titlePop = "编辑";
       this.editorId = row.id;
-      this.formPop.name = row.name;
+      this.formPop.title = row.title;
       this.formPop.status = row.status;
     },
     addData() {
       this.dialogTableVisible = true;
       this.titlePop = "添加";
-      this.formPop.name = "";
+      this.formPop.title = "";
       this.formPop.status = 0;
     },
     handleSave() {
       if (this.titlePop == "添加") {
         const params = {
-          name: this.formPop.name,
+          title: this.formPop.title,
           status: this.formPop.status
         };
-        addFiltrationList(params).then(res => {
+        addList(params).then(res => {
           if (res.code == 0) {
             this.$message({
               message: "添加成功",
@@ -268,10 +254,10 @@ export default {
       } else if (this.titlePop == "编辑") {
         const params = {
           id: this.editorId,
-          name: this.formPop.name,
+          title: this.formPop.title,
           status: this.formPop.status
         };
-        editorFiltrationList(params).then(res => {
+        editorList(params).then(res => {
           if (res.code == 0) {
             this.$message({
               message: "修改成功",
@@ -294,7 +280,7 @@ export default {
         id: row.id,
         status: status
       };
-      editorFiltrationList(params).then(res => {
+      editorList(params).then(res => {
         if (res.code == 0) {
           this.$message({
             message: "修改成功",
@@ -303,6 +289,31 @@ export default {
           this.getList();
         }
       });
+    },
+    handleCheckChange () {
+      let res = this.$refs.tree.getCheckedNodes()
+      let arr = []
+      res.forEach((item) => {
+        arr.push(item.id)
+      })
+      this.checkoutTree = arr
+    },
+    handleSure(){
+      console.log('checkoutTree',this.checkoutTree)
+      let params={
+        id:this.roleId,
+        rule_ids:this.checkoutTree.join(',')
+      }
+      setRoleRightList(params).then(res=>{
+        if(res.code == 0){
+          this.$message({
+            message: "权限分配成功",
+            type: "success"
+          });
+          this.dialogRightVisible = false
+          this.getList();
+        }
+      })
     }
   }
 };
@@ -337,9 +348,18 @@ export default {
 }
 .pop-bottom-btn {
   text-align: center;
+  margin-top: 20px;
 }
 .tree-wrap-box {
   height: 500px;
   overflow-y: auto;
+}
+.tree-wrap-box::-webkit-scrollbar {
+    width: 6px;
+    height:1px;
+    background-color:#eee;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius:2em;
 }
 </style>

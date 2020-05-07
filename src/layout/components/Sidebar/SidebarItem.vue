@@ -7,12 +7,10 @@
         </el-menu-item>
       </app-link>
     </template>
-
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <i :class="item.meta && item.meta.icon" aria-hidden="true" class="menu-left-icon"></i>
         <item v-if="item.meta"  :title="item.meta.title" :icon-type="item.meta.iconType" >
-          <!-- :icon="item.meta && item.meta.icon" -->
         </item>
 
       </template>

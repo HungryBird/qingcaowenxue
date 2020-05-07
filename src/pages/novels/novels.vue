@@ -562,6 +562,12 @@
                   更换作者
                 </a>
               </div>
+              <div v-else-if="cl.prop === 'sendorder'">
+                  <a style="font-size: 12px;color: #337ab7;padding-right: 4px;" @click.stop="toUpdateSendorder(row)">
+                    {{ row['sendorder'] }}
+                    <i class="el-icon-edit" />
+                  </a>
+              </div>
               <div v-else-if="cl.prop === 'status'">
                 <el-button :type="row[cl.prop] === 1 ? 'primary' : 'danger'" size="mini" @click="toggleStatus(row)">
                   {{ row[cl.prop] === 1 ? '上架' : '下架' }}
@@ -783,6 +789,17 @@
             </el-form-item>
           </el-col>
         </el-row>
+      </el-form>
+    </el-dialog>
+    <!-- 派单指数 -->
+    <el-dialog ref="rank" :visible.sync="SendorderPopVisible" title="派单指数">
+      <el-form ref="sendOrdersForm" :model="sendOrdersForm" :rules="sendOrdersRules" label-width="120px">
+        <el-form-item label="">
+          <el-input v-model="sendOrdersForm.value" oninput = "value=value.replace(/[^\d]/g,'')"></el-input>
+        </el-form-item>
+       <div class="sendorder-bottom-btn">
+          <el-button type="primary"  @click="sendorderSave">保存</el-button>
+       </div>
       </el-form>
     </el-dialog>
   </el-container>
@@ -1117,14 +1134,14 @@ export default {
             align: 'center',
             width: 440
           },
-          // {
-          //   label: '派单指数',
-          //   prop: 'zhishu',
-          //   align: 'center'
-          // },
           {
             label: '状态',
             prop: 'status',
+            align: 'center'
+          },
+          {
+            label: '派单指数',
+            prop: 'sendorder',
             align: 'center'
           },
           {
@@ -1166,7 +1183,17 @@ export default {
         loading: false
       },
       ids: [],
-      currentId: ''
+      currentId: '',
+      SendorderPopId:'',
+      SendorderPopVisible:false,
+      sendOrdersForm:{
+        value:''
+      },
+      sendOrdersRules:{
+        value: [
+          { required: true, message: '请填写内容' }
+        ],
+      }
     }
   },
   created() {
@@ -1503,6 +1530,23 @@ export default {
             this.rank.loading = false
           }).catch(() => {
             this.rank.loading = false
+          })
+        }
+      })
+    },
+    //保存派单指数
+    sendorderSave(){
+      this.$refs.sendOrdersForm.validate(valid => {
+        if (valid) {
+          let params={
+            id:this.SendorderPopId,
+            sendorder:this.sendOrdersForm.value
+          }
+          bookUpdate(params).then(res => {
+            this.$message.success(res.message)
+            this.getList(this.book_category_id)
+            this.SendorderPopVisible = false
+          }).catch(() => {
           })
         }
       })
@@ -1924,6 +1968,12 @@ export default {
       this.update.form.id = row.id
       this.update.visible = true
     },
+    //派单指数
+    toUpdateSendorder(row){
+      this.sendOrdersForm.value = row.sendorder
+      this.SendorderPopId = row.id
+      this.SendorderPopVisible = true
+    },
     // 保存更换作者
     saveUpdate() {
       this.update.loading = true
@@ -2084,6 +2134,9 @@ export default {
     /deep/ .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
       background: #f00;
       color: #fff;
+    }
+    .sendorder-bottom-btn{
+      text-align: center;
     }
   }
 </style>

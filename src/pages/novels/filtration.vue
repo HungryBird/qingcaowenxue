@@ -70,13 +70,11 @@ export default {
   data() {
     return {
       loading: false,
-      listQuery: [
-        {
+      listQuery:{
           page: 1,
           size: 20,
           total: 0
-        }
-      ],
+        },
       tableData: [],
       dialogTableVisible: false,
       jiexiurlzifucuan: '',
