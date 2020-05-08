@@ -56,9 +56,9 @@
     </el-container>
     <el-dialog :title="titlePop" :visible.sync="dialogTableVisible" width="60%">
       <el-form ref="formPop" :model="formPop" label-width="120px">
-        <!-- <el-form-item label="用户名称：" style="width:80%">
+        <el-form-item label="用户名称：" style="width:80%" v-if="titlePop==='添加'">
           <el-input v-model="formPop.username" />
-        </el-form-item> -->
+        </el-form-item>
         <el-form-item label="角色：" style="width:80%">
           <el-select v-model="formPop.group_id" placeholder="请选择管理员角色" style="width:100%">
             <el-option v-for="(item,index) in roleList" :key="index" :value="item.id" :label="item.title"></el-option>
@@ -128,7 +128,7 @@ export default {
         }
       ],
       editorId: "",
-      roleList:[]
+      roleList:[],
     };
   },
   created() {

@@ -34,9 +34,11 @@
           <el-table-column prop="create_time" label="添加时间" width="240" align="center" />
           <el-table-column prop="caozuo" label="操作" align="center">
             <template slot-scope="scope">
-              <el-button size="mini" type="primary" @click="handleRight(scope.row)">权限分配</el-button>
-              <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+              <div  v-if="scope.row.id!=1">
+                <el-button size="mini" type="primary" @click="handleRight(scope.row)">权限分配</el-button>
+                <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -171,6 +173,7 @@ export default {
         let params ={
           rules:row.rules
         }
+        console.log(params)
         roleRightList(params).then(res=>{
           this.treeData = res.data
           this.treeData.map(item=>{
@@ -291,12 +294,15 @@ export default {
       });
     },
     handleCheckChange () {
-      let res = this.$refs.tree.getCheckedNodes()
-      let arr = []
-      res.forEach((item) => {
-        arr.push(item.id)
-      })
-      this.checkoutTree = arr
+      // let res = this.$refs.tree.getCheckedNodes()
+      let res = this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
+      console.log(res)
+      // let arr = []
+      // res.forEach((item) => {
+      //   arr.push(item.id)
+      // })
+      
+      this.checkoutTree = res
     },
     handleSure(){
       console.log('checkoutTree',this.checkoutTree)

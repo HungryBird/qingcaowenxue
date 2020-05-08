@@ -35,7 +35,6 @@ export function generaMenu(routes, data) {
     }
     routes.push(menu)
   })
-  console.log('routes',routes)
 }
 
 /** 
@@ -77,12 +76,12 @@ const actions = {
       const loadMenuData = []
       //const asyncRoutes = []
 
-      getRouter().then(res => {
-        let data = res
-        if (res.code === 0) {
-          data = res.data.menu
-          Object.assign(loadMenuData, data)
-          generaMenu(asyncRoutes, loadMenuData)
+      // getRouter().then(res => {
+      //   let data = res
+      //   if (res.code === 0) {
+      //     data = res.data.menu
+      //     Object.assign(loadMenuData, data)
+      //     generaMenu(asyncRoutes, loadMenuData)
 
           let accessedRoutes
 
@@ -93,9 +92,9 @@ const actions = {
           } 
           commit('SET_ROUTES', accessedRoutes)
           resolve(accessedRoutes)
-          console.log('res2211', res)
-        }
-      })
+      //     console.log('res2211', res)
+      //   }
+      // })
 
       //  accessedRoutes = res.data.menu
     })

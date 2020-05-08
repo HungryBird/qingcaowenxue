@@ -400,6 +400,10 @@ export default {
     }
   },
   created() {
+    // this.$store.dispatch("user/showBtn",{name:'/wechat/wechat-list',btnName:'添加'}).then(res=>{
+    //   console.log('res',res)
+    // })
+    
     const query = this.$route.query
     const { current } = query
     this.headers.token = this.$store.getters.token
@@ -445,6 +449,7 @@ export default {
       this.proxyListVisible(true)
       this.getList()
     }
+   
   },
   methods: {
     // 打开显示

@@ -1,13 +1,15 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo,getRouter } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+
 
 const state = {
   token: getToken(),
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+  routerMenu:''
 }
 
 const mutations = {
@@ -26,7 +28,10 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
-  }
+  },
+  SET_MENU: (state, menu) => {
+    state.routerMenu = menu
+  },
 }
 
 const actions = {
@@ -133,9 +138,76 @@ const actions = {
 
       resolve()
     })
-  }
+  },
+  //获取动态路由
+  getRouter({ commit }){
+    return new Promise((resolve, reject) =>{
+      getRouter().then(res=>{
+        if(res.code == 0){
+          let menu = res.data.menu
+          commit('SET_MENU', menu)
+          resolve(menu)
+        }
+      })
+    }).catch(error => {
+      reject(error)
+    })
+  },
+  //判断按钮显示
+  async showBtn({dispatch}, text){ // flag为参数
+    // const menu = await dispatch("getRouter");
+    // let result
+    // menu.map(item1=>{
+    //   if(item1.children){
+    //     item1.children.map(item2=>{
+    //       if(item2.name == text.name){
+    //         if(item2.children){
+    //           item2.children.map(item3=>{
+    //             if(item3.title == text.btnName){
+    //               result = true
+    //               return false
+    //             }else{
+    //               alert(123)
+    //               result = false
+    //               return false
+    //             }
+    //           })
+    //         }else{
+    //           result = false
+    //           return false
+    //         }
+    //       }
+    //     })
+    //   }
+    // })
+  // for(let i =0;i<menu.legnth;i++){
+  //     if(menu[i].children){
+  //       for(let j=0;j<menu[i].children.legnth;j++){
+  //         if(menu[i].children[j].name == text.name){
+  //           if(menu[i].children[j].children){
+  //             for(let n = 0;n<menu[i].children[j].children.length;n++){
+  //               if(menu[i].children[j].children[n].title == text.btnName){
+  //                 alert(111)
+  //                 result = true
+  //                 return false
+  //               }else{
+  //                 alert(222)
+  //                 result = false
+  //                 return false
+  //               }
+  //             }
+  //           }else{
+  //             result = false
+  //             return false
+  //           }
+  //         }
+  //       }
+  //     }
+  // }
+    // console.log('result',result)
+    // return result
+	} 
 }
-
 export default {
   namespaced: true,
   state,

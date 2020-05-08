@@ -12,7 +12,6 @@
         <i :class="item.meta && item.meta.icon" aria-hidden="true" class="menu-left-icon"></i>
         <item v-if="item.meta"  :title="item.meta.title" :icon-type="item.meta.iconType" >
         </item>
-
       </template>
       <sidebar-item
         v-for="child in item.children"

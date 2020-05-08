@@ -130,7 +130,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/wechat/base-config',
     name: 'wechat',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '公众号管理',
       icon: 'fa fa-wechat'
@@ -155,7 +156,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/proxy/list',
     name: 'proxy',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '代理管理',
       icon: 'fa fa-user'
@@ -174,7 +176,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/novels/novels',
     name: 'novels',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '小说管理',
       icon: 'fa fa-bars'
@@ -211,7 +214,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/recommend/list',
     name: 'recommend',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '推荐位管理',
       icon: 'fa fa-space-shuttle'
@@ -312,7 +316,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/members/list',
     name: 'members',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '会员管理',
       icon: 'fa fa-user'
@@ -399,7 +404,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/authors/list',
     name: 'authors',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '作者管理',
       icon: 'fa fa-meh-o'
@@ -420,7 +426,8 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/system/user-list',
     name: 'system',
-    alwaysShow: true,
+    // alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '系统管理',
       icon: 'fa fa-cog'
