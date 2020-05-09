@@ -60,7 +60,7 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('add')">
+        <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" plain @click="toggleCurrent('add')">
           添加轮播
         </el-button>
         <div class="filter-item" style="margin-left: 10px;">
@@ -85,10 +85,10 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="edit(row)">
+              <el-button v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
-              <el-button type="danger" size="mini" @click="adDelete(row.id)">
+              <el-button v-if="btnList[2].flag" type="danger" size="mini" @click="adDelete(row.id)">
                 删除
               </el-button>
             </div>
@@ -240,10 +240,37 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
+      btnList:[
+        {
+          name:'/novels/carousel/add',
+          flag:false,
+        },
+        {
+          name:'/novels/carousel/edit',
+          flag:false,
+        },
+        {
+          name:'/novels/carousel/delete',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+     this.$store.dispatch("user/showBtn",{name:'/novels/carousel',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     const { current } = this.$route.query
     this.headers.token = this.$store.getters.token
     this.current = current

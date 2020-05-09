@@ -26,12 +26,18 @@ export function rankAdd(data) {
 
 export function rankUpdate(data) {
   return request({
+    url: '/rank/update',
+    method: 'post',
+    data
+  })
+}
+export function rankUpdateStatus(data) {
+  return request({
     url: '/rank/updateStatus',
     method: 'post',
     data
   })
 }
-
 export function rankAddbooks(data) {
   return request({
     url: '/rank/addbooks',

@@ -42,7 +42,7 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
+        <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
           添加推荐位
         </el-button>
         <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;" clearable>
@@ -70,13 +70,13 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="showDataList(row)">
+              <el-button v-if="btnList[3].flag" type="primary" size="mini" @click="showDataList(row)">
                 数据列表
               </el-button>
-              <el-button type="primary" size="mini" @click="edit(row)">
+              <el-button v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
-              <el-button type="danger" size="mini" @click="remove(row)">
+              <el-button v-if="btnList[2].flag" type="danger" size="mini" @click="remove(row)">
                 删除
               </el-button>
             </div>
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks, sortData } from '@/api/recommend/recommend'
+import { recommendList, recommendUpdate,recommendUpdatePage, recommendDelete, recommendAdd, getBooks, delBooks, sortData } from '@/api/recommend/recommend'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -276,10 +276,41 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
+       btnList:[
+        {
+          name:'/recommed/list/add',
+          flag:false,
+        },
+        {
+          name:'/recommed/list/edit',
+          flag:false,
+        },
+        {
+          name:'/recommed/list/delete',
+          flag:false,
+        },
+        {
+          name:'/recommed/list/data',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+    this.$store.dispatch("user/showBtn",{name:'/recommed/list',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     const query = this.$route.query
     const { current } = query
     this.current = current
@@ -376,7 +407,7 @@ export default {
     changeStatus(row) {
       this.table.loading = true
       const status = row.status === 1 ? 0 : 1
-      recommendUpdate({
+      recommendUpdatePage({
         status,
         id: row.id
       }).then(res => {

@@ -40,7 +40,7 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { type: 'rank' })">
+        <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { type: 'rank' })">
           添加榜单
         </el-button>
         <el-select v-model="search.form.channel" placeholder="选择频道" class="filter-item" style="margin-left: 10px;">
@@ -68,13 +68,13 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="showDataList(row)">
+              <el-button v-if="btnList[3].flag" type="primary" size="mini" @click="showDataList(row)">
                 数据列表
               </el-button>
-              <el-button type="primary" size="mini" @click="edit(row)">
+              <el-button v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
-              <el-button type="danger" size="mini" @click="remove(row)">
+              <el-button v-if="btnList[2].flag" type="danger" size="mini" @click="remove(row)">
                 删除
               </el-button>
             </div>
@@ -149,7 +149,7 @@
 
 <script>
 import { recommendAdd, sortDataList } from '@/api/recommend/recommend'
-import { rankList, rankUpdate, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
+import { rankList, rankUpdate,rankUpdateStatus, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -264,10 +264,41 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
+      btnList:[
+        {
+          name:'/recommed/list-2/add',
+          flag:false,
+        },
+        {
+          name:'/recommed/list-2/edit',
+          flag:false,
+        },
+        {
+          name:'/recommed/list-2/delete',
+          flag:false,
+        },
+        {
+          name:'/recommed/list-2/data',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+    this.$store.dispatch("user/showBtn",{name:'/recommed/list-2',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     const query = this.$route.query
     const { current, type } = query
     this.add.type = type
@@ -321,9 +352,10 @@ export default {
     dChangeStatus(row) {
       this.dataList.table.loading = true
       const status = row.status === 1 ? 0 : 1
-      rankUpdate({
+      console.log('row',row)
+      rankUpdateStatus({
         status,
-        id: row.pivot.id
+        id: row.id
       }).then(res => {
         this.$message.success(res.message)
         this.dataList.table.loading = false
@@ -455,8 +487,9 @@ export default {
       // console.log('dataList',this.dataList.table.data)
       const list = []
       const sortList = []
+      console.log(this.dataList.table.data)
       this.dataList.table.data.map(item => {
-        const json = { id: item.pivot.id, sort: item.sort }
+        const json = { id: item.id, sort: item.sort }
         list.push(json)
         sortList.push(item.sort)
       })

@@ -155,57 +155,16 @@ const actions = {
   },
   //判断按钮显示
   async showBtn({dispatch}, text){ // flag为参数
-    // const menu = await dispatch("getRouter");
-    // let result
-    // menu.map(item1=>{
-    //   if(item1.children){
-    //     item1.children.map(item2=>{
-    //       if(item2.name == text.name){
-    //         if(item2.children){
-    //           item2.children.map(item3=>{
-    //             if(item3.title == text.btnName){
-    //               result = true
-    //               return false
-    //             }else{
-    //               alert(123)
-    //               result = false
-    //               return false
-    //             }
-    //           })
-    //         }else{
-    //           result = false
-    //           return false
-    //         }
-    //       }
-    //     })
-    //   }
-    // })
-  // for(let i =0;i<menu.legnth;i++){
-  //     if(menu[i].children){
-  //       for(let j=0;j<menu[i].children.legnth;j++){
-  //         if(menu[i].children[j].name == text.name){
-  //           if(menu[i].children[j].children){
-  //             for(let n = 0;n<menu[i].children[j].children.length;n++){
-  //               if(menu[i].children[j].children[n].title == text.btnName){
-  //                 alert(111)
-  //                 result = true
-  //                 return false
-  //               }else{
-  //                 alert(222)
-  //                 result = false
-  //                 return false
-  //               }
-  //             }
-  //           }else{
-  //             result = false
-  //             return false
-  //           }
-  //         }
-  //       }
-  //     }
-  // }
-    // console.log('result',result)
-    // return result
+    const menu = await dispatch("getRouter");
+    for(let i =0;i<menu.length;i++){
+        if(menu[i].children){
+          for(let j=0;j<menu[i].children.length;j++){
+            if(menu[i].children[j].name == text.name){
+              return menu[i].children[j]
+            }
+          }
+        }
+    }
 	} 
 }
 export default {

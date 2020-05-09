@@ -2,7 +2,7 @@
   <div class="mixin-components-container">
     <el-container>
       <el-header>
-        <el-button type="primary" @click="addData">添加</el-button>
+        <el-button v-if="btnList[0].flag" type="primary" @click="addData">添加</el-button>
         <span style="margin-left:20px;">
           <el-input
             v-model="listQuery.username"
@@ -40,8 +40,8 @@
             <template slot-scope="scope">
               <!-- <el-button size="mini" type="primary" @click="handleWechat(scope.row)">推荐微信菜单</el-button>
               <el-button size="mini" type="primary" @click="handleWechatConf(scope.row)">微信配置</el-button> -->
-              <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+              <el-button v-if="btnList[1].flag" size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button v-if="btnList[2].flag" size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -129,9 +129,36 @@ export default {
       ],
       editorId: "",
       roleList:[],
+       btnList:[
+        {
+          name:'/system/user-list/add',
+          flag:false,
+        },
+        {
+          name:'/system/user-list/edit',
+          flag:false,
+        },
+        {
+          name:'/system/user-list/delete',
+          flag:false,
+        }
+      ]
     };
   },
   created() {
+    this.$store.dispatch("user/showBtn",{name:'/system/user-list',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     this.getList();
     this.getRoleList()
   },

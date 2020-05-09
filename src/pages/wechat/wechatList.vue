@@ -173,7 +173,7 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh" @click="refresh" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { admin_id: search.form.admin_id })">
+        <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { admin_id: search.form.admin_id })">
           添加
         </el-button>
         <el-select v-model="search.form.admin_id" class="filter-item" style="margin-left: 10px;" clearable @visible-change="proxyListVisible">
@@ -195,10 +195,10 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="danger" size="mini" @click="wechatDelete(row.id)">
+              <el-button  v-if="btnList[2].flag" type="danger" size="mini" @click="wechatDelete(row.id)">
                 删除
               </el-button>
-              <el-button type="primary" size="mini" @click="edit(row)">
+              <el-button  v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                 配置
               </el-button>
               <el-button type="primary" size="mini" @click="serverJoint(row)">
@@ -395,14 +395,39 @@ export default {
         total: 0,
         page: 1,
         size: 20,
-        loading: false
-      }
+        loading: false,
+      },
+      btnList:[
+        {
+          name:'/wechat/wechat-list/add',
+          flag:false,
+        },
+        {
+          name:'/wechat/wechat-list/edit',
+          flag:false,
+        },
+        {
+          name:'/wechat/wechat-list/delete',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
-    // this.$store.dispatch("user/showBtn",{name:'/wechat/wechat-list',btnName:'添加'}).then(res=>{
-    //   console.log('res',res)
-    // })
+    this.$store.dispatch("user/showBtn",{name:'/wechat/wechat-list',btnName:''}).then(res=>{
+    // console.log('res',res)
+    let arr = res
+    if(arr.children){
+      this.btnList.map(list=>{
+        arr.children.map((item,i)=>{
+            if(list.name == item.name ){
+              list.flag = true
+            }
+        })
+      })
+    }
+    // console.log('btnList',this.btnList)
+  })
     
     const query = this.$route.query
     const { current } = query
@@ -450,6 +475,9 @@ export default {
       this.getList()
     }
    
+  },
+  mounted(){
+
   },
   methods: {
     // 打开显示

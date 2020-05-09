@@ -2,7 +2,7 @@
   <div class="mixin-components-container">
     <el-container>
       <el-header>
-        <el-button type="primary" @click="addData">添加</el-button>
+        <el-button v-if="btnList[0].flag" type="primary" @click="addData">添加</el-button>
       </el-header>
       <el-main>
         <el-table v-loading="loading" :data="tableData" border style="width: 100%">
@@ -25,8 +25,8 @@
           </el-table-column>
           <el-table-column prop="caozuo" label="操作" width="250" align="center">
             <template slot-scope="scope">
-              <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+              <el-button v-if="btnList[1].flag" size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button v-if="btnList[2].flag" size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -94,10 +94,37 @@ export default {
           id: 1
         }
       ],
-      editorId: ''
+      editorId: '',
+       btnList:[
+        {
+          name:'/novels/filtration/add',
+          flag:false,
+        },
+        {
+          name:'/novels/filtration/edit',
+          flag:false,
+        },
+        {
+          name:'/novels/filtration/delete',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+     this.$store.dispatch("user/showBtn",{name:'/novels/filtration',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     this.getList()
   },
   methods: {

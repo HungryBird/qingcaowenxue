@@ -80,8 +80,8 @@ const actions = {
       //   let data = res
       //   if (res.code === 0) {
       //     data = res.data.menu
-      //     Object.assign(loadMenuData, data)
-      //     generaMenu(asyncRoutes, loadMenuData)
+          // Object.assign(loadMenuData, data)
+          // generaMenu(asyncRoutes, loadMenuData)
 
           let accessedRoutes
 
@@ -90,10 +90,11 @@ const actions = {
           } else {
             accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
           } 
+          console.log('accessedRoutes',accessedRoutes)
           commit('SET_ROUTES', accessedRoutes)
           resolve(accessedRoutes)
-      //     console.log('res2211', res)
-      //   }
+          console.log('res2211', res)
+        // }
       // })
 
       //  accessedRoutes = res.data.menu

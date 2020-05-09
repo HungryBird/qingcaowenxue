@@ -152,7 +152,7 @@
     <div v-else>
       <div class="filter-container">
         <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="toggleCurrent('')" />
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
+        <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add')">
           添加
         </el-button>
       </div>
@@ -169,10 +169,10 @@
         <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
           <template slot-scope="{ row }">
             <div v-if="cl.prop === 'action'">
-              <el-button type="primary" size="mini" @click="see(row)">
+              <el-button v-if="btnList[2].flag" type="primary" size="mini" @click="see(row)">
                 公众号查看
               </el-button>
-              <el-button type="primary" size="mini" @click="edit(row)">
+              <el-button v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                 编辑
               </el-button>
             </div>
@@ -280,10 +280,38 @@ export default {
         page: 1,
         size: 20,
         loading: false
-      }
+      },
+      btnList:[
+        {
+          name:'/proxy/list/add',
+          flag:false,
+        },
+        {
+          name:'/proxy/list/edit',
+          flag:false,
+        },
+        {
+          name:'/proxy/list/wechat',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+    //根据权限判断按钮显示隐藏
+    this.$store.dispatch("user/showBtn",{name:'/proxy/list',btnName:''}).then(res=>{
+    console.log('res',res)
+    let arr = res
+    if(arr.children){
+      this.btnList.map(list=>{
+        arr.children.map((item,i)=>{
+            if(list.name == item.name ){
+              list.flag = true
+            }
+        })
+      })
+    }
+  })
     const query = this.$route.query
     const { current } = query
     this.current = current

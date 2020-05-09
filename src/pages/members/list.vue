@@ -50,7 +50,7 @@
       <el-table-column v-for="cl in table.columns" :key="cl.prop" :prop="cl.prop" :label="cl.label" :width="cl.width" :align="cl.align">
         <template slot-scope="{ row }">
           <div v-if="cl.prop === 'action'">
-            <el-button type="danger" size="mini" @click="remove(row)">
+            <el-button v-if="btnList[0].flag" type="danger" size="mini" @click="remove(row)">
               删除
             </el-button>
           </div>
@@ -171,10 +171,29 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
+      btnList:[
+        {
+          name:'/members/list/delete',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+     this.$store.dispatch("user/showBtn",{name:'/members/list',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     const { current } = this.$route.query
     this.current = current
     if (!current) {

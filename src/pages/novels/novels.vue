@@ -134,7 +134,8 @@
                 <div>
                   章节数量：共
                   <span class="code">
-                    {{ story.chapter_num }}
+                    <!-- {{ story.chapter_num }} -->
+                    {{story.table.total}}
                   </span>章
                 </div>
               </el-col>
@@ -424,7 +425,7 @@
       <div v-else-if="current === 'index'">
         <div class="filter-container">
           <el-button class="filter-item" type="primary" icon="el-icon-refresh" @click="refresh" />
-          <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
+          <el-button v-if="btnList[0].flag" class="filter-item" style="margin-left: 10px;" type="primary" @click="toggleCurrent('add', { book_category_id })">
             添加本地小说
           </el-button>
           <!-- <el-select v-model="search.form.category_id" placeholder="搜索类型" class="filter-item" style="margin-left: 10px;">
@@ -515,10 +516,10 @@
                 <!-- <el-button type="primary" size="mini" @click="toCopyNovel(row)">
                   复制
                 </el-button> -->
-                <el-button type="primary" size="mini" @click="edit(row)">
+                <el-button v-if="btnList[1].flag" type="primary" size="mini" @click="edit(row)">
                   编辑
                 </el-button>
-                <el-button type="danger" size="mini" @click="remove(row)">
+                <el-button v-if="btnList[2].flag" type="danger" size="mini" @click="remove(row)">
                   删除
                 </el-button>
               </div>
@@ -1193,10 +1194,37 @@ export default {
         value: [
           { required: true, message: '请填写内容' }
         ],
-      }
+      },
+      btnList:[
+        {
+          name:'/novels/novels/add',
+          flag:false,
+        },
+        {
+          name:'/novels/novels/edit',
+          flag:false,
+        },
+        {
+          name:'/novels/novels/delete',
+          flag:false,
+        }
+      ]
     }
   },
   created() {
+    this.$store.dispatch("user/showBtn",{name:'/novels/novels',btnName:''}).then(res=>{
+    // console.log('res',res)
+    let arr = res
+    if(arr.children){
+      this.btnList.map(list=>{
+        arr.children.map((item,i)=>{
+            if(list.name == item.name ){
+              list.flag = true
+            }
+        })
+      })
+    }
+  })
     const { current } = this.$route.query
     this.headers.token = this.$store.getters.token
     this.current = current || 'index'

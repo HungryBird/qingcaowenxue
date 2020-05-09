@@ -40,6 +40,13 @@ export function recommendUpdate(data) {
   })
 }
 
+export function recommendUpdatePage(data) {
+  return request({
+    url: '/recommend/update',
+    method: 'post',
+    data
+  })
+}
 export function getBooks(data) {
   return request({
     url: '/recommend/getbooks',

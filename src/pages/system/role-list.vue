@@ -2,7 +2,7 @@
   <div class="mixin-components-container">
     <el-container>
       <el-header>
-        <el-button type="primary" @click="addData">添加</el-button>
+        <el-button v-if="btnList[0].flag" type="primary" @click="addData">添加</el-button>
         <span style="margin-left:20px;">
           <el-input
             v-model="listQuery.title"
@@ -35,9 +35,9 @@
           <el-table-column prop="caozuo" label="操作" align="center">
             <template slot-scope="scope">
               <div  v-if="scope.row.id!=1">
-                <el-button size="mini" type="primary" @click="handleRight(scope.row)">权限分配</el-button>
-                <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                <el-button v-if="btnList[3].flag" size="mini" type="primary" @click="handleRight(scope.row)">权限分配</el-button>
+                <el-button v-if="btnList[1].flag" size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button v-if="btnList[2].flag" size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
               </div>
             </template>
           </el-table-column>
@@ -73,7 +73,7 @@
     </el-dialog>
     <!-- 权限分配弹窗 -->
     <el-dialog title="权限分配" :visible.sync="dialogRightVisible" width="20%">
-      <div class="tree-wrap-box">
+      <div class="tree-wrap-box" v-loading="rolePopLoading">
         <el-tree
           ref="tree"
           :data="treeData"
@@ -136,10 +136,42 @@ export default {
       },
       checkoutTree:[],
       defaultCheckedTree:[],
-      roleId:""
+      roleId:"",
+      rolePopLoading:false,
+      btnList:[
+        {
+          name:'/system/role-list/add',
+          flag:false,
+        },
+        {
+          name:'/system/role-list/edit',
+          flag:false,
+        },
+        {
+          name:'/system/role-list/delete',
+          flag:false,
+        },
+        {
+          name:'/system/role-list/auth',
+          flag:false,
+        }
+      ]
     };
   },
   created() {
+    this.$store.dispatch("user/showBtn",{name:'/system/role-list',btnName:''}).then(res=>{
+      // console.log('res',res)
+      let arr = res
+      if(arr.children){
+        this.btnList.map(list=>{
+          arr.children.map((item,i)=>{
+              if(list.name == item.name ){
+                list.flag = true
+              }
+          })
+        })
+      }
+    })
     this.getList();
   },
   methods: {
@@ -170,12 +202,14 @@ export default {
         this.dialogRightVisible = true
         this.defaultCheckedTree = []
         this.roleId = row.id
+        this.rolePopLoading = true
         let params ={
           rules:row.rules
         }
         console.log(params)
         roleRightList(params).then(res=>{
           this.treeData = res.data
+          this.rolePopLoading = false
           this.treeData.map(item=>{
             if(item.isChecked == 'checked'){
               this.defaultCheckedTree.push(item.id)
