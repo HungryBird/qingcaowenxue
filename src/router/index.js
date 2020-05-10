@@ -131,6 +131,7 @@ export const asyncRoutes = [
     redirect: '/wechat/base-config',
     name: 'wechat',
     alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '公众号管理',
       icon: 'fa fa-wechat'
@@ -156,6 +157,7 @@ export const asyncRoutes = [
     redirect: '/proxy/list',
     name: 'proxy',
     alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '代理管理',
       icon: 'fa fa-user'
@@ -175,6 +177,7 @@ export const asyncRoutes = [
     redirect: '/novels/novels',
     name: 'novels',
     alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '小说管理',
       icon: 'fa fa-bars'
@@ -212,6 +215,7 @@ export const asyncRoutes = [
     redirect: '/recommend/list',
     name: 'recommend',
     alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '推荐位管理',
       icon: 'fa fa-space-shuttle'
@@ -313,6 +317,7 @@ export const asyncRoutes = [
     redirect: '/members/list',
     name: 'members',
     alwaysShow: true,
+    // hidden:true,
     meta: {
       title: '会员管理',
       icon: 'fa fa-user'

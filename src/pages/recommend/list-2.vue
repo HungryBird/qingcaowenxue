@@ -264,7 +264,7 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
     }
   },
   created() {
@@ -455,6 +455,7 @@ export default {
       // console.log('dataList',this.dataList.table.data)
       const list = []
       const sortList = []
+      console.log(this.dataList.table.data)
       this.dataList.table.data.map(item => {
         const json = { id: item.id, sort: item.sort }
         list.push(json)
@@ -471,6 +472,7 @@ export default {
       //     return
       //   }
       // }
+      
       sortDataList({ sortArr: list }).then(res => {
         if (res.code == 0) {
           this.$message({

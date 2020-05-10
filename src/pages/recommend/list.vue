@@ -276,7 +276,7 @@ export default {
         page: 1,
         size: 10,
         loading: false
-      }
+      },
     }
   },
   created() {
