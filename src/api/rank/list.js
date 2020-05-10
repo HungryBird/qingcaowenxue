@@ -24,9 +24,17 @@ export function rankAdd(data) {
   })
 }
 
-export function rankUpdate(data) {
+export function rankUpdateStatus(data) {
   return request({
     url: '/rank/updateStatus',
+    method: 'post',
+    data
+  })
+}
+
+export function rankUpdate(data) {
+  return request({
+    url: '/rank/update',
     method: 'post',
     data
   })

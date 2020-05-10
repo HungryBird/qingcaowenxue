@@ -34,6 +34,14 @@ export function recommendAddBooks(data) {
 
 export function recommendUpdate(data) {
   return request({
+    url: '/recommend/update',
+    method: 'post',
+    data
+  })
+}
+
+export function recommendUpdateStatus(data) {
+  return request({
     url: '/recommend/updateStatus',
     method: 'post',
     data

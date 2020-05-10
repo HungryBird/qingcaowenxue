@@ -149,7 +149,7 @@
 
 <script>
 import { recommendAdd, sortDataList } from '@/api/recommend/recommend'
-import { rankList, rankUpdate, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
+import { rankList, rankUpdate,rankUpdateStatus, rankDelete, rankAdd, getBooks, delBooks } from '@/api/rank/list'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -321,9 +321,9 @@ export default {
     dChangeStatus(row) {
       this.dataList.table.loading = true
       const status = row.status === 1 ? 0 : 1
-      rankUpdate({
+      rankUpdateStatus({
         status,
-        id: row.pivot.id
+        id: row.id
       }).then(res => {
         this.$message.success(res.message)
         this.dataList.table.loading = false
@@ -456,7 +456,7 @@ export default {
       const list = []
       const sortList = []
       this.dataList.table.data.map(item => {
-        const json = { id: item.pivot.id, sort: item.sort }
+        const json = { id: item.id, sort: item.sort }
         list.push(json)
         sortList.push(item.sort)
       })

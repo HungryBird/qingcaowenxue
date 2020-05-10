@@ -134,7 +134,8 @@
                 <div>
                   章节数量：共
                   <span class="code">
-                    {{ story.chapter_num }}
+                    <!-- {{ story.chapter_num }} -->
+                    {{story.table.total}}
                   </span>章
                 </div>
               </el-col>

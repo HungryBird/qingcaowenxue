@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { recommendList, recommendUpdate, recommendDelete, recommendAdd, getBooks, delBooks, sortData } from '@/api/recommend/recommend'
+import { recommendList, recommendUpdate,recommendUpdateStatus, recommendDelete, recommendAdd, getBooks, delBooks, sortData } from '@/api/recommend/recommend'
 import mix from '@/mixs/mix'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -332,7 +332,7 @@ export default {
     dChangeStatus(row) {
       this.dataList.table.loading = true
       const status = row.status === 1 ? 0 : 1
-      recommendUpdate({
+      recommendUpdateStatus({
         status,
         id: row.id
       }).then(res => {

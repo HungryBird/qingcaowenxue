@@ -394,73 +394,73 @@ export const asyncRoutes = [
   //     }
   //   ]
   // },
-  {
-    path: '/authors',
-    component: Layout,
-    redirect: '/authors/list',
-    name: 'authors',
-    alwaysShow: true,
-    meta: {
-      title: '作者管理',
-      icon: 'fa fa-meh-o'
-    },
-    children: [
-      {
-        path: 'list',
-        component: () => import('@/pages/authors/list'),
-        name: 'authors-list',
-        meta: {
-          title: '作者列表'
-        }
-      }
-    ]
-  },
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/user-list',
-    name: 'system',
-    alwaysShow: true,
-    meta: {
-      title: '系统管理',
-      icon: 'fa fa-cog'
-    },
-    children: [
-      {
-        path: 'user-list',
-        component: () => import('@/pages/system/user-list'),
-        name: 'user-list',
-        meta: {
-          title: '用户管理'
-        }
-      },
-      {
-        path: 'role-list',
-        component: () => import('@/pages/system/role-list'),
-        name: 'role-list',
-        meta: {
-          title: '角色管理'
-        }
-      },
-      // {
-      //   path: 'menu-list',
-      //   component: () => import('@/pages/system/menu-list'),
-      //   name: 'menu-list',
-      //   meta: {
-      //     title: '菜单管理'
-      //   }
-      // },
-      // {
-      //   path: 'wechat-conf',
-      //   component: () => import('@/pages/system/wechat-conf'),
-      //   name: 'wechat-conf',
-      //   meta: {
-      //     title: '微信配置'
-      //   },
-      //   hidden:true
-      // },
-    ]
-  }
+  // {
+  //   path: '/authors',
+  //   component: Layout,
+  //   redirect: '/authors/list',
+  //   name: 'authors',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '作者管理',
+  //     icon: 'fa fa-meh-o'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/pages/authors/list'),
+  //       name: 'authors-list',
+  //       meta: {
+  //         title: '作者列表'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/system',
+  //   component: Layout,
+  //   redirect: '/system/user-list',
+  //   name: 'system',
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '系统管理',
+  //     icon: 'fa fa-cog'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'user-list',
+  //       component: () => import('@/pages/system/user-list'),
+  //       name: 'user-list',
+  //       meta: {
+  //         title: '用户管理'
+  //       }
+  //     },
+  //     {
+  //       path: 'role-list',
+  //       component: () => import('@/pages/system/role-list'),
+  //       name: 'role-list',
+  //       meta: {
+  //         title: '角色管理'
+  //       }
+  //     },
+  //     // {
+  //     //   path: 'menu-list',
+  //     //   component: () => import('@/pages/system/menu-list'),
+  //     //   name: 'menu-list',
+  //     //   meta: {
+  //     //     title: '菜单管理'
+  //     //   }
+  //     // },
+  //     // {
+  //     //   path: 'wechat-conf',
+  //     //   component: () => import('@/pages/system/wechat-conf'),
+  //     //   name: 'wechat-conf',
+  //     //   meta: {
+  //     //     title: '微信配置'
+  //     //   },
+  //     //   hidden:true
+  //     // },
+  //   ]
+  // }
 ]
 
 const createRouter = () => new Router({

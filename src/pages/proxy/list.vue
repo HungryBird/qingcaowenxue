@@ -25,7 +25,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="登录密码：" prop="password">
-                  <el-input v-model="add.form.password" type="password" show-password />
+                  <el-input v-model="add.form.password_show" type="password" show-password />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -207,7 +207,7 @@ export default {
         form: {
           bank_address: '',
           username: '',
-          password: '',
+          password_show: '',
           nickname: '',
           mobile: '',
           status: 1,
