@@ -504,6 +504,7 @@ export default {
       //     return
       //   }
       // }
+      
       sortDataList({ sortArr: list }).then(res => {
         if (res.code == 0) {
           this.$message({
