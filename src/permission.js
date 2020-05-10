@@ -5,6 +5,8 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import Layout from '@/layout'
+
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -35,40 +37,10 @@ router.beforeEach(async(to, from, next) => {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
-
           // generate accessible routes map based on roles
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-          // const accessRoutes =[
-          //   {
-          //     path: '/wechat',
-          //     component: Layout,
-          //     redirect: '/wechat/base-config',
-          //     name: 'wechat',
-          //     // alwaysShow: true,
-          //     // hidden:true,
-          //     meta: {
-          //       title: '公众号管理',
-          //       icon: 'fa fa-wechat'
-          //     },
-          //     children: [
-          //       /* {
-          //         path: 'base-config',
-          //         component: () => import('@/pages/wechat/baseConfig'),
-          //         name: 'BaseConfig',
-          //         meta: { title: '基本配置' }
-          //       }, */
-          //       {
-          //         path: 'wechat-list',
-          //         component: () => import('@/pages/wechat/wechatList'),
-          //         name: 'wechat-list',
-          //         meta: { title: '公众号列表' }
-          //       }
-          //     ]
-          //   },
-            
-          // ]
           // dynamically add accessible routes
-          console.log('accessRoutes',accessRoutes)
+          // console.log('accessRoutes111',accessRoutes)
           router.addRoutes(accessRoutes)
 
           // hack method to ensure that addRoutes is complete

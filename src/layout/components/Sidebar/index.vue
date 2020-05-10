@@ -12,8 +12,8 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <!-- <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" /> -->
-        <sidebar-item v-for="list in route" :key="list.path" :item="list" :base-path="list.path" />
+        <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
+        <!-- <sidebar-item v-for="list in route" :key="list.path" :item="list" :base-path="list.path" /> -->
       </el-menu>
     </el-scrollbar>
   </div>
@@ -55,7 +55,7 @@ export default {
     }
   },
   mounted() {
-    this.getRouter();
+    // this.getRouter();
   },
   methods: {
     async getRouter() {

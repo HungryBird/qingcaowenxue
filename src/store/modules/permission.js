@@ -1,6 +1,7 @@
 import { asyncRoutes, constantRoutes } from '@/router'
 import { getRouter } from '@/api/user'
 import Layout from '@/layout'
+
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -19,25 +20,33 @@ function hasPermission(roles, route) {
  * @param routes
  */
 export function generaMenu(routes, data) {
-//  routes = []
   data.forEach(item => {
-    // alert(JSON.stringify(item))
     const menu = {
       path: item.name,
-      // component: item.name === '#' ? Layout : () => import(`@/pages${item.name}`),
-      // alwaysShow: true,
+      redirect:item.children[0].name ,
+      component: Layout,
+      alwaysShow: true,
       children: [],
       name: item.name,
-      meta: { title: item.title, icon: item.icon, roles: ['admin'] }
+      meta: { title: item.title, icon: 'fa ' + item.icon }
     }
     if (item.children) {
-      generaMenu(menu.children, item.children)
+      item.children.map(list => {
+        const menu2 = {
+          path: list.name,
+          component: () => import(`@/pages${list.name}`),
+          name: list.name,
+          meta: { title: list.title }
+        }
+        menu.children.push(menu2)
+      })
     }
     routes.push(menu)
   })
+  routes.push({ path: '*', redirect: '/404', hidden: true })
 }
 
-/** 
+/**
  * Filter asynchronous routing tables by recursion
  * @param routes asyncRoutes
  * @param roles
@@ -74,30 +83,25 @@ const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
       const loadMenuData = []
-      //const asyncRoutes = []
-
-      // getRouter().then(res => {
-      //   let data = res
-      //   if (res.code === 0) {
-      //     data = res.data.menu
-          // Object.assign(loadMenuData, data)
-          // generaMenu(asyncRoutes, loadMenuData)
-
+      let asyncRoutes22 = []
+      getRouter().then(res => {
+        let data = res
+        if (res.code === 0) {
+          data = res.data.menu
+          Object.assign(loadMenuData, data)
+          generaMenu(asyncRoutes22, loadMenuData)
           let accessedRoutes
-
-          if (roles.includes('res2211')) {
-            accessedRoutes = asyncRoutes || []
+          console.log('asyncRoutes22', asyncRoutes22)
+          if (roles.includes('admin')) {
+            accessedRoutes = asyncRoutes22 || []
           } else {
-            accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-          } 
-          console.log('accessedRoutes',accessedRoutes)
+            accessedRoutes = filterAsyncRoutes(asyncRoutes22, roles)
+          }
           commit('SET_ROUTES', accessedRoutes)
           resolve(accessedRoutes)
-          console.log('res2211', res)
-        // }
-      // })
-
-      //  accessedRoutes = res.data.menu
+          // console.log('admin', res)
+        }
+      })
     })
   }
 }

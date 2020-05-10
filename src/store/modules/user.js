@@ -9,7 +9,7 @@ const state = {
   avatar: '',
   introduction: '',
   roles: [],
-  routerMenu:''
+  routerMenu:'21313'
 }
 
 const mutations = {
