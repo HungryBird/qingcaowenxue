@@ -208,6 +208,7 @@ export default {
           bank_address: '',
           username: '',
           password_show: '',
+          password: '',
           nickname: '',
           mobile: '',
           status: 1,
@@ -367,6 +368,7 @@ export default {
       })
       if (isTrue1 && isTrue2) {
         this.add.loading = true
+        this.add.form.password = this.add.form.password_show
         const obj = Object.assign({}, this.add.form)
         obj.pid = obj.pid ? obj.pid : 0
         obj.id = obj.admin_id

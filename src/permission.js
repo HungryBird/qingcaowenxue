@@ -38,6 +38,35 @@ router.beforeEach(async(to, from, next) => {
 
           // generate accessible routes map based on roles
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          // const accessRoutes =[
+          //   {
+          //     path: '/wechat',
+          //     component: Layout,
+          //     redirect: '/wechat/base-config',
+          //     name: 'wechat',
+          //     // alwaysShow: true,
+          //     // hidden:true,
+          //     meta: {
+          //       title: '公众号管理',
+          //       icon: 'fa fa-wechat'
+          //     },
+          //     children: [
+          //       /* {
+          //         path: 'base-config',
+          //         component: () => import('@/pages/wechat/baseConfig'),
+          //         name: 'BaseConfig',
+          //         meta: { title: '基本配置' }
+          //       }, */
+          //       {
+          //         path: 'wechat-list',
+          //         component: () => import('@/pages/wechat/wechatList'),
+          //         name: 'wechat-list',
+          //         meta: { title: '公众号列表' }
+          //       }
+          //     ]
+          //   },
+            
+          // ]
           // dynamically add accessible routes
           console.log('accessRoutes',accessRoutes)
           router.addRoutes(accessRoutes)
