@@ -443,6 +443,25 @@
             </el-input>
           </div>
         </div>
+        <!-- <aside style="height:230px;">
+        <div>
+          <div style="width:100%;float:left;margin-top:20px;">
+            <span style="float:left;">性别：</span>
+              <el-radio-group @change="xuanzenannv" class="story-select-box">
+                <el-radio-button label="">全部</el-radio-button>
+                <el-radio-button v-for="(item,index) in treeData" :key="index" :label="item.id">{{item.name}}</el-radio-button>
+              </el-radio-group>
+          </div>
+          <div style="width:100%;float:left;margin-top:20px;">
+            <span style="float:left;">小说类型：</span>
+            <span style="float:left;width:85%;">
+                <el-radio-group @change="xuanlianzaiwanjie" class="story-select-box story-select-type">
+                <el-radio-button  v-for="(item,index) in item.children" :key="index" :label="item.id">{{item.name}}</el-radio-button>
+              </el-radio-group>
+              </span>
+          </div>
+        </div>
+      </aside> -->
         <!-- <el-form label-width="100px">
           <el-form-item label="小说属性：">
             <el-radio-group v-model="search.form.category_id">
@@ -1976,6 +1995,7 @@ export default {
     },
     // 选择查询结果
     handleSelect(data) {
+      console.log(data)
       this.dialogTableVisible = false
       this.book_category_id = data.id
       if(this.current == 'index'){
@@ -2094,6 +2114,10 @@ export default {
     // 编辑
     edit(row) {
       this.toggleCurrent('edit', { ...row, book_category_id: this.book_category_id })
+    },
+    //点击性别
+    xuanzenannv(){
+
     }
   }
 }
@@ -2167,4 +2191,15 @@ export default {
       text-align: center;
     }
   }
+</style>
+<style>
+.story-select-box .el-radio-button--medium  .el-radio-button__inner {
+    padding: 6px 11px;
+    border-radius: 2px;
+    margin-left:15px ;
+    border: 1px solid #DCDFE6;
+}
+.story-select-box .el-radio-button__orig-radio:checked+.el-radio-button__inner{
+  box-shadow: none;
+}
 </style>

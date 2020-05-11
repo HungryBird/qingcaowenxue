@@ -70,6 +70,12 @@
               {{ row[cl.prop] || 0 }}
             </span>
           </div>
+           <div v-else-if="cl.prop === 'nickname'" style="text-align: left;">
+             <img :src="row['head_uri']" alt="" class="header-img">
+              <a style="color: #337ab7;" href="javascript:;" >
+                {{row[cl.prop]}}
+              </a>
+            </div>
           <div v-else>
             {{ row[cl.prop] }}
           </div>
@@ -282,3 +288,10 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+  .header-img{
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+  }
+</style>
