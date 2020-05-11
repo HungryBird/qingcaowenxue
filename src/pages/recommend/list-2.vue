@@ -286,7 +286,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("user/showBtn",{name:'/recommed/list-2',btnName:''}).then(res=>{
+    this.$store.dispatch("user/showBtn",{name:'/recommend/list-2',btnName:''}).then(res=>{
       // console.log('res',res)
       let arr = res
       if(arr.children){

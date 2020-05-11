@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: calc(100vh - 84px);" class="novel-management">
-    <el-aside width="200px">
+    <el-aside v-if="current === 'add' || current === 'edit'">
       <el-tree
         ref="tree"
         :props="defaultProps"
@@ -443,25 +443,25 @@
             </el-input>
           </div>
         </div>
-        <!-- <aside style="height:230px;">
-        <div>
-          <div style="width:100%;float:left;margin-top:20px;">
-            <span style="float:left;">性别：</span>
-              <el-radio-group @change="xuanzenannv" class="story-select-box">
-                <el-radio-button label="">全部</el-radio-button>
-                <el-radio-button v-for="(item,index) in treeData" :key="index" :label="item.id">{{item.name}}</el-radio-button>
-              </el-radio-group>
+        <aside style="height:150px;">
+          <div>
+            <div style="width:100%;float:left;margin-top:20px;">
+              <span style="float:left;">性别：</span>
+                <el-radio-group v-model="searchSex" @change="xuanzenannv" class="story-select-box">
+                  <!-- <el-radio-button label="">全部</el-radio-button> -->
+                  <el-radio-button v-for="(item,index) in treeData" :key="index" :label="item.id">{{item.name}}</el-radio-button>
+                </el-radio-group>
+            </div>
+            <div style="width:100%;float:left;margin-top:20px;">
+              <span style="float:left;">小说类型：</span>
+              <span style="float:left;width:85%;">
+                  <el-radio-group v-model="searchSexdetailType" @change="selectType" class="story-select-box story-select-type">
+                  <el-radio-button  v-for="(item,index) in searchChildren" :key="index" :label="item.id">{{item.name}}</el-radio-button>
+                </el-radio-group>
+                </span>
+            </div>
           </div>
-          <div style="width:100%;float:left;margin-top:20px;">
-            <span style="float:left;">小说类型：</span>
-            <span style="float:left;width:85%;">
-                <el-radio-group @change="xuanlianzaiwanjie" class="story-select-box story-select-type">
-                <el-radio-button  v-for="(item,index) in item.children" :key="index" :label="item.id">{{item.name}}</el-radio-button>
-              </el-radio-group>
-              </span>
-          </div>
-        </div>
-      </aside> -->
+        </aside>
         <!-- <el-form label-width="100px">
           <el-form-item label="小说属性：">
             <el-radio-group v-model="search.form.category_id">
@@ -1227,7 +1227,10 @@ export default {
           name:'/novels/novels/delete',
           flag:false,
         }
-      ]
+      ],
+      searchSex:'',
+      searchSexdetailType:'',
+      searchChildren:[]
     }
   },
   created() {
@@ -1791,6 +1794,8 @@ export default {
           pTree.push(res.data[item])
         }
         this.treeData = pTree
+        this.searchSex = this.treeData[0].id
+        this.xuanzenannv()
         if (isEmpty(this.book_category_id)) {
           for (let i = 0; i < pTree.length; i++) {
             if (pTree[i].children && pTree[i].children.length !== 0) {
@@ -2117,7 +2122,16 @@ export default {
     },
     //点击性别
     xuanzenannv(){
-
+      this.treeData.map(item=>{
+        if(item.id == this.searchSex){
+          this.searchSexdetailType = item.children[0].id
+          this.searchChildren = item.children
+        }
+      })
+    },
+    //选择类型
+    selectType(){
+      this.getList(this.book_category_id)
     }
   }
 }

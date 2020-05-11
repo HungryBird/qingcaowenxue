@@ -158,9 +158,9 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
             .then(async() => {
-              // const menu = await this.$store.dispatch("user/getRouter");
-              // this.$router.push({ path: menu[0].name, query: this.otherQuery })
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+              const menu = await this.$store.dispatch("user/getRouter");
+              this.$router.push({ path: menu[0].name, query: this.otherQuery })
+              // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
             .catch(() => {

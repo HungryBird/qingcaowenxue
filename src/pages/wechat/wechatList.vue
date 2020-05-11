@@ -414,7 +414,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("user/showBtn",{name:'/wechat/wechat-list',btnName:''}).then(res=>{
+    this.$store.dispatch("user/showBtn",{name:'/wechat/wechatList',btnName:''}).then(res=>{
     // console.log('res',res)
     let arr = res
     if(arr.children){
