@@ -446,16 +446,17 @@
         <aside style="height:150px;">
           <div>
             <div style="width:100%;float:left;margin-top:20px;">
-              <span style="float:left;">性别：</span>
+              <span style="float:left;">频道类型：</span>
                 <el-radio-group v-model="searchSex" @change="xuanzenannv" class="story-select-box">
-                  <!-- <el-radio-button label="">全部</el-radio-button> -->
+                  <el-radio-button label="">全部</el-radio-button>
                   <el-radio-button v-for="(item,index) in treeData" :key="index" :label="item.id">{{item.name}}</el-radio-button>
                 </el-radio-group>
             </div>
             <div style="width:100%;float:left;margin-top:20px;">
               <span style="float:left;">小说类型：</span>
               <span style="float:left;width:85%;">
-                  <el-radio-group v-model="searchSexdetailType" @change="selectType" class="story-select-box story-select-type">
+                  <el-radio-group v-model="book_category_id" @change="selectType" class="story-select-box story-select-type">
+                  <el-radio-button  label="">全部</el-radio-button>
                   <el-radio-button  v-for="(item,index) in searchChildren" :key="index" :label="item.id">{{item.name}}</el-radio-button>
                 </el-radio-group>
                 </span>
@@ -1293,6 +1294,7 @@ export default {
     } else if (this.current === 'storyAdd' || this.current === 'storyEdit') {
       const { num, book_id, description, chapter_num, name, book_category_id, page, size } = this.$route.query
       this.story.add.form.num = num + 1
+      // this.story.add.form.num = chapter_num
       this.story.book_id = book_id
       this.story.description = description
       this.story.chapter_num = chapter_num
@@ -1679,6 +1681,8 @@ export default {
       this.$refs.storyAdd.validate(valid => {
         if (valid) {
           this.story.add.addLoading = true
+          this.story.add.form.num = this.story.add.form.chapter_num
+          console.log('this.story.add.form',this.story.add.form)
           const form = Object.assign({ book_id: this.story.book_id }, this.story.add.form)
           if (this.current === 'storyAdd') {
             chapterAdd(form).then(res => {
@@ -1794,7 +1798,7 @@ export default {
           pTree.push(res.data[item])
         }
         this.treeData = pTree
-        this.searchSex = this.treeData[0].id
+        // this.searchSex = this.treeData[0].id
         this.xuanzenannv()
         if (isEmpty(this.book_category_id)) {
           for (let i = 0; i < pTree.length; i++) {
@@ -1805,10 +1809,10 @@ export default {
             }
           }
         }
-        console.log('this.treeData',this.treeData )
-        this.$nextTick(() => {
-          this.$refs.tree.setCurrentKey(this.book_category_id)
-        })
+        // console.log('this.treeData',this.treeData )
+        // this.$nextTick(() => {
+        //   this.$refs.tree.setCurrentKey(this.book_category_id)
+        // })
       }).catch(err => {
         console.error('err: ', err)
       })
@@ -2124,8 +2128,11 @@ export default {
     xuanzenannv(){
       this.treeData.map(item=>{
         if(item.id == this.searchSex){
-          this.searchSexdetailType = item.children[0].id
+          this.book_category_id = item.children[0].id
           this.searchChildren = item.children
+          this.getList(this.book_category_id)
+        }else if(this.searchSex == ''){
+          this.searchChildren.push()
         }
       })
     },
